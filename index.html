@@ -1,0 +1,902 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>うまダッシュ・ターフ</title>
+  <style>
+    :root {
+      --bg: #f6f1e8;
+      --card: #fffaf0;
+      --ink: #29231b;
+      --muted: #766d62;
+      --line: #d9c9ac;
+      --accent: #7a4b20;
+      --accent2: #198754;
+      --danger: #b3261e;
+      --shadow: 0 10px 24px rgba(49, 34, 18, .12);
+      --radius: 18px;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: radial-gradient(circle at top, #fff8df 0, var(--bg) 44%, #eadcc8 100%);
+      color: var(--ink);
+    }
+    button, input, select { font: inherit; }
+    button {
+      border: 0;
+      border-radius: 999px;
+      padding: 10px 14px;
+      background: var(--accent);
+      color: white;
+      font-weight: 750;
+      box-shadow: 0 4px 10px rgba(0,0,0,.12);
+    }
+    button.secondary { background: #fff; color: var(--ink); border: 1px solid var(--line); }
+    button.good { background: var(--accent2); }
+    button.danger { background: var(--danger); }
+    button:disabled { opacity: .45; box-shadow: none; }
+    input, select {
+      width: 100%;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      padding: 10px 12px;
+      background: #fff;
+      color: var(--ink);
+    }
+    .app { max-width: 980px; margin: 0 auto; padding: 12px; padding-bottom: 36px; }
+    .hero {
+      background: linear-gradient(135deg, #4d8a4d, #246a46);
+      color: white;
+      border-radius: 24px;
+      padding: 18px;
+      box-shadow: var(--shadow);
+      overflow: hidden;
+      position: relative;
+    }
+    .hero:after { content: "🐎"; position: absolute; right: 12px; top: 0; font-size: 88px; opacity: .22; transform: rotate(-8deg); }
+    h1 { margin: 0; font-size: 28px; letter-spacing: .03em; }
+    .subtitle { margin-top: 6px; opacity: .9; font-size: 13px; }
+    .grid { display: grid; gap: 10px; }
+    .two { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    .three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+    .card {
+      background: rgba(255, 250, 240, .92);
+      border: 1px solid rgba(217, 201, 172, .85);
+      border-radius: var(--radius);
+      padding: 12px;
+      box-shadow: var(--shadow);
+      margin-top: 12px;
+    }
+    .row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .between { justify-content: space-between; }
+    .small { font-size: 12px; color: var(--muted); }
+    .tiny { font-size: 11px; color: var(--muted); }
+    .pill { display: inline-flex; align-items: center; gap: 5px; border: 1px solid var(--line); background: #fff; border-radius: 999px; padding: 6px 9px; font-size: 12px; font-weight: 700; }
+    .money { font-variant-numeric: tabular-nums; font-weight: 850; }
+    .current { outline: 3px solid rgba(25, 135, 84, .25); }
+    .playerBox { background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 10px; }
+    .track { display: grid; gap: 7px; }
+    .lane { display: grid; grid-template-columns: 90px 1fr 42px; gap: 7px; align-items: center; }
+    .laneName { font-size: 12px; font-weight: 800; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .bar { position: relative; height: 30px; border-radius: 999px; background: linear-gradient(90deg, #d8b37c, #f5e0b5 16%, #d2e7bd 17%, #d2e7bd 100%); border: 1px solid #c4a980; overflow: hidden; }
+    .bar:before { content: "P"; position: absolute; left: calc((24 / 36) * 100%); top: 0; bottom: 0; width: 2px; background: rgba(30,90,20,.4); font-size: 10px; color: #1d5e2f; }
+    .bar:after { content: "G"; position: absolute; right: 4px; top: 6px; font-size: 10px; color: #7b1d1d; font-weight: 900; }
+    .horseDot { position: absolute; top: 2px; transform: translateX(-50%); width: 26px; height: 26px; display: grid; place-items: center; border-radius: 999px; background: #fff; border: 2px solid #333; box-shadow: 0 2px 5px rgba(0,0,0,.22); font-size: 16px; }
+    .horseDot.done { filter: grayscale(.2); background: #ffe6b3; }
+    .horseDot.moved { opacity: .48; }
+    .horseDot.pace { outline: 3px solid #ffd54a; }
+    .betArea { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+    .horseBet { border: 1px solid var(--line); border-radius: 14px; padding: 9px; background: #fff; min-height: 74px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 4px; margin-top: 6px; }
+    .chip { min-width: 26px; height: 26px; border-radius: 999px; border: 2px solid #444; display: inline-grid; place-items: center; font-size: 12px; font-weight: 900; background: #fff; color: #222; }
+    .chip.hidden { background: #333; color: #333; }
+    .chip.zero { border-style: dashed; color: #777; }
+    .actions { position: sticky; bottom: 8px; z-index: 3; background: rgba(255,250,240,.94); border: 1px solid var(--line); border-radius: 22px; padding: 10px; box-shadow: var(--shadow); backdrop-filter: blur(8px); }
+    .log { max-height: 160px; overflow: auto; background: #fff; border: 1px solid var(--line); border-radius: 14px; padding: 8px; }
+    .log div { padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 12px; }
+    .rank { font-size: 24px; font-weight: 900; }
+    .selected { outline: 3px solid rgba(25, 135, 84, .35); }
+    @media (max-width: 560px) {
+      .two, .three { grid-template-columns: 1fr; }
+      .lane { grid-template-columns: 72px 1fr 34px; }
+      .betArea { grid-template-columns: 1fr; }
+      h1 { font-size: 24px; }
+      .app { padding: 8px; }
+    }
+  </style>
+</head>
+<body>
+  <div id="app" class="app"></div>
+
+<script type="module">
+  // ============================================================
+  // うまダッシュ・ターフ
+  // 1ファイルHTML版。スマホ2台同期は Firebase の設定が必要です。
+  //
+  // 1) Firebase ConsoleでWebアプリを作る
+  // 2) Authentication > 匿名ログインを有効化
+  // 3) Firestore Databaseを作成
+  // 4) 下の firebaseConfig を自分の値に置き換える
+  // ============================================================
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
+  import { getAuth, signInAnonymously } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+  import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCxHux7rE19LCvV-2sNwhEMtGABf3tZgDs",
+    authDomain: "umauma-737d6.firebaseapp.com",
+    projectId: "umauma-737d6",
+    storageBucket: "umauma-737d6.firebasestorage.app",
+    messagingSenderId: "704545420057",
+    appId: "1:704545420057:web:9fa4081aa62dc5900d4b88",
+    measurementId: "G-0E7DM5B4VB"
+  };
+
+  const GAME_TITLE = "うまダッシュ・ターフ";
+  const MAX_PLAYERS = 6;
+  const PACE_SPACE = 18;
+  const GOAL_LINE = 30;
+  const MIN_POS = -6;
+
+  const DICE = [
+    { key: "head", label: "馬首", icon: "🐴" },
+    { key: "head", label: "馬首", icon: "🐴" },
+    { key: "head", label: "馬首", icon: "🐴" },
+    { key: "hat", label: "帽子", icon: "🎩" },
+    { key: "carrot", label: "ニンジン", icon: "🥕" },
+    { key: "shoe", label: "蹄鉄", icon: "🧲" }
+  ];
+
+  const HORSES = [
+    { id: "white",  label: "ホワイト", icon: "⚪", color: "#f8f8f8" },
+    { id: "black",  label: "ブラック", icon: "⚫", color: "#333333" },
+    { id: "pink",   label: "ピンク",   icon: "🌸", color: "#f78ac3" },
+    { id: "blue",   label: "ブルー",   icon: "🔵", color: "#2f80ed" },
+    { id: "yellow", label: "イエロー", icon: "🟡", color: "#f2c94c" },
+    { id: "green",  label: "グリーン", icon: "🟢", color: "#27ae60" },
+    { id: "orange", label: "オレンジ", icon: "🟠", color: "#f2994a" }
+  ];
+
+  // オリジナルの近似カード値です。
+  // 実物カードに合わせたい場合は、ここだけ差し替えればゲーム全体に反映されます。
+  const CARD_DECK = [
+    { horse: "white",  name: "白い閃光",   moves: { head: 4, hat: 7, carrot: 5, shoe: 2 } },
+    { horse: "white",  name: "雪原ステップ", moves: { head: 3, hat: 4, carrot: 8, shoe: 3 } },
+    { horse: "white",  name: "ムーンゲイト", moves: { head: 5, hat: 5, carrot: 3, shoe: 6 } },
+    { horse: "black",  name: "黒い弾丸",   moves: { head: 6, hat: 3, carrot: 4, shoe: 5 } },
+    { horse: "black",  name: "ナイトラン", moves: { head: 4, hat: 8, carrot: 2, shoe: 3 } },
+    { horse: "black",  name: "ダークホース", moves: { head: 3, hat: 5, carrot: 6, shoe: 6 } },
+    { horse: "pink",   name: "ローズダッシュ", moves: { head: 5, hat: 4, carrot: 7, shoe: 2 } },
+    { horse: "pink",   name: "サクラロード", moves: { head: 4, hat: 6, carrot: 3, shoe: 5 } },
+    { horse: "pink",   name: "ラブリーラン", moves: { head: 3, hat: 3, carrot: 8, shoe: 4 } },
+    { horse: "blue",   name: "ブルーコメット", moves: { head: 4, hat: 5, carrot: 5, shoe: 5 } },
+    { horse: "blue",   name: "アクアスター", moves: { head: 6, hat: 2, carrot: 6, shoe: 3 } },
+    { horse: "blue",   name: "スカイビート", moves: { head: 3, hat: 7, carrot: 4, shoe: 4 } },
+    { horse: "yellow", name: "ゴールドラッシュ", moves: { head: 5, hat: 6, carrot: 2, shoe: 5 } },
+    { horse: "yellow", name: "サンダーゲート", moves: { head: 4, hat: 4, carrot: 6, shoe: 4 } },
+    { horse: "yellow", name: "レモンブースト", moves: { head: 3, hat: 8, carrot: 3, shoe: 3 } },
+    { horse: "green",  name: "グリーンライン", moves: { head: 4, hat: 3, carrot: 7, shoe: 4 } },
+    { horse: "green",  name: "フォレストラン", moves: { head: 6, hat: 4, carrot: 3, shoe: 4 } },
+    { horse: "green",  name: "ミントホープ", moves: { head: 3, hat: 6, carrot: 5, shoe: 5 } },
+    { horse: "orange", name: "オレンジブレイズ", moves: { head: 5, hat: 5, carrot: 4, shoe: 4 } },
+    { horse: "orange", name: "サンセットラン", moves: { head: 4, hat: 2, carrot: 8, shoe: 4 } },
+    { horse: "orange", name: "キャロットキング", moves: { head: 3, hat: 5, carrot: 5, shoe: 7 } }
+  ];
+
+  // 配当表：列はその馬への総ベット数。5以上は5列目を使用。
+  const PAYOUT_TABLE = {
+    1: [500, 350, 250, 200, 150],
+    2: [350, 250, 200, 150, 100],
+    3: [250, 200, 150, 100, 100]
+  };
+
+  const PLAYER_COLORS = ["#e53935", "#1e88e5", "#43a047", "#8e24aa", "#fb8c00", "#546e7a"];
+  const CPU_NAMES = ["CPUミドリ", "CPUアオ", "CPUモモ", "CPUクロ", "CPUキイロ"];
+
+  let appEl = document.getElementById("app");
+  let localId = localStorage.getItem("umaDashPlayerId") || crypto.randomUUID();
+  localStorage.setItem("umaDashPlayerId", localId);
+  let localName = localStorage.getItem("umaDashPlayerName") || "井上";
+  let roomCode = new URL(location.href).hash.replace("#", "").trim().toUpperCase();
+  let room = null;
+  let db = null;
+  let online = false;
+  let roomRef = null;
+  let unsubscribe = null;
+  let selectedChip = null;
+  let cpuTimer = null;
+
+  function hasFirebaseConfig() {
+    return Boolean(firebaseConfig.apiKey && firebaseConfig.projectId);
+  }
+
+  async function initFirebase() {
+    if (!hasFirebaseConfig()) return;
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    await signInAnonymously(auth);
+    db = getFirestore(app);
+    online = true;
+  }
+
+  function clone(x) { return JSON.parse(JSON.stringify(x)); }
+  function horseInfo(id) { return HORSES.find(h => h.id === id); }
+  function playerName(id, r = room) { return r.players.find(p => p.id === id)?.name || "?"; }
+  function currentPlayer(r = room) { return r.players[r.turnIndex % r.players.length]; }
+  function chipsForRule(r = room) { return r.secretBet ? [0, 1, 1, 2] : [1, 1, 2]; }
+  function chipLabel(v) { return v === 0 ? "0" : String(v); }
+  function diceObj(key) { return DICE.find(d => d.key === key); }
+  function shuffle(arr) {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(Math.random() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  }
+  function randomCode() {
+    return Math.random().toString(36).slice(2, 6).toUpperCase();
+  }
+
+  async function saveRoom(next) {
+    room = next;
+    if (online && roomCode) {
+      await setDoc(roomRef, next);
+    } else {
+      localStorage.setItem("umaDashLocalRoom", JSON.stringify(next));
+      render();
+    }
+  }
+
+  async function createRoom() {
+    const nameInput = document.getElementById("playerName");
+    localName = (nameInput?.value || localName || "プレイヤー").trim();
+    localStorage.setItem("umaDashPlayerName", localName);
+    roomCode = (document.getElementById("roomCode")?.value || randomCode()).trim().toUpperCase();
+    history.replaceState(null, "", "#" + roomCode);
+    const base = {
+      version: 1,
+      title: GAME_TITLE,
+      code: roomCode,
+      hostId: localId,
+      phase: "lobby",
+      secretBet: true,
+      raceNo: 0,
+      turnIndex: 0,
+      starterIndex: 0,
+      players: [{ id: localId, name: localName, type: "human", color: PLAYER_COLORS[0], money: 0, seat: 0 }],
+      race: null,
+      createdAt: Date.now(),
+      updatedAt: Date.now()
+    };
+    await openRoom(roomCode);
+    await saveRoom(base);
+  }
+
+  async function joinRoom() {
+    const nameInput = document.getElementById("playerName");
+    localName = (nameInput?.value || localName || "プレイヤー").trim();
+    localStorage.setItem("umaDashPlayerName", localName);
+    roomCode = (document.getElementById("roomCode")?.value || roomCode || "").trim().toUpperCase();
+    if (!roomCode) return alert("部屋番号を入れてください");
+    history.replaceState(null, "", "#" + roomCode);
+    await openRoom(roomCode);
+  }
+
+  async function openRoom(code) {
+    roomCode = code;
+    if (unsubscribe) unsubscribe();
+    if (online) {
+      roomRef = doc(db, "rooms", roomCode);
+      unsubscribe = onSnapshot(roomRef, async snap => {
+        if (!snap.exists()) {
+          room = null;
+          render();
+          return;
+        }
+        room = snap.data();
+        await maybeJoinAsHuman();
+        render();
+        maybeRunCpu();
+      });
+    } else {
+      const saved = localStorage.getItem("umaDashLocalRoom");
+      room = saved ? JSON.parse(saved) : null;
+      render();
+    }
+  }
+
+  async function maybeJoinAsHuman() {
+    if (!room || room.phase !== "lobby") return;
+    if (room.players.some(p => p.id === localId)) return;
+    if (room.players.length >= MAX_PLAYERS) return;
+    const next = clone(room);
+    next.players.push({
+      id: localId,
+      name: localName || "プレイヤー",
+      type: "human",
+      color: PLAYER_COLORS[next.players.length],
+      money: 0,
+      seat: next.players.length
+    });
+    next.updatedAt = Date.now();
+    await saveRoom(next);
+  }
+
+  async function toggleSecret() {
+    if (!isHost()) return;
+    const next = clone(room);
+    next.secretBet = !next.secretBet;
+    await saveRoom(next);
+  }
+
+  async function addCpu() {
+    if (!isHost() || !room || room.players.length >= MAX_PLAYERS) return;
+    const next = clone(room);
+    const cpuCount = next.players.filter(p => p.type === "cpu").length;
+    if (cpuCount >= 5) return;
+    const id = "cpu-" + crypto.randomUUID();
+    next.players.push({
+      id,
+      name: CPU_NAMES[cpuCount] || `CPU${cpuCount + 1}`,
+      type: "cpu",
+      color: PLAYER_COLORS[next.players.length],
+      money: 0,
+      seat: next.players.length
+    });
+    await saveRoom(next);
+  }
+
+  function isHost() { return room?.hostId === localId; }
+  function isLocalTurn() { return currentPlayer()?.id === localId; }
+
+  async function startGame() {
+    if (!isHost()) return;
+    if (room.players.length < 1) return alert("プレイヤーを1人以上にしてください");
+    const next = clone(room);
+    next.players.forEach(p => p.money = 0);
+    next.raceNo = 1;
+    next.starterIndex = Math.floor(Math.random() * next.players.length);
+    setupRace(next);
+    await saveRoom(next);
+  }
+
+  function chooseStarterIndex(r) {
+    if (r.raceNo === 1) return Math.floor(Math.random() * r.players.length);
+    const maxMoney = Math.max(...r.players.map(p => p.money));
+    const rich = r.players.map((p, i) => ({ p, i })).filter(x => x.p.money === maxMoney);
+    return rich[Math.floor(Math.random() * rich.length)].i;
+  }
+
+  function setupRace(r) {
+    r.phase = "betting";
+    r.starterIndex = chooseStarterIndex(r);
+    r.turnIndex = r.starterIndex;
+    selectedChip = null;
+    const picked = [];
+    const seen = new Set();
+    for (const card of shuffle(CARD_DECK)) {
+      if (!seen.has(card.horse)) {
+        seen.add(card.horse);
+        picked.push({ ...clone(card), id: crypto.randomUUID(), moved: false });
+      }
+      if (picked.length === HORSES.length) break;
+    }
+    const horses = {};
+    picked.forEach((card, idx) => {
+      horses[card.horse] = { pos: 0 - idx, status: "running", rank: null };
+    });
+    r.race = {
+      no: r.raceNo,
+      cards: picked,
+      horses,
+      bets: [],
+      dice: null,
+      finishOrder: [],
+      paceHorse: null,
+      lastHorse: null,
+      payout: null,
+      log: [`第${r.raceNo}レース開始。${r.players[r.starterIndex].name}から賭けます。`]
+    };
+  }
+
+  function remainingChips(r, playerId) {
+    const chips = chipsForRule(r);
+    for (const bet of r.race.bets.filter(b => b.playerId === playerId)) {
+      const idx = chips.indexOf(bet.chip);
+      if (idx >= 0) chips.splice(idx, 1);
+    }
+    return chips;
+  }
+
+  function alreadyBetHorses(r, playerId) {
+    return new Set(r.race.bets.filter(b => b.playerId === playerId).map(b => b.horse));
+  }
+
+  function currentBetPlayer(r = room) {
+    const made = r.race.bets.length;
+    return r.players[(r.starterIndex + made) % r.players.length];
+  }
+
+  async function placeBet(horseId) {
+    if (!room || room.phase !== "betting") return;
+    const p = currentBetPlayer(room);
+    if (p.id !== localId) return;
+    if (selectedChip === null) return alert("先にチップを選んでください");
+    const remaining = remainingChips(room, p.id);
+    if (!remaining.includes(selectedChip)) return;
+    if (alreadyBetHorses(room, p.id).has(horseId)) return alert("同じ馬には2枚以上置けません");
+    const next = clone(room);
+    next.race.bets.push({ id: crypto.randomUUID(), playerId: p.id, horse: horseId, chip: selectedChip });
+    next.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} にチップを置きました。`);
+    selectedChip = null;
+    afterBet(next);
+    await saveRoom(next);
+  }
+
+  function afterBet(r) {
+    const totalNeeded = r.players.length * chipsForRule(r).length;
+    if (r.race.bets.length >= totalNeeded) {
+      r.phase = "racing";
+      r.turnIndex = r.starterIndex;
+      r.race.dice = null;
+      r.race.log.unshift("賭け終了。レース開始！");
+    } else {
+      const p = currentBetPlayer(r);
+      r.race.log.unshift(`次は ${p.name} の賭けです。`);
+    }
+  }
+
+  async function rollDice() {
+    if (!room || room.phase !== "racing" || !isLocalTurn() || room.race.dice) return;
+    const next = clone(room);
+    const d = DICE[Math.floor(Math.random() * DICE.length)];
+    next.race.dice = d.key;
+    next.race.log.unshift(`${currentPlayer(next).name} の出目：${d.icon} ${d.label}`);
+    await saveRoom(next);
+  }
+
+  function activeCards(r) {
+    let cards = r.race.cards.filter(c => r.race.horses[c.horse]?.status === "running" && !c.moved);
+    if (cards.length === 0) {
+      r.race.cards.forEach(c => { if (r.race.horses[c.horse]?.status === "running") c.moved = false; });
+      cards = r.race.cards.filter(c => r.race.horses[c.horse]?.status === "running");
+      r.race.log.unshift("全頭が一度動いたので、カードを表に戻しました。");
+    }
+    return cards;
+  }
+
+  async function moveHorse(horseId) {
+    if (!room || room.phase !== "racing" || !isLocalTurn() || !room.race.dice) return;
+    const next = clone(room);
+    doMoveHorse(next, horseId);
+    await saveRoom(next);
+  }
+
+  function doMoveHorse(r, horseId) {
+    const p = currentPlayer(r);
+    const diceKey = r.race.dice;
+    const card = r.race.cards.find(c => c.horse === horseId);
+    if (!card || card.moved || r.race.horses[horseId].status !== "running") return;
+    const move = Number(card.moves[diceKey] || 0);
+    const h = r.race.horses[horseId];
+    const before = h.pos;
+    const rawTarget = h.pos + move;
+
+    if (!r.race.paceHorse && rawTarget >= PACE_SPACE) {
+      r.race.paceHorse = horseId;
+      r.race.log.unshift(`${horseInfo(horseId).label} がペースホース！`);
+    }
+
+    if (rawTarget > GOAL_LINE) {
+      h.status = "finished";
+      h.rank = r.race.finishOrder.length + 1;
+      h.pos = GOAL_LINE + h.rank;
+      r.race.finishOrder.push(horseId);
+      card.moved = true;
+      r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${move}進め、${h.rank}着でゴール！`);
+    } else {
+      const occupied = new Set(Object.entries(r.race.horses)
+        .filter(([hid, state]) => hid !== horseId && state.status === "running")
+        .map(([_, state]) => state.pos));
+      let target = rawTarget;
+      while (target > before && occupied.has(target)) target--;
+      h.pos = target;
+      card.moved = true;
+      r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${before} → ${target} に進めました。`);
+    }
+
+    if (r.race.finishOrder.length >= 3) {
+      finishRace(r);
+      return;
+    }
+
+    activeCards(r);
+    r.turnIndex = (r.turnIndex + 1) % r.players.length;
+    r.race.dice = null;
+  }
+
+  function finishRace(r) {
+    const running = Object.entries(r.race.horses).filter(([_, s]) => s.status === "running");
+    running.sort((a, b) => a[1].pos - b[1].pos);
+    const lastHorse = running[0]?.[0] || null;
+    r.race.lastHorse = lastHorse;
+    if (lastHorse) r.race.horses[lastHorse].rank = 7;
+    r.race.payout = calculatePayout(r);
+    r.phase = r.raceNo >= 3 ? "gameover" : "payout";
+    r.race.log.unshift(`第${r.raceNo}レース終了。払い戻しを計算しました。`);
+  }
+
+  function calculatePayout(r) {
+    const multiplier = r.raceNo === 3 ? 2 : 1;
+    const horseTotals = {};
+    for (const h of HORSES) horseTotals[h.id] = 0;
+    for (const bet of r.race.bets) if (bet.chip > 0) horseTotals[bet.horse] += bet.chip;
+
+    const playerResults = r.players.map(p => ({
+      playerId: p.id,
+      name: p.name,
+      before: p.money,
+      gain: 0,
+      loss: 0,
+      details: []
+    }));
+
+    function resultOf(pid) { return playerResults.find(x => x.playerId === pid); }
+
+    for (const bet of r.race.bets) {
+      if (bet.chip <= 0) continue;
+      const res = resultOf(bet.playerId);
+      const rankIndex = r.race.finishOrder.indexOf(bet.horse);
+      if (rankIndex >= 0 && rankIndex < 3) {
+        const rank = rankIndex + 1;
+        const total = Math.max(1, horseTotals[bet.horse]);
+        const col = Math.min(total, 5) - 1;
+        let amount = PAYOUT_TABLE[rank][col] * bet.chip;
+        if (r.race.paceHorse === bet.horse) amount += 100 * bet.chip;
+        amount *= multiplier;
+        res.gain += amount;
+        res.details.push(`${horseInfo(bet.horse).label}${rank}着 +${amount}`);
+      }
+      if (r.race.lastHorse === bet.horse) {
+        const amount = 100 * bet.chip * multiplier;
+        res.loss += amount;
+        res.details.push(`${horseInfo(bet.horse).label}最下位 -${amount}`);
+      }
+    }
+
+    for (const res of playerResults) {
+      const player = r.players.find(p => p.id === res.playerId);
+      player.money += res.gain;
+      const payable = Math.min(player.money, res.loss);
+      player.money -= payable;
+      res.loss = payable;
+      res.after = player.money;
+      res.net = res.after - res.before;
+    }
+
+    return { multiplier, horseTotals, playerResults };
+  }
+
+  async function nextRace() {
+    if (!isHost() || !room || room.phase !== "payout") return;
+    const next = clone(room);
+    next.raceNo += 1;
+    setupRace(next);
+    await saveRoom(next);
+  }
+
+  async function backToLobby() {
+    if (!isHost() || !room) return;
+    const next = clone(room);
+    next.phase = "lobby";
+    next.raceNo = 0;
+    next.race = null;
+    next.players.forEach(p => p.money = 0);
+    await saveRoom(next);
+  }
+
+  function cpuChooseBet(r, cpu) {
+    const remaining = remainingChips(r, cpu.id);
+    const used = alreadyBetHorses(r, cpu.id);
+    let chip = [...remaining].sort((a, b) => b - a)[0];
+    if (r.secretBet && remaining.includes(0) && Math.random() < 0.32) chip = 0;
+    const options = r.race.cards
+      .filter(c => !used.has(c.horse))
+      .map(c => {
+        const avg = (c.moves.head * 3 + c.moves.hat + c.moves.carrot + c.moves.shoe) / 6;
+        const pos = r.race.horses[c.horse].pos;
+        const popularity = r.race.bets.filter(b => b.horse === c.horse).reduce((s, b) => s + Math.max(0, b.chip), 0);
+        return { horse: c.horse, score: avg * 2 + pos * .6 - popularity * 1.1 + Math.random() * 3 };
+      })
+      .sort((a, b) => b.score - a.score);
+    return { chip, horse: options[0].horse };
+  }
+
+  function cpuChooseMove(r, cpu) {
+    if (!r.race.dice) return null;
+    const cards = activeCards(r);
+    const own = Object.fromEntries(r.race.bets.filter(b => b.playerId === cpu.id).map(b => [b.horse, b.chip]));
+    const options = cards.map(c => {
+      const move = Number(c.moves[r.race.dice] || 0);
+      const pos = r.race.horses[c.horse].pos;
+      const ownChip = own[c.horse] || 0;
+      const others = r.race.bets.filter(b => b.horse === c.horse && b.playerId !== cpu.id).reduce((s, b) => s + Math.max(0, b.chip), 0);
+      let score = move * 4 + ownChip * 35 - others * 8 + Math.random() * 8;
+      if (ownChip && pos + move >= PACE_SPACE && !r.race.paceHorse) score += 25;
+      if (ownChip && pos + move > GOAL_LINE) score += 90;
+      if (!ownChip && pos + move > GOAL_LINE) score -= 35;
+      return { horse: c.horse, score };
+    }).sort((a, b) => b.score - a.score);
+    return options[0]?.horse;
+  }
+
+  function maybeRunCpu() {
+    clearTimeout(cpuTimer);
+    if (!room || !isHost()) return;
+    const cpuAction = async () => {
+      if (!room || !isHost()) return;
+      const next = clone(room);
+      if (next.phase === "betting") {
+        const p = currentBetPlayer(next);
+        if (p?.type !== "cpu") return;
+        const choice = cpuChooseBet(next, p);
+        next.race.bets.push({ id: crypto.randomUUID(), playerId: p.id, horse: choice.horse, chip: choice.chip });
+        next.race.log.unshift(`${p.name} がチップを置きました。`);
+        afterBet(next);
+        await saveRoom(next);
+      } else if (next.phase === "racing") {
+        const p = currentPlayer(next);
+        if (p?.type !== "cpu") return;
+        if (!next.race.dice) {
+          const d = DICE[Math.floor(Math.random() * DICE.length)];
+          next.race.dice = d.key;
+          next.race.log.unshift(`${p.name} の出目：${d.icon} ${d.label}`);
+          await saveRoom(next);
+        } else {
+          const horse = cpuChooseMove(next, p);
+          if (!horse) return;
+          doMoveHorse(next, horse);
+          await saveRoom(next);
+        }
+      }
+    };
+    const p = room.phase === "betting" ? currentBetPlayer(room) : currentPlayer(room);
+    if ((room.phase === "betting" || room.phase === "racing") && p?.type === "cpu") {
+      cpuTimer = setTimeout(cpuAction, 700);
+    }
+  }
+
+  function escapeHtml(s) {
+    return String(s).replace(/[&<>"]/g, c => ({ "&":"&amp;", "<":"&lt;", ">":"&gt;", '"':"&quot;" }[c]));
+  }
+
+  function render() {
+    appEl.innerHTML = `
+      <section class="hero">
+        <h1>${GAME_TITLE}</h1>
+        <div class="subtitle">1〜6人 / CPU最大5人 / スマホ同期対応 / 秘密の賭け対応</div>
+      </section>
+      ${!room ? renderHome() : renderRoom()}
+    `;
+    bindEvents();
+  }
+
+  function renderHome() {
+    return `
+      <section class="card grid">
+        <div class="small">${online ? "Firebase同期モード" : "ローカル練習モード：スマホ2台同期には firebaseConfig を設定してください"}</div>
+        <label>名前<input id="playerName" value="${escapeHtml(localName)}" /></label>
+        <label>部屋番号<input id="roomCode" value="${escapeHtml(roomCode || randomCode())}" maxlength="8" /></label>
+        <div class="grid two">
+          <button id="createRoom">部屋を作る</button>
+          <button id="joinRoom" class="secondary">部屋に入る</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderRoom() {
+    if (room.phase === "lobby") return renderLobby();
+    return renderGame();
+  }
+
+  function renderLobby() {
+    return `
+      <section class="card">
+        <div class="row between">
+          <div><b>部屋番号：${room.code}</b><div class="tiny">相手のスマホで同じURLまたは部屋番号を入力</div></div>
+          <span class="pill">${online ? "同期ON" : "ローカル"}</span>
+        </div>
+        <div class="grid" style="margin-top:10px">
+          ${room.players.map((p, i) => `
+            <div class="playerBox row between">
+              <div class="row"><span class="chip" style="border-color:${p.color};">${i + 1}</span><b>${escapeHtml(p.name)}</b><span class="small">${p.type === "cpu" ? "CPU" : "人間"}</span></div>
+              ${p.id === room.hostId ? `<span class="pill">親</span>` : ""}
+            </div>`).join("")}
+        </div>
+        <div class="card" style="box-shadow:none;background:#fff;">
+          <div class="row between">
+            <div><b>秘密の賭け</b><div class="small">ON：0・1・1・2を裏向き / OFF：1・1・2を表向き</div></div>
+            <button id="toggleSecret" class="secondary" ${!isHost() ? "disabled" : ""}>${room.secretBet ? "ON" : "OFF"}</button>
+          </div>
+        </div>
+        <div class="grid two">
+          <button id="addCpu" class="secondary" ${!isHost() || room.players.length >= MAX_PLAYERS ? "disabled" : ""}>CPUを追加</button>
+          <button id="startGame" class="good" ${!isHost() ? "disabled" : ""}>ゲーム開始</button>
+        </div>
+      </section>
+    `;
+  }
+
+  function renderGame() {
+    return `
+      ${renderScoreBoard()}
+      ${renderRaceHeader()}
+      ${renderTrack()}
+      ${renderBets()}
+      ${renderActionPanel()}
+      ${renderPayout()}
+      <section class="card"><b>ログ</b><div class="log">${room.race.log.slice(0, 40).map(x => `<div>${escapeHtml(x)}</div>`).join("")}</div></section>
+    `;
+  }
+
+  function renderScoreBoard() {
+    const sorted = [...room.players].sort((a, b) => b.money - a.money);
+    return `<section class="card grid two">
+      ${sorted.map(p => `<div class="playerBox ${currentPlayer()?.id === p.id && room.phase === "racing" ? "current" : ""}">
+        <div class="row between"><b>${escapeHtml(p.name)}</b><span class="money">¥${p.money}</span></div>
+        <div class="small">${p.type === "cpu" ? "CPU" : p.id === localId ? "あなた" : "人間"}</div>
+      </div>`).join("")}
+    </section>`;
+  }
+
+  function renderRaceHeader() {
+    const dice = room.race.dice ? diceObj(room.race.dice) : null;
+    const turn = room.phase === "betting" ? currentBetPlayer(room) : currentPlayer(room);
+    return `<section class="card">
+      <div class="row between">
+        <div><b>第${room.raceNo}レース</b> <span class="pill">${phaseText(room.phase)}</span></div>
+        <div class="pill">手番：${escapeHtml(turn?.name || "-")}</div>
+      </div>
+      <div class="row" style="margin-top:8px">
+        <span class="pill">ペース：${room.race.paceHorse ? horseInfo(room.race.paceHorse).label : "未定"}</span>
+        <span class="pill">出目：${dice ? `${dice.icon} ${dice.label}` : "未振り"}</span>
+        <span class="pill">3R倍率：${room.raceNo === 3 ? "2倍" : "通常"}</span>
+      </div>
+    </section>`;
+  }
+
+  function phaseText(phase) {
+    return { lobby: "待機", betting: "賭け", racing: "レース", payout: "払い戻し", gameover: "終了" }[phase] || phase;
+  }
+
+  function renderTrack() {
+    const cardsByHorse = Object.fromEntries(room.race.cards.map(c => [c.horse, c]));
+    const horseOrder = Object.keys(room.race.horses).sort((a, b) => room.race.horses[b].pos - room.race.horses[a].pos);
+    return `<section class="card track">
+      <b>コース</b>
+      ${horseOrder.map(hid => {
+        const h = horseInfo(hid);
+        const s = room.race.horses[hid];
+        const c = cardsByHorse[hid];
+        const pct = Math.max(2, Math.min(98, ((s.pos - MIN_POS) / (GOAL_LINE - MIN_POS + 4)) * 100));
+        return `<div class="lane">
+          <div class="laneName">${h.icon} ${h.label}</div>
+          <div class="bar"><div class="horseDot ${s.status === "finished" ? "done" : ""} ${c?.moved ? "moved" : ""} ${room.race.paceHorse === hid ? "pace" : ""}" style="left:${pct}%;border-color:${h.color};">🐎</div></div>
+          <div class="small">${s.status === "finished" ? `${s.rank}着` : s.pos}</div>
+        </div>`;
+      }).join("")}
+    </section>`;
+  }
+
+  function renderBets() {
+    const visible = room.phase === "payout" || room.phase === "gameover" || !room.secretBet;
+    return `<section class="card">
+      <div class="row between"><b>賭けエリア</b><span class="small">総票数は0を除外</span></div>
+      <div class="betArea" style="margin-top:8px">
+        ${HORSES.map(h => {
+          const bets = room.race.bets.filter(b => b.horse === h.id);
+          const total = bets.reduce((s, b) => s + Math.max(0, b.chip), 0);
+          return `<div class="horseBet">
+            <div class="row between"><b>${h.icon} ${h.label}</b><span class="pill">${total}票</span></div>
+            <div class="chips">${bets.map(b => {
+              const p = room.players.find(x => x.id === b.playerId);
+              const canSee = visible || b.playerId === localId;
+              return `<span title="${escapeHtml(p?.name || "")}" class="chip ${!canSee ? "hidden" : ""} ${b.chip === 0 ? "zero" : ""}" style="border-color:${p?.color || "#333"};">${canSee ? chipLabel(b.chip) : "?"}</span>`;
+            }).join("")}</div>
+          </div>`;
+        }).join("")}
+      </div>
+    </section>`;
+  }
+
+  function renderActionPanel() {
+    if (room.phase === "betting") return renderBetAction();
+    if (room.phase === "racing") return renderRaceAction();
+    if (room.phase === "payout") return `<section class="actions"><button id="nextRace" class="good" ${!isHost() ? "disabled" : ""}>次のレースへ</button></section>`;
+    if (room.phase === "gameover") return `<section class="actions"><button id="backToLobby" ${!isHost() ? "disabled" : ""}>ロビーに戻る</button></section>`;
+    return "";
+  }
+
+  function renderBetAction() {
+    const p = currentBetPlayer(room);
+    if (p.id !== localId) return `<section class="actions"><b>${escapeHtml(p.name)}の賭け待ち</b><div class="small">CPUなら自動で進みます。</div></section>`;
+    const remaining = remainingChips(room, p.id);
+    const used = alreadyBetHorses(room, p.id);
+    return `<section class="actions">
+      <b>あなたの賭け</b>
+      <div class="small">チップを選んでから馬を選択。同じ馬に2枚は置けません。</div>
+      <div class="row" style="margin-top:8px">
+        ${remaining.map((c, idx) => `<button class="secondary chipBtn ${selectedChip === c ? "selected" : ""}" data-chip="${c}" data-idx="${idx}">チップ ${chipLabel(c)}</button>`).join("")}
+      </div>
+      <div class="row" style="margin-top:8px">
+        ${room.race.cards.map(c => `<button class="horseBetBtn" data-horse="${c.horse}" ${used.has(c.horse) ? "disabled" : ""}>${horseInfo(c.horse).icon} ${horseInfo(c.horse).label}</button>`).join("")}
+      </div>
+    </section>`;
+  }
+
+  function renderRaceAction() {
+    const p = currentPlayer(room);
+    if (p.id !== localId) return `<section class="actions"><b>${escapeHtml(p.name)}の手番待ち</b><div class="small">CPUなら自動で進みます。</div></section>`;
+    if (!room.race.dice) return `<section class="actions"><b>あなたの手番</b><div class="row" style="margin-top:8px"><button id="rollDice">ダイスを振る</button></div></section>`;
+    const dice = diceObj(room.race.dice);
+    const nextForView = clone(room);
+    const cards = activeCards(nextForView);
+    return `<section class="actions">
+      <b>出目：${dice.icon} ${dice.label}</b>
+      <div class="small">動かす馬を選んでください。灰色のカードは全頭が一度動くまで選べません。</div>
+      <div class="row" style="margin-top:8px">
+        ${cards.map(c => `<button class="moveHorseBtn" data-horse="${c.horse}">${horseInfo(c.horse).icon} ${horseInfo(c.horse).label} +${c.moves[room.race.dice]}</button>`).join("")}
+      </div>
+    </section>`;
+  }
+
+  function renderPayout() {
+    if (!room.race?.payout) return "";
+    const order = room.race.finishOrder.map((hid, idx) => `${idx + 1}着 ${horseInfo(hid).label}`).join(" / ");
+    const last = room.race.lastHorse ? horseInfo(room.race.lastHorse).label : "-";
+    const winner = [...room.players].sort((a, b) => b.money - a.money)[0];
+    return `<section class="card">
+      <b>${room.phase === "gameover" ? "最終結果" : "払い戻し"}</b>
+      <div class="row" style="margin-top:8px"><span class="pill">${order}</span><span class="pill">最下位 ${last}</span><span class="pill">倍率 ${room.race.payout.multiplier}倍</span></div>
+      <div class="grid" style="margin-top:10px">
+        ${room.race.payout.playerResults.map(res => `<div class="playerBox">
+          <div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net >= 0 ? "+" : ""}${res.net} → ¥${res.after}</span></div>
+          <div class="tiny">${res.details.length ? escapeHtml(res.details.join(" / ")) : "的中・支払いなし"}</div>
+        </div>`).join("")}
+      </div>
+      ${room.phase === "gameover" ? `<div class="card" style="box-shadow:none;background:#fff;"><span class="rank">🏆</span> 優勝：<b>${escapeHtml(winner.name)}</b> ¥${winner.money}</div>` : ""}
+    </section>`;
+  }
+
+  function bindEvents() {
+    document.getElementById("createRoom")?.addEventListener("click", createRoom);
+    document.getElementById("joinRoom")?.addEventListener("click", joinRoom);
+    document.getElementById("toggleSecret")?.addEventListener("click", toggleSecret);
+    document.getElementById("addCpu")?.addEventListener("click", addCpu);
+    document.getElementById("startGame")?.addEventListener("click", startGame);
+    document.getElementById("rollDice")?.addEventListener("click", rollDice);
+    document.getElementById("nextRace")?.addEventListener("click", nextRace);
+    document.getElementById("backToLobby")?.addEventListener("click", backToLobby);
+    document.querySelectorAll(".chipBtn").forEach(btn => btn.addEventListener("click", () => {
+      selectedChip = Number(btn.dataset.chip);
+      render();
+    }));
+    document.querySelectorAll(".horseBetBtn").forEach(btn => btn.addEventListener("click", () => placeBet(btn.dataset.horse)));
+    document.querySelectorAll(".moveHorseBtn").forEach(btn => btn.addEventListener("click", () => moveHorse(btn.dataset.horse)));
+  }
+
+  await initFirebase().catch(err => {
+    console.warn("Firebase init failed", err);
+    online = false;
+  });
+  if (roomCode) await openRoom(roomCode);
+  render();
+</script>
+</body>
+</html>
