@@ -99,6 +99,164 @@
     .log div { padding: 4px 0; border-bottom: 1px dashed #eee; font-size: 12px; }
     .rank { font-size: 24px; font-weight: 900; }
     .selected { outline: 3px solid rgba(25, 135, 84, .35); }
+
+    /* ===== 見た目強化：1周コース + サイコロ演出 ===== */
+    .raceVisual {
+      position: relative;
+      height: min(68vw, 520px);
+      min-height: 340px;
+      border-radius: 28px;
+      background: linear-gradient(180deg, #64b96c, #2f8f4a);
+      border: 10px solid #6c4a25;
+      overflow: hidden;
+      box-shadow: inset 0 0 0 6px rgba(255,255,255,.25), var(--shadow);
+    }
+    .raceVisual:before {
+      content: "";
+      position: absolute;
+      inset: 8%;
+      border-radius: 50%;
+      border: 38px solid #c99658;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.25), 0 0 0 3px rgba(74,42,15,.35);
+    }
+    .raceVisual:after {
+      content: "";
+      position: absolute;
+      inset: 27% 24%;
+      border-radius: 50%;
+      background: linear-gradient(180deg, #5cb85c, #318f4a);
+      border: 3px dashed rgba(255,255,255,.45);
+    }
+    .startLine {
+      position: absolute;
+      top: 8%;
+      left: 50%;
+      width: 6px;
+      height: 80px;
+      transform: translateX(-50%);
+      background: repeating-linear-gradient(180deg, #fff 0 8px, #111 8px 16px);
+      border-radius: 8px;
+      z-index: 2;
+      box-shadow: 0 2px 8px rgba(0,0,0,.25);
+    }
+    .startLabel, .paceLabel {
+      position: absolute;
+      z-index: 3;
+      padding: 5px 8px;
+      border-radius: 999px;
+      background: rgba(255,255,255,.9);
+      border: 1px solid rgba(0,0,0,.1);
+      font-size: 11px;
+      font-weight: 900;
+      box-shadow: 0 2px 8px rgba(0,0,0,.12);
+    }
+    .startLabel { top: 5%; left: 50%; transform: translateX(-50%); }
+    .paceLabel { right: 11%; bottom: 27%; color: #0f6c36; }
+    .horseSprite {
+      position: absolute;
+      z-index: 5;
+      left: var(--x);
+      top: var(--y);
+      transform: translate(-50%, -50%) rotate(var(--rot));
+      transition: left .75s cubic-bezier(.2,.85,.2,1), top .75s cubic-bezier(.2,.85,.2,1), transform .75s cubic-bezier(.2,.85,.2,1), filter .2s;
+    }
+    .horseSprite.moved { filter: grayscale(.75) opacity(.65); }
+    .horseSprite.done { filter: drop-shadow(0 0 8px #ffd54a); }
+    .horseToken {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #fff;
+      border: 4px solid var(--horse-color);
+      box-shadow: 0 5px 12px rgba(0,0,0,.28);
+      font-size: 24px;
+      position: relative;
+    }
+    .horseToken:after {
+      content: attr(data-rank);
+      position: absolute;
+      right: -7px;
+      top: -8px;
+      min-width: 20px;
+      height: 20px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #fff3bf;
+      color: #6b4500;
+      font-size: 10px;
+      font-weight: 950;
+      border: 1px solid #d7aa26;
+    }
+    .horseNameTag {
+      position: absolute;
+      left: 50%;
+      top: 42px;
+      transform: translateX(-50%) rotate(calc(-1 * var(--rot)));
+      white-space: nowrap;
+      background: rgba(255,255,255,.92);
+      border: 1px solid rgba(0,0,0,.08);
+      border-radius: 999px;
+      padding: 3px 7px;
+      font-size: 10px;
+      font-weight: 850;
+      box-shadow: 0 2px 6px rgba(0,0,0,.14);
+    }
+    .cardStrip {
+      margin-top: 10px;
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+    .raceCardMini {
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      padding: 8px;
+      font-size: 12px;
+    }
+    .raceCardMini.moved { opacity: .48; }
+    .moveNums { display:flex; gap:4px; flex-wrap:wrap; margin-top:5px; }
+    .moveNums span { background:#f6efe2; border-radius:999px; padding:3px 6px; font-size:11px; font-weight:800; }
+    .dicePanel { margin-top: 10px; display:flex; justify-content:center; }
+    .diceStage {
+      display: inline-flex;
+      gap: 10px;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 18px;
+      padding: 10px 14px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.12);
+    }
+    .diceCube {
+      width: 58px;
+      height: 58px;
+      border-radius: 14px;
+      display: grid;
+      place-items: center;
+      background: radial-gradient(circle at 30% 25%, #fff, #f5f5f5 45%, #d9d9d9);
+      border: 3px solid #222;
+      font-size: 30px;
+      box-shadow: 0 8px 0 #b8b8b8, 0 12px 16px rgba(0,0,0,.22);
+      transform: rotate(-5deg);
+    }
+    .diceCube.rolling {
+      animation: diceShake .12s infinite alternate, diceSpin .6s infinite linear;
+    }
+    .diceText { font-size: 13px; font-weight: 900; }
+    .diceFaces { letter-spacing: .18em; color: var(--muted); font-size: 12px; }
+    @keyframes diceShake {
+      from { translate: -3px -2px; }
+      to { translate: 3px 2px; }
+    }
+    @keyframes diceSpin {
+      from { rotate: 0deg; }
+      to { rotate: 360deg; }
+    }
+
     @media (max-width: 560px) {
       .two, .three { grid-template-columns: 1fr; }
       .lane { grid-template-columns: 72px 1fr 34px; }
@@ -396,6 +554,7 @@
       horses,
       bets: [],
       dice: null,
+      diceRolling: false,
       finishOrder: [],
       paceHorse: null,
       lastHorse: null,
@@ -444,6 +603,7 @@
       r.phase = "racing";
       r.turnIndex = r.starterIndex;
       r.race.dice = null;
+    r.race.diceRolling = false;
       r.race.log.unshift("賭け終了。レース開始！");
     } else {
       const p = currentBetPlayer(r);
@@ -452,12 +612,22 @@
   }
 
   async function rollDice() {
-    if (!room || room.phase !== "racing" || !isLocalTurn() || room.race.dice) return;
+    if (!room || room.phase !== "racing" || !isLocalTurn() || room.race.dice || room.race.diceRolling) return;
     const next = clone(room);
-    const d = DICE[Math.floor(Math.random() * DICE.length)];
-    next.race.dice = d.key;
-    next.race.log.unshift(`${currentPlayer(next).name} の出目：${d.icon} ${d.label}`);
+    next.race.dice = null;
+    next.race.diceRolling = true;
+    next.race.log.unshift(`${currentPlayer(next).name} がサイコロを振っています…`);
     await saveRoom(next);
+
+    setTimeout(async () => {
+      if (!room || room.phase !== "racing" || currentPlayer(room)?.id !== localId || !room.race.diceRolling) return;
+      const latest = clone(room);
+      const d = DICE[Math.floor(Math.random() * DICE.length)];
+      latest.race.dice = d.key;
+      latest.race.diceRolling = false;
+      latest.race.log.unshift(`${currentPlayer(latest).name} の出目：${d.icon} ${d.label}`);
+      await saveRoom(latest);
+    }, 850);
   }
 
   function activeCards(r) {
@@ -652,9 +822,14 @@
       } else if (next.phase === "racing") {
         const p = currentPlayer(next);
         if (p?.type !== "cpu") return;
-        if (!next.race.dice) {
+        if (!next.race.dice && !next.race.diceRolling) {
+          next.race.diceRolling = true;
+          next.race.log.unshift(`${p.name} がサイコロを振っています…`);
+          await saveRoom(next);
+        } else if (next.race.diceRolling) {
           const d = DICE[Math.floor(Math.random() * DICE.length)];
           next.race.dice = d.key;
+          next.race.diceRolling = false;
           next.race.log.unshift(`${p.name} の出目：${d.icon} ${d.label}`);
           await saveRoom(next);
         } else {
@@ -667,7 +842,7 @@
     };
     const p = room.phase === "betting" ? currentBetPlayer(room) : currentPlayer(room);
     if ((room.phase === "betting" || room.phase === "racing") && p?.type === "cpu") {
-      cpuTimer = setTimeout(cpuAction, 700);
+      cpuTimer = setTimeout(cpuAction, room.race?.diceRolling ? 850 : 700);
     }
   }
 
@@ -765,10 +940,40 @@
       </div>
       <div class="row" style="margin-top:8px">
         <span class="pill">ペース：${room.race.paceHorse ? horseInfo(room.race.paceHorse).label : "未定"}</span>
-        <span class="pill">出目：${dice ? `${dice.icon} ${dice.label}` : "未振り"}</span>
+        <span class="pill">出目：${dice ? `${dice.icon} ${dice.label}` : room.race.diceRolling ? "回転中" : "未振り"}</span>
         <span class="pill">3R倍率：${room.raceNo === 3 ? "2倍" : "通常"}</span>
       </div>
+      <div class="dicePanel">${renderDiceVisual(room.race.dice, room.race.diceRolling)}</div>
     </section>`;
+  }
+
+  function renderDiceVisual(diceKey, rolling) {
+    if (rolling) {
+      return `<div class="diceStage">
+        <div class="diceCube rolling">🎲</div>
+        <div><div class="diceText">サイコロ回転中…</div><div class="diceFaces">🐴 🐴 🐴 🎩 🥕 🧲</div></div>
+      </div>`;
+    }
+    const d = diceKey ? diceObj(diceKey) : null;
+    return `<div class="diceStage">
+      <div class="diceCube">${d ? d.icon : "🎲"}</div>
+      <div><div class="diceText">${d ? `出目：${d.label}` : "サイコロ待ち"}</div><div class="diceFaces">🐴×3 / 🎩 / 🥕 / 🧲</div></div>
+    </div>`;
+  }
+
+  function trackPoint(pos, laneIndex = 0) {
+    const total = GOAL_LINE - MIN_POS + 4;
+    const progress = Math.max(0, Math.min(1, (pos - MIN_POS) / total));
+    const angleDeg = -90 + progress * 360;
+    const angle = angleDeg * Math.PI / 180;
+    const lane = (laneIndex - 3) * 1.6;
+    const rx = 39 + lane;
+    const ry = 35 + lane * .55;
+    return {
+      x: 50 + Math.cos(angle) * rx,
+      y: 50 + Math.sin(angle) * ry,
+      rot: angleDeg + 90
+    };
   }
 
   function phaseText(phase) {
@@ -778,19 +983,34 @@
   function renderTrack() {
     const cardsByHorse = Object.fromEntries(room.race.cards.map(c => [c.horse, c]));
     const horseOrder = Object.keys(room.race.horses).sort((a, b) => room.race.horses[b].pos - room.race.horses[a].pos);
-    return `<section class="card track">
-      <b>コース</b>
-      ${horseOrder.map(hid => {
-        const h = horseInfo(hid);
-        const s = room.race.horses[hid];
-        const c = cardsByHorse[hid];
-        const pct = Math.max(2, Math.min(98, ((s.pos - MIN_POS) / (GOAL_LINE - MIN_POS + 4)) * 100));
-        return `<div class="lane">
-          <div class="laneName">${h.icon} ${h.label}</div>
-          <div class="bar"><div class="horseDot ${s.status === "finished" ? "done" : ""} ${c?.moved ? "moved" : ""} ${room.race.paceHorse === hid ? "pace" : ""}" style="left:${pct}%;border-color:${h.color};">🐎</div></div>
-          <div class="small">${s.status === "finished" ? `${s.rank}着` : s.pos}</div>
-        </div>`;
-      }).join("")}
+    return `<section class="card">
+      <div class="row between"><b>コース</b><span class="small">1周してゴール。黄色の光はペースホース。</span></div>
+      <div class="raceVisual" style="margin-top:10px">
+        <div class="startLine"></div>
+        <div class="startLabel">START / GOAL</div>
+        <div class="paceLabel">PACE 18</div>
+        ${horseOrder.map((hid, idx) => {
+          const h = horseInfo(hid);
+          const s = room.race.horses[hid];
+          const c = cardsByHorse[hid];
+          const pt = trackPoint(s.pos, idx);
+          const rankText = s.status === "finished" ? `${s.rank}` : s.pos;
+          return `<div class="horseSprite ${s.status === "finished" ? "done" : ""} ${c?.moved ? "moved" : ""}" style="--x:${pt.x}%;--y:${pt.y}%;--rot:${pt.rot}deg;--horse-color:${h.color};">
+            <div class="horseToken" data-rank="${rankText}">🐎</div>
+            <div class="horseNameTag">${h.icon} ${h.label}</div>
+          </div>`;
+        }).join("")}
+      </div>
+      <div class="cardStrip">
+        ${room.race.cards.map(c => {
+          const h = horseInfo(c.horse);
+          const state = room.race.horses[c.horse];
+          return `<div class="raceCardMini ${c.moved ? "moved" : ""}">
+            <div class="row between"><b>${h.icon} ${h.label}</b><span>${state.status === "finished" ? `${state.rank}着` : `位置 ${state.pos}`}</span></div>
+            <div class="moveNums"><span>🐴${c.moves.head}</span><span>🎩${c.moves.hat}</span><span>🥕${c.moves.carrot}</span><span>🧲${c.moves.shoe}</span></div>
+          </div>`;
+        }).join("")}
+      </div>
     </section>`;
   }
 
@@ -842,14 +1062,15 @@
 
   function renderRaceAction() {
     const p = currentPlayer(room);
-    if (p.id !== localId) return `<section class="actions"><b>${escapeHtml(p.name)}の手番待ち</b><div class="small">CPUなら自動で進みます。</div></section>`;
-    if (!room.race.dice) return `<section class="actions"><b>あなたの手番</b><div class="row" style="margin-top:8px"><button id="rollDice">ダイスを振る</button></div></section>`;
+    if (p.id !== localId) return `<section class="actions"><b>${escapeHtml(p.name)}の手番待ち</b><div class="small">CPUならサイコロ演出後に自動で進みます。</div></section>`;
+    if (room.race.diceRolling) return `<section class="actions"><b>サイコロを振っています…</b><div class="small">出目が決まるまで少し待ってください。</div></section>`;
+    if (!room.race.dice) return `<section class="actions"><b>あなたの手番</b><div class="row" style="margin-top:8px"><button id="rollDice">サイコロを振る</button></div></section>`;
     const dice = diceObj(room.race.dice);
     const nextForView = clone(room);
     const cards = activeCards(nextForView);
     return `<section class="actions">
       <b>出目：${dice.icon} ${dice.label}</b>
-      <div class="small">動かす馬を選んでください。灰色のカードは全頭が一度動くまで選べません。</div>
+      <div class="small">動かす馬を選んでください。選んだ馬がコース上を進みます。</div>
       <div class="row" style="margin-top:8px">
         ${cards.map(c => `<button class="moveHorseBtn" data-horse="${c.horse}">${horseInfo(c.horse).icon} ${horseInfo(c.horse).label} +${c.moves[room.race.dice]}</button>`).join("")}
       </div>
