@@ -100,6 +100,156 @@
     .rank { font-size: 24px; font-weight: 900; }
     .selected { outline: 3px solid rgba(25, 135, 84, .35); }
 
+    /* ===== トップページ強化 ===== */
+    .homeHeroCard {
+      margin-top: 12px;
+      padding: 18px;
+      border-radius: 26px;
+      background:
+        radial-gradient(circle at 15% 10%, rgba(255,255,255,.9), transparent 34%),
+        linear-gradient(135deg, #215f3b, #3b8f52 58%, #d7a447);
+      color: white;
+      box-shadow: var(--shadow);
+      position: relative;
+      overflow: hidden;
+      min-height: 230px;
+    }
+    .homeHeroCard:after {
+      content: "🐎";
+      position: absolute;
+      right: -8px;
+      bottom: -20px;
+      font-size: 132px;
+      opacity: .24;
+      transform: rotate(-10deg);
+    }
+    .homeTitle {
+      font-size: clamp(30px, 8vw, 54px);
+      font-weight: 950;
+      letter-spacing: .04em;
+      line-height: 1.05;
+      margin: 0;
+      text-shadow: 0 3px 12px rgba(0,0,0,.22);
+    }
+    .homeLead { max-width: 520px; margin-top: 10px; font-weight: 750; opacity: .96; }
+    .homeBadges { display:flex; gap:7px; flex-wrap:wrap; margin-top:14px; }
+    .homeBadge { background: rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.34); border-radius:999px; padding:7px 10px; font-size:12px; font-weight:850; backdrop-filter: blur(6px); }
+    .homePanel { margin-top: 12px; display:grid; grid-template-columns: 1.2fr .8fr; gap: 12px; }
+    .homeForm, .homeHowTo {
+      background: rgba(255,250,240,.94);
+      border: 1px solid rgba(217,201,172,.9);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: var(--shadow);
+    }
+    .homeHowTo ol { margin: 8px 0 0; padding-left: 20px; }
+    .homeHowTo li { margin: 6px 0; }
+
+    /* ===== 双六風ボード ===== */
+    .sugorokuBoardWrap { margin-top: 10px; }
+    .sugorokuBoard {
+      display: grid;
+      grid-template-columns: repeat(9, minmax(0, 1fr));
+      gap: 4px;
+      padding: 8px;
+      border-radius: 22px;
+      background: linear-gradient(180deg, #347f43, #236839);
+      border: 6px solid #6c4a25;
+      box-shadow: inset 0 0 0 4px rgba(255,255,255,.17), var(--shadow);
+    }
+    .space {
+      min-height: 44px;
+      aspect-ratio: 1 / 1;
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      background: transparent;
+    }
+    .space.path {
+      background: linear-gradient(180deg, #f4d29b, #c9924e);
+      border: 2px solid rgba(77,45,18,.42);
+      box-shadow: inset 0 2px 0 rgba(255,255,255,.32);
+    }
+    .space.empty { visibility: hidden; }
+    .space.start { background: repeating-linear-gradient(45deg, #fff 0 8px, #222 8px 16px); color: #222; }
+    .space.finish { background: linear-gradient(180deg, #ffe26a, #d79a1c); }
+    .space.pace { outline: 3px solid #fff178; }
+    .spaceNum {
+      position: absolute;
+      left: 4px;
+      top: 3px;
+      font-size: 10px;
+      font-weight: 950;
+      color: rgba(49,35,20,.72);
+      z-index: 2;
+    }
+    .spaceLabel {
+      position: absolute;
+      right: 4px;
+      bottom: 3px;
+      font-size: 9px;
+      font-weight: 950;
+      color: rgba(49,35,20,.72);
+      z-index: 2;
+    }
+    .spaceHorses {
+      position: absolute;
+      inset: 15px 3px 3px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1px;
+      z-index: 4;
+    }
+    .miniHorse {
+      width: 22px;
+      height: 22px;
+      display: grid;
+      place-items: center;
+      border-radius: 999px;
+      background: #fff;
+      border: 3px solid var(--horse-color);
+      box-shadow: 0 3px 8px rgba(0,0,0,.2);
+      font-size: 13px;
+    }
+    .miniHorse.latest { animation: horseHop .8s ease both; }
+    .miniHorse.blocked { animation: blockedBounce .95s ease both; }
+    .paddock {
+      margin-top: 8px;
+      display: flex;
+      gap: 6px;
+      flex-wrap: wrap;
+      align-items: center;
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 16px;
+      padding: 8px;
+    }
+    .moveBanner {
+      margin-top: 8px;
+      padding: 8px 10px;
+      border-radius: 14px;
+      background: #fff7d6;
+      border: 1px solid #e3c765;
+      font-size: 12px;
+      font-weight: 850;
+    }
+    .remainTag { font-size: 11px; color: var(--muted); font-weight: 850; }
+    @keyframes horseHop {
+      0% { transform: translateY(0) scale(1); }
+      35% { transform: translateY(-10px) scale(1.15); }
+      70% { transform: translateY(1px) scale(.98); }
+      100% { transform: translateY(0) scale(1); }
+    }
+    @keyframes blockedBounce {
+      0% { transform: translateX(0) scale(1); }
+      25% { transform: translateX(12px) translateY(-5px) scale(1.12); }
+      55% { transform: translateX(-8px) scale(.98); }
+      80% { transform: translateX(3px); }
+      100% { transform: translateX(0) scale(1); }
+    }
+
     /* ===== 見た目強化：1周コース + サイコロ演出 ===== */
     .raceVisual {
       position: relative;
@@ -258,6 +408,15 @@
     }
 
     @media (max-width: 560px) {
+      .homePanel { grid-template-columns: 1fr; }
+      .homeHeroCard { min-height: 210px; }
+      .sugorokuBoard { gap: 3px; padding: 5px; border-width: 4px; }
+      .space { min-height: 34px; border-radius: 8px; }
+      .space.path { border-width: 1px; }
+      .spaceNum { font-size: 8px; left: 3px; top: 2px; }
+      .spaceLabel { font-size: 7px; right: 3px; bottom: 2px; }
+      .miniHorse { width: 18px; height: 18px; font-size: 11px; border-width: 2px; }
+      .spaceHorses { inset: 12px 2px 2px; }
       .two, .three { grid-template-columns: 1fr; }
       .lane { grid-template-columns: 72px 1fr 34px; }
       .betArea { grid-template-columns: 1fr; }
@@ -385,7 +544,7 @@
   function horseInfo(id) { return HORSES.find(h => h.id === id); }
   function playerName(id, r = room) { return r.players.find(p => p.id === id)?.name || "?"; }
   function currentPlayer(r = room) { return r.players[r.turnIndex % r.players.length]; }
-  function chipsForRule(r = room) { return r.secretBet ? [0, 1, 1, 2] : [1, 1, 2]; }
+  function chipsForRule(r = room) { return [1, 1, 2]; }
   function chipLabel(v) { return v === 0 ? "0" : String(v); }
   function diceObj(key) { return DICE.find(d => d.key === key); }
   function shuffle(arr) {
@@ -422,7 +581,7 @@
       code: roomCode,
       hostId: localId,
       phase: "lobby",
-      secretBet: true,
+      secretBet: false,
       raceNo: 0,
       turnIndex: 0,
       starterIndex: 0,
@@ -485,11 +644,27 @@
     await saveRoom(next);
   }
 
-  async function toggleSecret() {
-    if (!isHost()) return;
+  async function quitToTop() {
+    if (!room) return;
+    const oldId = localId;
     const next = clone(room);
-    next.secretBet = !next.secretBet;
+    const me = next.players.find(p => p.id === oldId);
+    if (me) {
+      me.type = "cpu";
+      me.name = `CPU代理-${me.name.replace(/^CPU代理-/, "")}`;
+    }
+    const otherHuman = next.players.find(p => p.type === "human" && p.id !== oldId);
+    if (next.hostId === oldId && otherHuman) next.hostId = otherHuman.id;
+    next.race?.log?.unshift(`${me?.name || "退出者"} が操作をCPUに引き継ぎました。`);
+    next.updatedAt = Date.now();
     await saveRoom(next);
+    if (unsubscribe) unsubscribe();
+    localId = crypto.randomUUID();
+    localStorage.setItem("umaDashPlayerId", localId);
+    room = null;
+    roomCode = "";
+    history.replaceState(null, "", location.pathname);
+    render();
   }
 
   async function addCpu() {
@@ -584,7 +759,7 @@
   async function placeBet(horseId) {
     if (!room || room.phase !== "betting") return;
     const p = currentBetPlayer(room);
-    if (p.id !== localId) return;
+    if (p.id !== localId || p.type !== "human") return;
     if (selectedChip === null) return alert("先にチップを選んでください");
     const remaining = remainingChips(room, p.id);
     if (!remaining.includes(selectedChip)) return;
@@ -612,7 +787,7 @@
   }
 
   async function rollDice() {
-    if (!room || room.phase !== "racing" || !isLocalTurn() || room.race.dice || room.race.diceRolling) return;
+    if (!room || room.phase !== "racing" || !isLocalTurn() || currentPlayer(room)?.type !== "human" || room.race.dice || room.race.diceRolling) return;
     const next = clone(room);
     next.race.dice = null;
     next.race.diceRolling = true;
@@ -668,6 +843,7 @@
       h.pos = GOAL_LINE + h.rank;
       r.race.finishOrder.push(horseId);
       card.moved = true;
+      r.race.lastMove = { horse: horseId, from: before, rawTarget, finalTarget: h.pos, blocked: false, ts: Date.now() };
       r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${move}進め、${h.rank}着でゴール！`);
     } else {
       const occupied = new Set(Object.entries(r.race.horses)
@@ -677,7 +853,13 @@
       while (target > before && occupied.has(target)) target--;
       h.pos = target;
       card.moved = true;
-      r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${before} → ${target} に進めました。`);
+      const blocked = target < rawTarget;
+      r.race.lastMove = { horse: horseId, from: before, rawTarget, finalTarget: target, blocked, ts: Date.now() };
+      if (blocked) {
+        r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${rawTarget}まで進めようとしましたが、マスが埋まっていたため ${target} まで戻りました。`);
+      } else {
+        r.race.log.unshift(`${p.name} が ${horseInfo(horseId).label} を ${before} → ${target} に進めました。`);
+      }
     }
 
     if (r.race.finishOrder.length >= 3) {
@@ -863,13 +1045,35 @@
 
   function renderHome() {
     return `
-      <section class="card grid">
-        <div class="small">${online ? "Firebase同期モード" : "ローカル練習モード：スマホ2台同期には firebaseConfig を設定してください"}</div>
-        <label>名前<input id="playerName" value="${escapeHtml(localName)}" /></label>
-        <label>部屋番号<input id="roomCode" value="${escapeHtml(roomCode || randomCode())}" maxlength="8" /></label>
-        <div class="grid two">
-          <button id="createRoom">部屋を作る</button>
-          <button id="joinRoom" class="secondary">部屋に入る</button>
+      <section class="homeHeroCard">
+        <h2 class="homeTitle">うまダッシュ<br>ターフ</h2>
+        <div class="homeLead">スマホだけで遊べる、競馬すごろく風レースゲーム。部屋番号を共有して、家族・友人・CPUとすぐ対戦できます。</div>
+        <div class="homeBadges">
+          <span class="homeBadge">👥 1〜6人</span>
+          <span class="homeBadge">🤖 CPU最大5人</span>
+          <span class="homeBadge">🎲 サイコロ演出</span>
+          <span class="homeBadge">📱 スマホ対応</span>
+        </div>
+      </section>
+      <section class="homePanel">
+        <div class="homeForm grid">
+          <div><b>ゲームをはじめる</b><div class="small">1台目は部屋を作る、2台目以降は同じ部屋番号で入ります。</div></div>
+          <label>名前<input id="playerName" value="${escapeHtml(localName)}" /></label>
+          <label>部屋番号<input id="roomCode" value="${escapeHtml(roomCode || randomCode())}" maxlength="8" /></label>
+          <div class="grid two">
+            <button id="createRoom">部屋を作る</button>
+            <button id="joinRoom" class="secondary">部屋に入る</button>
+          </div>
+          <div class="tiny">${online ? "Firebase同期ON：スマホ2台で同じ部屋に入れます。" : "ローカル練習モード：スマホ2台同期にはFirebase設定が必要です。"}</div>
+        </div>
+        <div class="homeHowTo">
+          <b>遊び方</b>
+          <ol class="small">
+            <li>馬に 1・1・2 のチップを賭ける</li>
+            <li>サイコロを振って、動かす馬を選ぶ</li>
+            <li>3着まで決まったら配当計算</li>
+            <li>3レース後に所持金が多い人の勝ち</li>
+          </ol>
         </div>
       </section>
     `;
@@ -894,16 +1098,11 @@
               ${p.id === room.hostId ? `<span class="pill">親</span>` : ""}
             </div>`).join("")}
         </div>
-        <div class="card" style="box-shadow:none;background:#fff;">
-          <div class="row between">
-            <div><b>秘密の賭け</b><div class="small">ON：0・1・1・2を裏向き / OFF：1・1・2を表向き</div></div>
-            <button id="toggleSecret" class="secondary" ${!isHost() ? "disabled" : ""}>${room.secretBet ? "ON" : "OFF"}</button>
-          </div>
-        </div>
         <div class="grid two">
           <button id="addCpu" class="secondary" ${!isHost() || room.players.length >= MAX_PLAYERS ? "disabled" : ""}>CPUを追加</button>
           <button id="startGame" class="good" ${!isHost() ? "disabled" : ""}>ゲーム開始</button>
         </div>
+        <div class="small" style="margin-top:8px">賭けチップは全員 1・1・2。秘密の賭けは使わない設定です。</div>
       </section>
     `;
   }
@@ -980,33 +1179,73 @@
     return { lobby: "待機", betting: "賭け", racing: "レース", payout: "払い戻し", gameover: "終了" }[phase] || phase;
   }
 
+  function boardSpaces() {
+    const coords = [];
+    for (let c = 4; c <= 8; c++) coords.push([0, c]);
+    for (let r = 1; r <= 8; r++) coords.push([r, 8]);
+    for (let c = 7; c >= 0; c--) coords.push([8, c]);
+    for (let r = 7; r >= 0; r--) coords.push([r, 0]);
+    for (let c = 1; c <= 3; c++) coords.push([0, c]);
+    return coords.slice(0, 31).map((xy, i) => ({ no: i, row: xy[0] + 1, col: xy[1] + 1 }));
+  }
+
   function renderTrack() {
     const cardsByHorse = Object.fromEntries(room.race.cards.map(c => [c.horse, c]));
-    const horseOrder = Object.keys(room.race.horses).sort((a, b) => room.race.horses[b].pos - room.race.horses[a].pos);
+    const lastMove = room.race.lastMove || {};
+    const placed = {};
+    const paddock = [];
+    for (const hid of Object.keys(room.race.horses)) {
+      const s = room.race.horses[hid];
+      if (s.status === "finished") continue;
+      if (s.pos < 0) paddock.push(hid);
+      else {
+        const no = Math.max(0, Math.min(GOAL_LINE, s.pos));
+        placed[no] ||= [];
+        placed[no].push(hid);
+      }
+    }
+    const spaces = boardSpaces();
+    const finishOrder = room.race.finishOrder.map((hid, idx) => `${idx + 1}着 ${horseInfo(hid).icon}${horseInfo(hid).label}`).join(" / ") || "まだゴールなし";
     return `<section class="card">
-      <div class="row between"><b>コース</b><span class="small">1周してゴール。黄色の光はペースホース。</span></div>
-      <div class="raceVisual" style="margin-top:10px">
-        <div class="startLine"></div>
-        <div class="startLabel">START / GOAL</div>
-        <div class="paceLabel">PACE 18</div>
-        ${horseOrder.map((hid, idx) => {
-          const h = horseInfo(hid);
-          const s = room.race.horses[hid];
-          const c = cardsByHorse[hid];
-          const pt = trackPoint(s.pos, idx);
-          const rankText = s.status === "finished" ? `${s.rank}` : s.pos;
-          return `<div class="horseSprite ${s.status === "finished" ? "done" : ""} ${c?.moved ? "moved" : ""}" style="--x:${pt.x}%;--y:${pt.y}%;--rot:${pt.rot}deg;--horse-color:${h.color};">
-            <div class="horseToken" data-rank="${rankText}">🐎</div>
-            <div class="horseNameTag">${h.icon} ${h.label}</div>
-          </div>`;
-        }).join("")}
+      <div class="row between"><b>すごろくコース</b><span class="small">30を超えたらゴール。同じマスには止まれないので、埋まっていたら戻ります。</span></div>
+      ${lastMove.blocked ? `<div class="moveBanner">${horseInfo(lastMove.horse).label}：${lastMove.rawTarget}マス目が埋まっていたため、${lastMove.finalTarget}マス目まで戻りました！</div>` : ""}
+      <div class="sugorokuBoardWrap">
+        <div class="sugorokuBoard">
+          ${Array.from({ length: 81 }).map((_, idx) => {
+            const row = Math.floor(idx / 9) + 1;
+            const col = idx % 9 + 1;
+            const sp = spaces.find(s => s.row === row && s.col === col);
+            if (!sp) return `<div class="space empty"></div>`;
+            const horses = placed[sp.no] || [];
+            const cls = `space path ${sp.no === 0 ? "start" : ""} ${sp.no === GOAL_LINE ? "finish" : ""} ${sp.no === PACE_SPACE ? "pace" : ""}`;
+            return `<div class="${cls}">
+              <div class="spaceNum">${sp.no}</div>
+              <div class="spaceLabel">${sp.no === 0 ? "START" : sp.no === GOAL_LINE ? "GOAL" : sp.no === PACE_SPACE ? "PACE" : ""}</div>
+              <div class="spaceHorses">
+                ${horses.map(hid => {
+                  const hi = horseInfo(hid);
+                  const c = cardsByHorse[hid];
+                  const isLatest = lastMove.horse === hid;
+                  return `<span class="miniHorse ${isLatest ? "latest" : ""} ${isLatest && lastMove.blocked ? "blocked" : ""} ${c?.moved ? "moved" : ""}" style="--horse-color:${hi.color};" title="${hi.label}">🐎</span>`;
+                }).join("")}
+              </div>
+            </div>`;
+          }).join("")}
+        </div>
       </div>
+      <div class="paddock"><b>出走待ち</b>${paddock.length ? paddock.map(hid => {
+        const hi = horseInfo(hid);
+        const s = room.race.horses[hid];
+        return `<span class="pill"><span class="miniHorse" style="--horse-color:${hi.color};">🐎</span>${hi.icon}${hi.label} ${s.pos}</span>`;
+      }).join("") : `<span class="small">なし</span>`}</div>
+      <div class="paddock"><b>ゴール</b><span class="small">${finishOrder}</span></div>
       <div class="cardStrip">
         ${room.race.cards.map(c => {
           const h = horseInfo(c.horse);
           const state = room.race.horses[c.horse];
+          const need = state.status === "finished" ? "ゴール済" : `あと${Math.max(1, GOAL_LINE - state.pos + 1)}マス以上`;
           return `<div class="raceCardMini ${c.moved ? "moved" : ""}">
-            <div class="row between"><b>${h.icon} ${h.label}</b><span>${state.status === "finished" ? `${state.rank}着` : `位置 ${state.pos}`}</span></div>
+            <div class="row between"><b>${h.icon} ${h.label}</b><span class="remainTag">${need}</span></div>
             <div class="moveNums"><span>🐴${c.moves.head}</span><span>🎩${c.moves.hat}</span><span>🥕${c.moves.carrot}</span><span>🧲${c.moves.shoe}</span></div>
           </div>`;
         }).join("")}
@@ -1015,7 +1254,7 @@
   }
 
   function renderBets() {
-    const visible = room.phase === "payout" || room.phase === "gameover" || !room.secretBet;
+    const visible = true;
     return `<section class="card">
       <div class="row between"><b>賭けエリア</b><span class="small">総票数は0を除外</span></div>
       <div class="betArea" style="margin-top:8px">
@@ -1036,10 +1275,11 @@
   }
 
   function renderActionPanel() {
-    if (room.phase === "betting") return renderBetAction();
-    if (room.phase === "racing") return renderRaceAction();
-    if (room.phase === "payout") return `<section class="actions"><button id="nextRace" class="good" ${!isHost() ? "disabled" : ""}>次のレースへ</button></section>`;
-    if (room.phase === "gameover") return `<section class="actions"><button id="backToLobby" ${!isHost() ? "disabled" : ""}>ロビーに戻る</button></section>`;
+    const quitBtn = `<button id="quitToTop" class="secondary">ゲームをやめる</button>`;
+    if (room.phase === "betting") return renderBetAction() + `<section class="actions">${quitBtn}<div class="small">やめると自分の操作はCPUが代理します。</div></section>`;
+    if (room.phase === "racing") return renderRaceAction() + `<section class="actions">${quitBtn}<div class="small">やめると自分の操作はCPUが代理します。</div></section>`;
+    if (room.phase === "payout") return `<section class="actions"><div class="row"><button id="nextRace" class="good" ${!isHost() ? "disabled" : ""}>次のレースへ</button>${quitBtn}</div></section>`;
+    if (room.phase === "gameover") return `<section class="actions"><div class="row"><button id="backToLobby" ${!isHost() ? "disabled" : ""}>ロビーに戻る</button>${quitBtn}</div></section>`;
     return "";
   }
 
@@ -1098,12 +1338,13 @@
   function bindEvents() {
     document.getElementById("createRoom")?.addEventListener("click", createRoom);
     document.getElementById("joinRoom")?.addEventListener("click", joinRoom);
-    document.getElementById("toggleSecret")?.addEventListener("click", toggleSecret);
+    
     document.getElementById("addCpu")?.addEventListener("click", addCpu);
     document.getElementById("startGame")?.addEventListener("click", startGame);
     document.getElementById("rollDice")?.addEventListener("click", rollDice);
     document.getElementById("nextRace")?.addEventListener("click", nextRace);
     document.getElementById("backToLobby")?.addEventListener("click", backToLobby);
+    document.getElementById("quitToTop")?.addEventListener("click", quitToTop);
     document.querySelectorAll(".chipBtn").forEach(btn => btn.addEventListener("click", () => {
       selectedChip = Number(btn.dataset.chip);
       render();
