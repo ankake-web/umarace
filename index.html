@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v30 taller board / less vertical overlap -->
+<!-- umauma-race v31 simple board / bigger spaces / green dice button / effects -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -60,10 +60,10 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 @keyframes diceShake{from{translate:-3px -2px}to{translate:3px 2px}}
 @keyframes diceSpin{from{rotate:0deg}to{rotate:360deg}}
 
-.trackBoard{position:relative;margin-top:10px;aspect-ratio:2.42;border-radius:20px;background:linear-gradient(180deg,#5eb56b,#17723c);border:5px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);overflow:hidden}
+.trackBoard{position:relative;margin-top:0;aspect-ratio:2.35;border-radius:20px;background:linear-gradient(180deg,#5eb56b,#17723c);border:5px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);overflow:hidden}
 .trackBoard:before{content:"";position:absolute;inset:11% 3%;border-radius:16px;border:7px solid rgba(229,195,132,.92);background:linear-gradient(180deg,#2e8b4b,#146a34);box-shadow:inset 0 0 0 3px rgba(255,255,255,.26)}
 .trackBoard:after{content:"";position:absolute;inset:33% 21%;border-radius:14px;background:linear-gradient(180deg,#2b8448,#0f6330);border:2px solid rgba(255,255,255,.28)}
-.trackSpace{position:absolute;width:7.1%;height:13.8%;transform:translate(-50%,-50%);border-radius:6px;background:linear-gradient(180deg,#ffe0a5,#d7a05b);border:1px solid rgba(77,45,18,.42);box-shadow:inset 0 2px 0 rgba(255,255,255,.36);z-index:2}
+.trackSpace{position:absolute;width:7.45%;height:14.4%;transform:translate(-50%,-50%);border-radius:6px;background:linear-gradient(180deg,#ffe0a5,#d7a05b);border:1px solid rgba(77,45,18,.42);box-shadow:inset 0 2px 0 rgba(255,255,255,.36);z-index:2}
 .trackSpace.finish{background:linear-gradient(180deg,#fff07a,#dba020)}
 .trackSpace.pace{outline:2px solid #fff178}
 .num{position:absolute;left:2px;top:1px;font-size:7px;font-weight:950;color:rgba(49,35,20,.72);z-index:2}
@@ -81,7 +81,7 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .centerList{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:3px 10px}
 .moveLine{font-size:12px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .waitLine{text-align:center;font-size:14px;font-weight:950}
-.moveBanner{margin-top:8px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
+.moveBanner{margin-bottom:8px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
 
 .cardStrip{margin-top:10px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .horseGrid{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -112,6 +112,8 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .primaryActionRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .primaryActionRow button{flex:1 1 auto}
 .betGuide{font-size:15px;font-weight:950;line-height:1.45;text-align:center;color:#fff}
+.diceRollButton{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;font-size:18px;padding:14px 16px;background:linear-gradient(180deg,#45c979,#15884b);border:2px solid rgba(255,255,255,.75)}
+.diceRollButton .diceIcon{font-size:28px}
 .log{max-height:150px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}
 .log div{padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
 .rank{font-size:24px;font-weight:950}
@@ -126,10 +128,10 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .app{padding:8px 6px 132px}
 .card{padding:10px;border-radius:18px}
 .actions{border-radius:18px}
-.trackBoard{aspect-ratio:2.58;border-width:4px;border-radius:15px}
+.trackBoard{aspect-ratio:2.48;border-width:4px;border-radius:15px}
 .trackBoard:before{inset:10% 2.8%;border-width:6px;border-radius:13px}
 .trackBoard:after{inset:33% 20%;border-radius:11px}
-.trackSpace{width:7.3%;height:14.2%;border-radius:5px}
+.trackSpace{width:7.6%;height:14.8%;border-radius:5px}
 .num{font-size:6px}
 .lab{font-size:5px}
 .pony{width:13px;height:13px;font-size:8px;border-width:2px}
@@ -149,6 +151,8 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .centerList{gap:3px 10px}
 .moveLine{font-size:10px;line-height:1.25}
 .waitLine{font-size:11px}
+.diceRollButton{font-size:17px;padding:13px 14px}
+.diceRollButton .diceIcon{font-size:26px}
 }
 </style>
 </head>
@@ -215,6 +219,7 @@ await signInAnonymously(auth);
 db=getFirestore(app);
 online=true;
 }
+
 const clone=x=>JSON.parse(JSON.stringify(x));
 function shuffle(arr){const a=[...arr];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
 const randomCode=()=>Math.random().toString(36).slice(2,6).toUpperCase();
@@ -279,7 +284,7 @@ localName=(document.getElementById("playerName")?.value||"名無").trim().slice(
 localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 history.replaceState(null,"","#"+roomCode);
-const base={version:30,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal"},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:31,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal"},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
@@ -373,6 +378,7 @@ return chips;
 }
 const nextChip=(r,pid)=>remainingChips(r,pid)[0]??null;
 const alreadyBetHorses=(r,pid)=>new Set(r.race.bets.filter(b=>b.playerId===pid).map(b=>b.horse));
+
 async function placeBet(horseId){
 if(!room||room.phase!=="betting")return;
 const p=currentBetPlayer(room);
@@ -384,6 +390,7 @@ const next=clone(room);
 next.race.bets.push({id:crypto.randomUUID(),playerId:p.id,horse:horseId,chip});
 next.race.log.unshift(`${p.name} が ${horseDisplayName(horseId)} に${chip}チップを置きました。`);
 afterBet(next);
+playEffect("bet");
 await saveRoom(next);
 }
 function afterBet(r){
@@ -398,6 +405,7 @@ r.race.log.unshift("賭け終了。レース開始！");
 r.race.log.unshift(`次は ${currentBetPlayer(r).name} の賭けです。`);
 }
 }
+
 async function rollDice(){
 if(!room||room.phase!=="racing"||currentPlayer(room)?.id!==localId||currentPlayer(room)?.type!=="human"||room.race.dice||room.race.diceRolling||animationState)return;
 const next=clone(room);
@@ -650,6 +658,7 @@ if(!room?.race?.lastMove||room.race.lastMove.ts!==move.ts){animationState=null;r
 if(idx<path.length){
 animationState={horse:move.horse,pos:path[idx],ts:move.ts};
 idx++;
+playEffect("step");
 render();
 animationTimer=setTimeout(step,190);
 }else{
@@ -741,7 +750,7 @@ return`<div class="diceStage"><div class="diceCube">${d?d.icon:"🎲"}</div><div
 }
 function renderCenter(){
 if(room.race.diceRolling)return`<div class="centerInfo"><div class="waitLine">🎲 回転中…</div></div>`;
-if(!room.race.dice)return`<div class="centerInfo"><div class="waitLine">🎲 サイコロ待ち</div></div>`;
+if(!room.race.dice)return`<div class="centerInfo"><div class="waitLine">🎲</div></div>`;
 const dice=diceObj(room.race.dice);
 const cards=activeCards(clone(room));
 return`<div class="centerInfo"><b>🎲 ${dice.icon} ${dice.label}</b><div class="centerList">${cards.map(c=>{const p=previewMove(c);return`<div class="moveLine">🐴${horseShort(c.horse)} ${p.from}→${p.to}</div>`}).join("")}</div></div>`;
@@ -755,8 +764,7 @@ const pos=displayPosition(hid,horseDisplayPos(s));
 placed[pos]??=[];
 placed[pos].push(hid);
 }
-const finishOrder=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / ")||"まだゴールなし";
-return`<section class="card"><div class="row between"><b>36マスコース</b><span class="small">START 30〜36 / PACE 18 / GOAL 36</span></div>${lastMove.blocked?`<div class="moveBanner">${horseDisplayName(lastMove.horse)}：マスが埋まっていたため${lastMove.finalTarget}へ戻りました</div>`:""}<div class="trackBoard">${renderCenter()}${trackSpaces().map(sp=>{const horses=placed[sp.no]||[],cls=`trackSpace ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}" style="left:${sp.x}%;top:${sp.y}%"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),latest=lastMove.horse===hid;return`<span class="pony ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div><div style="margin-top:8px"><b>ゴール</b> <span class="small">${finishOrder}</span></div>${renderHorseCards()}</section>`;
+return`<section class="card">${lastMove.blocked?`<div class="moveBanner">${horseDisplayName(lastMove.horse)}：マスが埋まっていたため${lastMove.finalTarget}へ戻りました</div>`:""}<div class="trackBoard">${renderCenter()}${trackSpaces().map(sp=>{const horses=placed[sp.no]||[],cls=`trackSpace ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}" style="left:${sp.x}%;top:${sp.y}%"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),latest=lastMove.horse===hid;return`<span class="pony ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div>${renderHorseCards()}</section>`;
 }
 function renderHorseCards(){
 const isBet=room.phase==="betting"&&currentBetPlayer(room)?.id===localId&&currentBetPlayer(room)?.type==="human";
@@ -801,23 +809,17 @@ function renderRaceAction(){
 const p=currentPlayer(room);
 if(animationState)return"";
 if(p.id!==localId||p.type!=="human")return"";
-
 if(room.race.diceRolling){
-  return`<section class="actions">
-    <div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div>
-  </section>`;
+  return`<section class="actions"><div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div></section>`;
 }
-
 if(room.race.dice){
   return`<section class="actions">
     <div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div>
     <div class="betGuide" style="color:var(--ink);margin-top:6px">進める馬カードをタップ</div>
   </section>`;
 }
-
 return`<section class="actions">
-  <div class="primaryActionRow"><button id="rollDice" class="good">🎲 サイコロを振る</button></div>
-  <div class="dicePanel">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div>
+  <button id="rollDice" class="diceRollButton"><span class="diceIcon">🎲</span><span>サイコロを振る</span></button>
 </section>`;
 }
 function renderPayout(){
@@ -825,6 +827,7 @@ if(!room.race?.payout)return"";
 const order=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / "),last=room.race.lastHorse?horseDisplayName(room.race.lastHorse):"-",winner=[...room.players].sort((a,b)=>b.money-a.money)[0];
 return`<section class="card"><b>${room.phase==="gameover"?"最終結果":"払い戻し"}</b><div class="row" style="margin-top:8px"><span class="pill">${order}</span><span class="pill">最下位 ${last}</span><span class="pill">倍率 ${room.race.payout.multiplier}倍</span></div><div class="grid" style="margin-top:10px">${room.race.payout.playerResults.map(res=>`<div class="playerBox"><div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net>=0?"+":""}${res.net} → ¥${res.after}</span></div><div class="tiny">${res.details.length?escapeHtml(res.details.join(" / ")):"的中・支払いなし"}</div></div>`).join("")}</div>${room.phase==="gameover"?`<div class="card" style="box-shadow:none;background:#fff"><span class="rank">🏆</span> 優勝：<b>${escapeHtml(winner.name)}</b> ¥${winner.money}</div>`:""}</section>`;
 }
+
 function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}
 function playNote(freq,start,duration,type="square",gain=.05){
 if(!audioCtx)return;
@@ -838,10 +841,31 @@ osc.start(start);
 osc.stop(start+duration+.02);
 }
 function playEffect(kind){
-if(!bgmOn)return;
 ensureAudio();
 const t=audioCtx.currentTime;
-(kind==="dice"?[420,520,630,760]:[330,392,494]).forEach((f,i)=>playNote(f,t+i*.07,.06,"triangle",.035));
+
+if(kind==="dice"){
+  [420,520,630,760].forEach((f,i)=>playNote(f,t+i*.06,.055,"triangle",.035));
+  return;
+}
+
+if(kind==="move"){
+  [392,440,494,587].forEach((f,i)=>playNote(f,t+i*.055,.05,"square",.025));
+  return;
+}
+
+if(kind==="bet"){
+  [523,659].forEach((f,i)=>playNote(f,t+i*.055,.06,"triangle",.035));
+  return;
+}
+
+if(kind==="step"){
+  playNote(240,t,.035,"square",.018);
+  playNote(360,t+.025,.035,"triangle",.014);
+  return;
+}
+
+playNote(440,t,.05,"triangle",.03);
 }
 function bgmTick(){
 if(!bgmOn)return;
@@ -856,6 +880,7 @@ bgmStep=(bgmStep+4)%mel.length;
 function startBgm(){ensureAudio();bgmOn=true;bgmTick();clearInterval(bgmTimer);bgmTimer=setInterval(bgmTick,720);render()}
 function stopBgm(){bgmOn=false;clearInterval(bgmTimer);render()}
 function toggleBgm(){bgmOn?stopBgm():startBgm()}
+
 function bindEvents(){
 document.getElementById("createRoom")?.addEventListener("click",createRoom);
 document.getElementById("joinRoom")?.addEventListener("click",joinRoom);
