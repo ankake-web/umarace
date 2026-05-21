@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまダッシュ</title>
-<!-- umauma-dash v23 fixed full-course map / smooth fade / dice-only bottom bar -->
+<!-- umauma-dash v24 center-move-list / no fixed map -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -55,7 +55,7 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 @keyframes diceShake{from{translate:-3px -2px}to{translate:3px 2px}}
 @keyframes diceSpin{from{rotate:0deg}to{rotate:360deg}}
 
-.board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;padding:4px;border-radius:20px;background:linear-gradient(180deg,#74c979,#38a35a);border:5px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);position:relative;margin-top:8px}
+.board{display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:2px;padding:4px;border-radius:20px;background:linear-gradient(180deg,#74c979,#38a35a);border:5px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);position:relative;margin-top:10px}
 .sp{min-height:28px;aspect-ratio:1/1;border-radius:9px;position:relative;overflow:hidden}
 .path{background:linear-gradient(180deg,#ffe0a5,#d7a05b);border:1px solid rgba(77,45,18,.38);box-shadow:inset 0 2px 0 rgba(255,255,255,.36)}
 .empty{visibility:hidden}.finish{background:linear-gradient(180deg,#fff07a,#dba020)}.pace{outline:2px solid #fff178}
@@ -67,9 +67,13 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .pony.latest{animation:horseHop .8s ease both}.pony.blocked{animation:blockedBounce .95s ease both}
 @keyframes horseHop{0%{transform:translateY(0) scale(1)}35%{transform:translateY(-10px) scale(1.15)}70%{transform:translateY(1px) scale(.98)}100%{transform:translateY(0) scale(1)}}
 @keyframes blockedBounce{0%{transform:translateX(0) scale(1)}25%{transform:translateX(12px) translateY(-5px) scale(1.12)}55%{transform:translateX(-8px) scale(.98)}80%{transform:translateX(3px)}100%{transform:translateX(0) scale(1)}}
-.centerInfo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;background:rgba(255,253,247,.94);border:1px solid var(--line);border-radius:16px;padding:7px 9px;box-shadow:0 5px 14px rgba(0,0,0,.12);font-size:10px;line-height:1.45;width:54%;max-width:320px}
-.centerInfo b{display:block;text-align:center;margin-bottom:3px}.centerLine{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.centerInfo{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);z-index:3;background:rgba(255,253,247,.95);border:1px solid var(--line);border-radius:16px;padding:8px 10px;box-shadow:0 5px 14px rgba(0,0,0,.12);font-size:13px;line-height:1.42;width:58%;max-width:340px}
+.centerInfo b{display:block;text-align:center;margin-bottom:4px;font-size:13px}
+.moveLine{font-size:13px;font-weight:950;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.waitLine{text-align:center;font-size:14px;font-weight:950}
 .moveBanner{margin-top:8px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
+
 .cardStrip,.horseGrid{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .horseCard{background:linear-gradient(180deg,#fff,#fffaf0);border:1px solid var(--line);border-radius:18px;padding:9px;font-size:12px;transition:transform .15s,box-shadow .15s,outline .15s}
 .horseCard.clickable{cursor:pointer}.horseCard.clickable:active{transform:scale(.98)}
@@ -82,12 +86,7 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .betMini{display:flex;flex-wrap:wrap;gap:5px;margin-top:6px;min-height:30px;align-content:flex-start}
 .actionSlot{min-height:42px;margin-top:8px}
 
-.fixedTrack{position:fixed;left:50%;top:calc(8px + env(safe-area-inset-top));transform:translateX(-50%);z-index:11;width:min(980px,calc(100vw - 16px));background:rgba(255,253,247,.97);border:1px solid var(--line);border-radius:22px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeDown .55s ease both}
-.fixedTrack .board{margin-top:4px;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22)}
-.fixedTitle{display:flex;justify-content:space-between;gap:8px;align-items:center;font-size:12px;font-weight:950}
-.fixedSpacer{height:330px}
 .actions{position:fixed;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 16px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:24px;padding:10px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeUp .55s ease both}
-@keyframes fadeDown{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
 @keyframes fadeUp{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
 .primaryActionRow{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.primaryActionRow button{flex:1 1 auto}
 .stickyDiceMini{display:inline-flex;align-items:center;gap:8px;padding:6px 9px;border-radius:999px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:900}
@@ -104,13 +103,10 @@ h1{margin:0;font-size:24px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .app{padding:8px 8px 132px}.actions{border-radius:18px}
 .horseCard{padding:7px}.horseName{font-size:12px}.moves span{font-size:10px;padding:2px 5px}
 .mood{padding:4px 6px}.moodText{display:none}
-.centerInfo{font-size:8px;padding:4px;width:58%}
-.fixedTrack{padding:6px;border-radius:18px}
-.fixedTrack .sp{min-height:18px}
-.fixedTrack .pony{width:14px;height:14px;font-size:9px}
-.fixedTrack .slot{inset:7px 1px 1px}
-.fixedTrack .centerInfo{font-size:8px;padding:4px}
-.fixedSpacer{height:255px}
+.centerInfo{font-size:10px;padding:5px 6px;width:62%;border-radius:12px}
+.centerInfo b{font-size:10px;margin-bottom:2px}
+.moveLine{font-size:10px;line-height:1.35}
+.waitLine{font-size:11px}
 }
 </style>
 </head>
@@ -144,13 +140,13 @@ const DICE=[
 {key:"weather",label:"天候",icon:"☀️"}
 ];
 const HORSES=[
-{id:"red",label:"レッドインパクト",base:{horse:2,cap:12,carrot:5,weather:7},color:"#e53935"},
-{id:"black",label:"コタサンブラック",base:{horse:7,cap:2,carrot:4,weather:3},color:"#222"},
-{id:"pink",label:"オグリピンク",base:{horse:4,cap:3,carrot:12,weather:3},color:"#f78ac3"},
-{id:"yellow",label:"イエローアイ",base:{horse:3,cap:10,carrot:8,weather:3},color:"#f2c94c"},
-{id:"green",label:"グリーンテイオー",base:{horse:4,cap:11,carrot:1,weather:6},color:"#27ae60"},
-{id:"white",label:"シロイロックス",base:{horse:5,cap:8,carrot:2,weather:5},color:"#f8f8f8"},
-{id:"blue",label:"オルフェーブルー",base:{horse:1,cap:14,carrot:1,weather:12},color:"#2f80ed"}
+{id:"red",label:"レッドインパクト",short:"レッド",base:{horse:2,cap:12,carrot:5,weather:7},color:"#e53935"},
+{id:"black",label:"コタサンブラック",short:"コタ",base:{horse:7,cap:2,carrot:4,weather:3},color:"#222"},
+{id:"pink",label:"オグリピンク",short:"オグリ",base:{horse:4,cap:3,carrot:12,weather:3},color:"#f78ac3"},
+{id:"yellow",label:"イエローアイ",short:"イエロ",base:{horse:3,cap:10,carrot:8,weather:3},color:"#f2c94c"},
+{id:"green",label:"グリーンテイオー",short:"グリン",base:{horse:4,cap:11,carrot:1,weather:6},color:"#27ae60"},
+{id:"white",label:"シロイロックス",short:"シロイ",base:{horse:5,cap:8,carrot:2,weather:5},color:"#f8f8f8"},
+{id:"blue",label:"オルフェーブルー",short:"オルフ",base:{horse:1,cap:14,carrot:1,weather:12},color:"#2f80ed"}
 ];
 const MOOD={
 good:{label:"好調",face:"😄",delta:0,className:"moodGood"},
@@ -191,6 +187,7 @@ const face=key=>FACE[key]||key;
 const effectiveTotal=m=>m.horse*3+m.cap+m.carrot+m.weather;
 const averageMove=m=>(effectiveTotal(m)/6).toFixed(1);
 const horseDisplayName=hid=>horseInfo(hid)?.label||hid;
+const horseShort=hid=>horseInfo(hid)?.short||hid;
 const horseCard=(hid,r=room)=>r?.race?.cards?.find(c=>c.horse===hid);
 function moodBadge(k){const m=MOOD[k]||MOOD.normal;return`<span class="mood ${m.className}"><span>${m.face}</span><span class="moodText">${m.label}</span></span>`}
 
@@ -229,7 +226,7 @@ localName=(document.getElementById("playerName")?.value||"プレイヤー").trim
 localStorage.setItem("umaDashPlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 history.replaceState(null,"","#"+roomCode);
-const base={version:23,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:24,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
@@ -576,6 +573,18 @@ render();
 };
 step();
 }
+function previewMove(card){
+const diceKey=room.race.dice;
+const state=room.race.horses[card.horse];
+const before=state.pos;
+const move=Number(card.moves[diceKey]||0);
+const raw=before+move;
+if(raw>GOAL_LINE)return{from:before,to:"GOAL",zero:false};
+const occupied=new Set(Object.entries(room.race.horses).filter(([hid,s])=>hid!==card.horse&&s.status==="running").map(([_,s])=>s.pos));
+let target=raw;
+while(target>before&&occupied.has(target))target--;
+return{from:before,to:target,zero:target===before};
+}
 
 function render(){appEl.innerHTML=`${room?`<section class="hero"><h1>${GAME_TITLE}</h1></section>`:""}${!room?renderHome():renderRoom()}`;bindEvents()}
 function payoutTable(){return`<table class="payout"><tr><th>着順</th><th>1票</th><th>2票</th><th>3票</th><th>4票</th><th>5票〜</th></tr><tr><th>1着</th><td>500</td><td>350</td><td>250</td><td>200</td><td>150</td></tr><tr><th>2着</th><td>350</td><td>250</td><td>200</td><td>150</td><td>100</td></tr><tr><th>3着</th><td>250</td><td>200</td><td>150</td><td>100</td><td>100</td></tr></table>`}
@@ -583,15 +592,19 @@ function renderHome(){return`<section class="homeHero"><div class="homeCopy"><h2
 function renderRoom(){return room.phase==="lobby"?renderLobby():renderGame()}
 function renderLobby(){return`<section class="card"><div class="row between"><div><b>部屋番号：${room.code}</b><div class="tiny">同じ部屋番号で参加</div></div><span class="pill">${online?"同期ON":"ローカル"}</span></div><div class="grid" style="margin-top:10px">${room.players.map((p,i)=>`<div class="playerBox row between"><div class="row"><span class="chip" style="border-color:${p.color}">${i+1}</span><b>${escapeHtml(p.name)}</b></div></div>`).join("")}</div><div class="grid two" style="margin-top:10px"><button id="addCpu" class="secondary" ${!isHost()||room.players.length>=MAX_PLAYERS?"disabled":""}>CPUを追加</button><button id="removeCpu" class="secondary" ${!isHost()||!room.players.some(p=>p.type==="cpu")?"disabled":""}>CPUを減らす</button><button id="startGame" class="good" ${!isHost()?"disabled":""}>ゲーム開始</button></div><div class="row" style="margin-top:8px"><button id="toggleBgm" class="secondary">🎺 BGM ${bgmOn?"OFF":"ON"}</button></div></section><section class="card"><b>ルール</b><ol class="small" style="margin:8px 0 0;padding-left:20px"><li>馬カードを選び、2 → 1 → 1 の順にチップを賭けます。</li><li>サイコロは 🐎馬×3 / 🧢ジョッキー / 🥕人参 / ☀️天候。</li><li>同じマスに複数の馬は止まれません。</li><li>人気が集まるほど配当は下がり、人気薄ほど高配当になります。</li><li>3レース終了時に所持金が多い人の勝ちです。</li></ol></section>${renderHorseMaster()}`}
 function renderHorseMaster(){return`<section class="card"><b>出走馬・基本能力</b><div class="horseGrid">${HORSES.map(h=>`<div class="horseCard"><div class="horseHead"><b class="horseName"><span class="pony" style="--horse-color:${h.color}">🐴</span> ${h.label}</b></div><div class="moves"><span>${face("horse")}${h.base.horse}</span><span>${face("cap")}${h.base.cap}</span><span>${face("carrot")}${h.base.carrot}</span><span>${face("weather")}${h.base.weather}</span></div></div>`).join("")}</div></section>`}
-function renderGame(){return`${renderFixedTrack()}${renderScoreBoard()}${renderRaceHeader()}${room.phase==="betting"?renderBetTurnPanel():""}${renderHorseArea()}${renderPayout()}<section class="card"><b>ログ</b><div class="log">${room.race.log.slice(0,40).map(x=>`<div>${escapeHtml(x)}</div>`).join("")}</div></section>${renderPayoutGuide()}${renderActionPanel()}`}
+function renderGame(){return`${renderScoreBoard()}${renderRaceHeader()}${room.phase==="betting"?renderBetTurnPanel():""}${renderTrack()}${renderPayout()}<section class="card"><b>ログ</b><div class="log">${room.race.log.slice(0,40).map(x=>`<div>${escapeHtml(x)}</div>`).join("")}</div></section>${renderPayoutGuide()}${renderActionPanel()}`}
 function renderScoreBoard(){const sorted=[...room.players].sort((a,b)=>b.money-a.money);return`<section class="card scoreGrid">${sorted.map(p=>`<div class="playerBox ${currentPlayer()?.id===p.id&&room.phase==="racing"?"current":""}"><div class="row between"><b>${escapeHtml(p.name)}</b><span class="money">¥${p.money}</span></div><div class="small">${p.id===localId?"あなた":""}</div></div>`).join("")}</section>`}
 function renderDiceVisual(diceKey,rolling){if(rolling)return`<div class="diceStage"><div class="diceCube rolling">🎲</div><div><div class="diceText">サイコロ回転中…</div><div class="diceFaces">🐎 🐎 🐎 🧢 🥕 ☀️</div></div></div>`;const d=diceKey?diceObj(diceKey):null;return`<div class="diceStage"><div class="diceCube">${d?d.icon:"🎲"}</div><div><div class="diceText">${d?`出目：${d.label}`:"サイコロ待ち"}</div><div class="diceFaces">🐎×3 / 🧢 / 🥕 / ☀️</div></div></div>`}
 function renderRaceHeader(){const turn=room.phase==="betting"?currentBetPlayer(room):currentPlayer(room);return`<section class="card"><div class="row between"><b>第${room.raceNo}レース</b><span class="pill">手番：${escapeHtml(turn?.name||"-")}</span></div><div class="row" style="margin-top:8px"><button id="toggleBgm" class="secondary">🎺 BGM ${bgmOn?"OFF":"ON"}</button><button id="quitToTop" class="secondary">ゲームをやめる</button>${room.raceNo===3?`<span class="pill">3R：すべて2倍</span>`:""}</div></section>`}
 function renderBetTurnPanel(){const p=currentBetPlayer(room),chip=nextChip(room,p.id);return p.id===localId&&p.type==="human"?`<section class="card"><b>あなたのBET</b><div class="small">次のチップ：<b>${chip}</b>。下の馬カードをタップ。</div></section>`:`<section class="card"><b>${escapeHtml(p.name)} のBET待ち</b><div class="small">CPUなら自動で進みます。</div></section>`}
-function renderCenter(){const turn=room.phase==="betting"?currentBetPlayer(room):currentPlayer(room);const dice=room.race.dice?diceObj(room.race.dice):null;const order=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / ")||"未定";return`<div class="centerInfo"><b>レース状況</b><div class="centerLine">手番：${escapeHtml(turn?.name||"-")}</div><div class="centerLine">出目：${dice?`${dice.icon} ${dice.label}`:room.race.diceRolling?"🎲 回転中":"未振り"}</div><div class="centerLine">PACE：${room.race.paceHorse?horseDisplayName(room.race.paceHorse):"未定"}</div><div class="centerLine">順位：${order}</div></div>`}
-function renderBoard(){const lastMove=room.race.lastMove||{},placed={};for(const hid of Object.keys(room.race.horses)){const s=room.race.horses[hid];if(s.status==="finished")continue;const pos=Math.max(1,Math.min(GOAL_LINE,displayPosition(hid,s.pos)));placed[pos]??=[];placed[pos].push(hid)}const spaces=boardSpaces();return`<div class="board">${renderCenter()}${Array.from({length:100}).map((_,idx)=>{const row=Math.floor(idx/10)+1,col=idx%10+1,sp=spaces.find(s=>s.row===row&&s.col===col);if(!sp)return`<div class="sp empty"></div>`;const horses=placed[sp.no]||[],cls=`sp path ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),latest=lastMove.horse===hid;return`<span class="pony ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div>`}
-function renderFixedTrack(){if(!room.race)return"";const lastMove=room.race.lastMove||{};return`<div class="fixedSpacer"></div><section class="fixedTrack"><div class="fixedTitle"><span>🏇 36マスコース</span><span>${room.race.dice?`🎲 ${diceObj(room.race.dice).icon} ${diceObj(room.race.dice).label}`:room.race.diceRolling?"🎲 回転中":"🎲 未振り"}</span></div>${lastMove.blocked?`<div class="moveBanner">${horseDisplayName(lastMove.horse)}：${lastMove.rawTarget}が埋まっていたため${lastMove.finalTarget}へ戻りました</div>`:""}${renderBoard()}</section>`}
-function renderHorseArea(){const finishOrder=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / ")||"まだゴールなし";return`<section class="card"><div class="row between"><b>馬カード</b><span class="small">ゴール：${finishOrder}</span></div>${renderHorseCards()}</section>`}
+function renderCenter(){
+if(room.race.diceRolling)return`<div class="centerInfo"><div class="waitLine">🎲 回転中…</div></div>`;
+if(!room.race.dice)return`<div class="centerInfo"><div class="waitLine">🎲 サイコロ待ち</div></div>`;
+const dice=diceObj(room.race.dice);
+const cards=activeCards(clone(room));
+return`<div class="centerInfo"><b>🎲 ${dice.icon} ${dice.label}</b>${cards.map(c=>{const p=previewMove(c);return`<div class="moveLine">🐴${horseShort(c.horse)} ${p.from}→${p.to}${p.zero?"（+0）":""}</div>`}).join("")}</div>`;
+}
+function renderTrack(){const lastMove=room.race.lastMove||{},placed={};for(const hid of Object.keys(room.race.horses)){const s=room.race.horses[hid];if(s.status==="finished")continue;const pos=Math.max(1,Math.min(GOAL_LINE,displayPosition(hid,s.pos)));placed[pos]??=[];placed[pos].push(hid)}const spaces=boardSpaces(),finishOrder=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / ")||"まだゴールなし";return`<section class="card"><div class="row between"><b>36マスコース</b><span class="small">同じマスには止まれません</span></div>${lastMove.blocked?`<div class="moveBanner">${horseDisplayName(lastMove.horse)}：${lastMove.rawTarget}が埋まっていたため${lastMove.finalTarget}へ戻りました</div>`:""}<div class="board">${renderCenter()}${Array.from({length:100}).map((_,idx)=>{const row=Math.floor(idx/10)+1,col=idx%10+1,sp=spaces.find(s=>s.row===row&&s.col===col);if(!sp)return`<div class="sp empty"></div>`;const horses=placed[sp.no]||[],cls=`sp path ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),latest=lastMove.horse===hid;return`<span class="pony ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div><div style="margin-top:8px"><b>ゴール</b> <span class="small">${finishOrder}</span></div>${renderHorseCards()}</section>`}
 function renderHorseCards(){const isBet=room.phase==="betting"&&currentBetPlayer(room)?.id===localId&&currentBetPlayer(room)?.type==="human",chip=isBet?nextChip(room,localId):null,used=isBet?alreadyBetHorses(room,localId):new Set(),isRace=room.phase==="racing"&&currentPlayer(room)?.id===localId&&currentPlayer(room)?.type==="human",activeIds=isRace&&room.race.dice?new Set(activeCards(clone(room)).map(c=>c.horse)):new Set();return`<div class="cardStrip">${room.race.cards.map(c=>{const h=horseInfo(c.horse),state=room.race.horses[c.horse],shown=state.status==="finished"?GOAL_LINE:state.pos,need=state.status==="finished"?"ゴール済":`現在${shown} / あと${Math.max(1,GOAL_LINE-shown+1)}マス以上`,canBet=isBet&&!used.has(c.horse),canMove=isRace&&room.race.dice&&activeIds.has(c.horse),bets=room.race.bets.filter(b=>b.horse===c.horse);return`<div class="horseCard ${c.moved?"moved":""} ${canBet?"clickable betCard":""} ${canMove?"clickable moveCard":""} ${used.has(c.horse)?"selected":""}" data-horse="${c.horse}"><div class="horseHead"><b class="horseName"><span class="pony" style="--horse-color:${h.color}">🐴</span> ${c.name}</b>${moodBadge(c.mood)}</div><div class="tiny">${need}${room.race.paceHorse===c.horse?" / ペースホース":""}</div><div class="moves"><span>${face("horse")}${c.moves.horse}</span><span>${face("cap")}${c.moves.cap}</span><span>${face("carrot")}${c.moves.carrot}</span><span>${face("weather")}${c.moves.weather}</span></div><div class="betMini">${bets.map(b=>{const p=room.players.find(x=>x.id===b.playerId);return`<span class="pill"><b style="color:${p?.color||"#333"}">${escapeHtml(p?.name||"?")}</b> ${b.chip}</span>`}).join("")}</div><div class="actionSlot">${canBet?`<button class="good betOnCardBtn" data-horse="${c.horse}" style="width:100%;">${chip}チップBET</button>`:""}${canMove?`<button class="good moveOnCardBtn" data-horse="${c.horse}" style="width:100%;">進める +${c.moves[room.race.dice]}</button>`:""}</div></div>`}).join("")}</div>`}
 function renderPayoutGuide(){return`<section class="card"><b>配当表</b>${payoutTable()}</section>`}
 function renderActionPanel(){if(room.phase==="racing")return renderRaceAction();if(room.phase==="payout")return`<section class="actions"><div class="primaryActionRow"><button id="nextRace" class="good" ${!isHost()?"disabled":""}>次のレースへ</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;if(room.phase==="gameover")return`<section class="actions"><div class="primaryActionRow"><button id="backToLobby" ${!isHost()?"disabled":""}>ロビーに戻る</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;return""}
