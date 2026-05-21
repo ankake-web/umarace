@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v32 dice-screen-button / secret Harularara / 4-digit room / single-device mode / winner animation -->
+<!-- umauma-race v36 harularara total22 / visible all dice / result pause / richer result show -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -126,6 +126,17 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .log div{padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
 .rank{font-size:24px;font-weight:950}
 
+.resultShow{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff8d7,#ffe8ef,#e7f8de);border:2px solid rgba(255,255,255,.9);border-radius:24px;padding:14px;text-align:center;animation:resultPop .55s ease both}
+.resultTitle{font-size:20px;font-weight:950;text-shadow:0 2px 0 rgba(255,255,255,.6)}
+.podiumGrid{display:grid;grid-template-columns:repeat(3,1fr);gap:7px;margin-top:10px}
+.podiumCard{background:#fff;border:1px solid var(--line);border-radius:18px;padding:10px 6px;box-shadow:0 6px 12px rgba(91,55,22,.08)}
+.podiumCard.first{background:linear-gradient(180deg,#fff6b8,#fff)}
+.podiumRank{font-size:24px;font-weight:950}
+.podiumHorse{font-size:12px;font-weight:950;line-height:1.2;margin-top:3px}
+.lastCard{margin-top:10px;background:#fff;border:1px dashed #b38b5a;border-radius:18px;padding:8px;font-size:13px;font-weight:950}
+.resultHold{font-size:14px;font-weight:950;text-align:center;color:var(--ink)}
+@keyframes resultPop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
+
 .winnerCelebration{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff7c2,#ffd1dc,#c9f7c9);border:3px solid rgba(255,255,255,.9);border-radius:24px;padding:18px;text-align:center;box-shadow:0 14px 30px rgba(91,55,22,.18)}
 .winnerTrophy{font-size:54px;animation:trophyPop 1.05s ease-in-out infinite alternate;filter:drop-shadow(0 8px 10px rgba(0,0,0,.18))}
 .winnerName{font-size:28px;font-weight:950;margin-top:4px;text-shadow:0 2px 0 rgba(255,255,255,.65)}
@@ -179,6 +190,8 @@ button.diceStageButton .diceText{font-size:16px}
 button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 .winnerName{font-size:22px}
 .winnerTrophy{font-size:46px}
+.podiumRank{font-size:20px}
+.podiumHorse{font-size:10px}
 }
 </style>
 </head>
@@ -261,7 +274,6 @@ function horseDisplayName(hid,r=room){return horseCard(hid,r)?.name||horseInfo(h
 function horseShort(hid,r=room){const c=horseCard(hid,r);if(c?.secret)return"ハルラ";return horseInfo(hid)?.short||hid}
 const displayPosFromDistance=d=>((d-1)%GOAL_LINE)+1;
 const horseDisplayPos=s=>displayPosFromDistance(Number(s.distance??s.pos??1));
-const horseProgress=s=>Number(s.distance??s.pos??1)-Number(s.startDistance??s.startPos??s.pos??1);
 function canControlPlayer(p){return !!p&&(p.id===localId||(room?.settings?.singleDevice&&p.type==="local"))}
 
 function cpuConfig(r=room){
@@ -289,8 +301,9 @@ rem-=p.cost;
 }
 return stats;
 }
-function randomWeightedMoves(total=18){
-const horse=Math.floor(Math.random()*5)+1;
+function randomWeightedMoves(total=22){
+const maxHorse=Math.floor((total-3)/3);
+const horse=Math.floor(Math.random()*maxHorse)+1;
 const rest=total-horse*3;
 const a=Math.floor(Math.random()*(rest-2))+1;
 const b=Math.floor(Math.random()*(rest-a-1))+1;
@@ -303,7 +316,7 @@ const moods=["good","normal","bad"];
 const harulararaAppears=Math.random()<0.20;
 return HORSES.map(h=>{
 if(h.id==="pink"&&harulararaAppears){
-const moves=randomWeightedMoves(18);
+const moves=randomWeightedMoves(22);
 return{horse:h.id,name:"ハルラララ",mood:"normal",moves,expected:Number(averageMove(moves)),id:crypto.randomUUID(),moved:false,secret:true};
 }
 const mood=moods[Math.floor(Math.random()*moods.length)];
@@ -321,8 +334,9 @@ async function createRoom(){
 localName=(document.getElementById("playerName")?.value||"名無").trim().slice(0,3);
 localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
+const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
 history.replaceState(null,"","#"+roomCode);
-const base={version:32,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice:false},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:36,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
@@ -428,7 +442,7 @@ const cards=makeRaceCards();
 const starts=shuffle([30,31,32,33,34,35,36]);
 const horses={};
 cards.forEach((c,i)=>horses[c.horse]={pos:starts[i],distance:starts[i],startPos:starts[i],startDistance:starts[i],status:"running",rank:null});
-r.race={no:r.raceNo,cards,horses,bets:[],dice:null,diceRolling:false,finishOrder:[],paceHorse:null,lastHorse:null,payout:null,lastMove:null,log:[`第${r.raceNo}レース開始。賭け順・スタート位置が決まりました。`]};
+r.race={no:r.raceNo,cards,horses,bets:[],dice:null,diceRolling:false,finishOrder:[],paceHorse:null,lastHorse:null,payout:null,lastMove:null,resultReadyAt:null,log:[`第${r.raceNo}レース開始。賭け順・スタート位置が決まりました。`]};
 }
 function remainingChips(r,pid){
 const chips=chipsForRule();
@@ -520,7 +534,7 @@ h.startDistance=Number(h.startDistance??h.startPos??h.pos);
 const beforeDist=h.distance;
 const beforePos=displayPosFromDistance(beforeDist);
 const rawDist=beforeDist+move;
-const finishDist=h.startDistance+GOAL_LINE;
+const finishDist=GOAL_LINE*2;
 const forwardPath=[];
 for(let d=beforeDist+1;d<=Math.min(rawDist,finishDist);d++)forwardPath.push(displayPosFromDistance(d));
 if(!r.race.paceHorse&&crossesSpace(beforeDist,rawDist,PACE_SPACE)){
@@ -533,6 +547,7 @@ h.rank=r.race.finishOrder.length+1;
 h.distance=finishDist;
 h.pos=GOAL_LINE;
 r.race.finishOrder.push(horseId);
+playEffect("goal");
 card.moved=true;
 r.race.lastMove={horse:horseId,from:beforePos,rawTarget:GOAL_LINE,finalTarget:GOAL_LINE,blocked:false,path:forwardPath,ts:Date.now()};
 r.race.log.unshift(`${p.name} が ${horseDisplayName(horseId,r)} を${move}進め、${h.rank}着でゴール！`);
@@ -559,13 +574,15 @@ r.race.diceRolling=false;
 }
 function finishRace(r){
 const running=Object.entries(r.race.horses).filter(([_,s])=>s.status==="running");
-running.sort((a,b)=>horseProgress(a[1])-horseProgress(b[1]));
+running.sort((a,b)=>Number(a[1].distance??a[1].pos)-Number(b[1].distance??b[1].pos));
 const last=running[0]?.[0]||null;
 r.race.lastHorse=last;
 if(last)r.race.horses[last].rank=7;
 r.race.payout=calculatePayout(r);
+r.race.resultReadyAt=Date.now()+2600;
 r.phase=r.raceNo>=3?"gameover":"payout";
 r.race.log.unshift(`第${r.raceNo}レース終了。払い戻しを計算しました。`);
+playEffect(r.raceNo>=3?"winner":"raceEnd");
 }
 function calculatePayout(r){
 const mult=r.raceNo===3?2:1;
@@ -633,7 +650,7 @@ const opts=r.race.cards.filter(c=>!used.has(c.horse)).map(c=>{
 const s=r.race.horses[c.horse];
 const pop=r.race.bets.filter(b=>b.horse===c.horse).reduce((a,b)=>a+b.chip,0);
 const mood=c.mood==="good"?8:c.mood==="normal"?3:-4;
-const base=horseProgress(s)*1.3+c.expected*3+mood-pop*2;
+const base=Number(s.distance??s.pos)*.7+c.expected*3+mood-pop*2;
 return{horse:c.horse,score:base*cfg.skill+Math.random()*cfg.random};
 }).sort((a,b)=>b.score-a.score);
 return{chip,horse:opts[0].horse};
@@ -650,8 +667,8 @@ const ownChip=own[c.horse]||0;
 const others=r.race.bets.filter(b=>b.horse===c.horse&&b.playerId!==cpu.id).reduce((a,b)=>a+b.chip,0);
 let base=move*4+ownChip*38-others*8;
 if(ownChip&&crossesSpace(Number(s.distance??s.pos),Number(s.distance??s.pos)+move,PACE_SPACE)&&!r.race.paceHorse)base+=25;
-if(ownChip&&Number(s.distance??s.pos)+move>=Number(s.startDistance??s.startPos??s.pos)+GOAL_LINE)base+=100;
-if(!ownChip&&Number(s.distance??s.pos)+move>=Number(s.startDistance??s.startPos??s.pos)+GOAL_LINE)base-=35;
+if(ownChip&&Number(s.distance??s.pos)+move>=GOAL_LINE*2)base+=100;
+if(!ownChip&&Number(s.distance??s.pos)+move>=GOAL_LINE*2)base-=35;
 return{horse:c.horse,score:base*cfg.skill+Math.random()*cfg.random};
 }).sort((a,b)=>b.score-a.score);
 return opts[0]?.horse;
@@ -735,11 +752,10 @@ function previewMove(card){
 const diceKey=room.race.dice;
 const state=room.race.horses[card.horse];
 const beforeDist=Number(state.distance??state.pos);
-const startDist=Number(state.startDistance??state.startPos??state.pos);
 const before=displayPosFromDistance(beforeDist);
 const move=Number(card.moves[diceKey]||0);
 const rawDist=beforeDist+move;
-if(rawDist>=startDist+GOAL_LINE)return{from:before,to:"GOAL",zero:false};
+if(rawDist>=GOAL_LINE*2)return{from:before,to:"GOAL",zero:false};
 const occupied=new Set(Object.entries(room.race.horses).filter(([hid,s])=>hid!==card.horse&&s.status==="running").map(([_,s])=>horseDisplayPos(s)));
 let targetDist=rawDist;
 while(targetDist>beforeDist&&occupied.has(displayPosFromDistance(targetDist)))targetDist--;
@@ -762,6 +778,10 @@ return`<section class="homeHero"><div class="homeCopy"><h2 class="homeTitle">う
 <div><b>ゲームをはじめる</b></div>
 <label>名前<input id="playerName" value="${escapeHtml(localName.slice(0,3))}" placeholder="名前" maxlength="3"></label>
 <label>部屋番号<input id="roomCode" value="${escapeHtml(roomCode||suggestedCode)}" maxlength="4" inputmode="numeric" pattern="[0-9]*"></label>
+<div class="modeBox">
+<label class="modeCheck"><input id="homeSingleDeviceMode" type="checkbox">1画面モードで遊ぶ</label>
+<div class="tiny">PC・タブレット1台をみんなで回して遊ぶ場合はこちら</div>
+</div>
 <div class="grid two"><button id="createRoom">部屋を作る</button><button id="joinRoom" class="secondary">部屋に入る</button></div>
 </div>
 <div class="homeHow"><b>遊び方</b>
@@ -855,11 +875,26 @@ return`<div class="horseCard ${c.secret?"secretHorse":""} ${c.moved?"moved":""} 
 }).join("")}</div>`;
 }
 function renderPayoutGuide(){return`<section class="card"><b>配当表</b>${payoutTable()}</section>`}
+function resultIsReady(){
+if(!room?.race?.resultReadyAt)return true;
+return Date.now()>=room.race.resultReadyAt;
+}
+function scheduleResultRefresh(){
+if(!room?.race?.resultReadyAt)return;
+const wait=Math.max(0,room.race.resultReadyAt-Date.now())+40;
+setTimeout(()=>{if(room)render()},wait);
+}
 function renderActionPanel(){
 if(room.phase==="betting")return renderBetAction();
 if(room.phase==="racing")return renderRaceAction();
-if(room.phase==="payout")return`<section class="actions"><div class="primaryActionRow"><button id="nextRace" class="good" ${!isHost()?"disabled":""}>次のレースへ</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;
-if(room.phase==="gameover")return`<section class="actions"><div class="primaryActionRow"><button id="backToLobby" ${!isHost()?"disabled":""}>ロビーに戻る</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;
+if(room.phase==="payout"){
+if(!resultIsReady()){scheduleResultRefresh();return`<section class="actions"><div class="resultHold">結果発表中…</div></section>`}
+return`<section class="actions"><div class="primaryActionRow"><button id="nextRace" class="good" ${!isHost()?"disabled":""}>次のレースへ</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;
+}
+if(room.phase==="gameover"){
+if(!resultIsReady()){scheduleResultRefresh();return`<section class="actions"><div class="resultHold">優勝者発表中…</div></section>`}
+return`<section class="actions"><div class="primaryActionRow"><button id="backToLobby" ${!isHost()?"disabled":""}>ロビーに戻る</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;
+}
 return"";
 }
 function renderBetAction(){
@@ -871,25 +906,41 @@ return`<section class="actions betActions"><div class="betGuide">${escapeHtml(p.
 function renderRaceAction(){
 const p=currentPlayer(room);
 if(animationState)return"";
-if(!canControlPlayer(p))return"";
+
 if(room.race.diceRolling){
-return`<section class="actions"><div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div></section>`;
+return`<section class="actions"><div class="betGuide" style="color:var(--ink);margin-bottom:6px">${escapeHtml(p?.name||"CPU")} のサイコロ</div><div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div></section>`;
 }
+
 if(room.race.dice){
-return`<section class="actions"><div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div><div class="betGuide" style="color:var(--ink);margin-top:6px">${escapeHtml(p.name)}：進める馬カードをタップ</div></section>`;
+return`<section class="actions"><div class="dicePanel" style="margin-top:0">${renderDiceVisual(room.race.dice,room.race.diceRolling)}</div><div class="betGuide" style="color:var(--ink);margin-top:6px">${escapeHtml(p?.name||"CPU")}：${canControlPlayer(p)?"進める馬カードをタップ":"考え中…"}</div></section>`;
 }
+
+if(!canControlPlayer(p)){
+return`<section class="actions"><div class="resultHold">${escapeHtml(p?.name||"CPU")} のターン待ち…</div></section>`;
+}
+
 return`<section class="actions"><button id="rollDice" class="diceStageButton"><div class="diceCube">🎲</div><div><div class="diceText">${escapeHtml(p.name)}：サイコロを振る</div><div class="diceFaces">🐎×3 / 🧢 / 🥕 / ☀️</div></div></button></section>`;
 }
 function renderPayout(){
 if(!room.race?.payout)return"";
-const order=room.race.finishOrder.map((hid,i)=>`${i+1}着 ${horseDisplayName(hid)}`).join(" / ");
-const last=room.race.lastHorse?horseDisplayName(room.race.lastHorse):"-";
+const podium=room.race.finishOrder.slice(0,3);
+const last=room.race.lastHorse;
 const winner=[...room.players].sort((a,b)=>b.money-a.money)[0];
+
+const raceResult=`<section class="card resultShow">
+<div class="resultTitle">第${room.raceNo}レース 結果発表</div>
+<div class="podiumGrid">
+${podium.map((hid,i)=>`<div class="podiumCard ${i===0?"first":""}"><div class="podiumRank">${i===0?"🥇":i===1?"🥈":"🥉"}</div><div class="podiumHorse">${escapeHtml(horseDisplayName(hid))}</div></div>`).join("")}
+</div>
+<div class="lastCard">ビリ：${last?escapeHtml(horseDisplayName(last)):"-"}</div>
+</section>`;
+
 const winnerBlock=room.phase==="gameover"?`<section class="card winnerCelebration">
 <span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span>
 <div class="winnerTrophy">🏆</div><div class="winnerName">${escapeHtml(winner.name)} 優勝！</div><div class="winnerSub">最終所持金 ¥${winner.money}</div>
 </section>`:"";
-return`${winnerBlock}<section class="card"><b>${room.phase==="gameover"?"最終結果":"払い戻し"}</b><div class="row" style="margin-top:8px"><span class="pill">${order}</span><span class="pill">最下位 ${last}</span><span class="pill">倍率 ${room.race.payout.multiplier}倍</span></div><div class="grid" style="margin-top:10px">${room.race.payout.playerResults.map(res=>`<div class="playerBox"><div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net>=0?"+":""}${res.net} → ¥${res.after}</span></div><div class="tiny">${res.details.length?escapeHtml(res.details.join(" / ")):"的中・支払いなし"}</div></div>`).join("")}</div></section>`;
+
+return`${raceResult}${winnerBlock}<section class="card"><b>${room.phase==="gameover"?"最終結果":"払い戻し"}</b><div class="grid" style="margin-top:10px">${room.race.payout.playerResults.map(res=>`<div class="playerBox"><div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net>=0?"+":""}${res.net} → ¥${res.after}</span></div><div class="tiny">${res.details.length?escapeHtml(res.details.join(" / ")):"的中・支払いなし"}</div></div>`).join("")}</div></section>`;
 }
 
 function ensureAudio(){if(!audioCtx)audioCtx=new(window.AudioContext||window.webkitAudioContext)();if(audioCtx.state==="suspended")audioCtx.resume()}
@@ -907,19 +958,24 @@ osc.stop(start+duration+.02);
 function playEffect(kind){
 ensureAudio();
 const t=audioCtx.currentTime;
-if(kind==="dice"){[420,520,630,760].forEach((f,i)=>playNote(f,t+i*.06,.055,"triangle",.035));return}
-if(kind==="move"){[392,440,494,587].forEach((f,i)=>playNote(f,t+i*.055,.05,"square",.025));return}
-if(kind==="bet"){[523,659].forEach((f,i)=>playNote(f,t+i*.055,.06,"triangle",.035));return}
-if(kind==="step"){playNote(240,t,.035,"square",.018);playNote(360,t+.025,.035,"triangle",.014);return}
-playNote(440,t,.05,"triangle",.03);
+
+if(kind==="click"){playNote(620,t,.06,"triangle",.06);playNote(820,t+.04,.055,"triangle",.045);return}
+if(kind==="dice"){[420,540,680,860].forEach((f,i)=>playNote(f,t+i*.06,.06,"triangle",.075));return}
+if(kind==="move"){[392,440,494,587].forEach((f,i)=>playNote(f,t+i*.055,.055,"square",.06));return}
+if(kind==="bet"){[523,659,784].forEach((f,i)=>playNote(f,t+i*.055,.065,"triangle",.075));return}
+if(kind==="step"){playNote(260,t,.04,"square",.045);playNote(390,t+.025,.04,"triangle",.034);return}
+if(kind==="goal"){[523,659,784,1046,1318,1568].forEach((f,i)=>playNote(f,t+i*.085,.09,"triangle",.09));playNote(196,t,.5,"square",.045);playNote(262,t+.18,.35,"square",.04);return}
+if(kind==="raceEnd"){[392,523,659,784].forEach((f,i)=>playNote(f,t+i*.11,.1,"triangle",.075));return}
+if(kind==="winner"){[523,659,784,1046,1318,1568,2093].forEach((f,i)=>playNote(f,t+i*.09,.1,"triangle",.095));playNote(131,t,.8,"square",.045);return}
+playNote(440,t,.05,"triangle",.05);
 }
 function bgmTick(){
 if(!bgmOn)return;
 ensureAudio();
 const t=audioCtx.currentTime,mel=[523,659,784,659,698,880,784,659,523,659,784,988,880,784,659,587],bass=[196,196,220,220,196,196,247,247];
 for(let i=0;i<4;i++){
-playNote(mel[(bgmStep+i)%mel.length],t+i*.18,.14,"square",.025);
-if(i%2===0)playNote(bass[Math.floor((bgmStep+i)/2)%bass.length],t+i*.18,.16,"triangle",.018);
+playNote(mel[(bgmStep+i)%mel.length],t+i*.18,.14,"square",.012);
+if(i%2===0)playNote(bass[Math.floor((bgmStep+i)/2)%bass.length],t+i*.18,.16,"triangle",.009);
 }
 bgmStep=(bgmStep+4)%mel.length;
 }
@@ -944,6 +1000,7 @@ document.getElementById("quitToTop")?.addEventListener("click",quitToTop);
 document.querySelectorAll("#toggleBgm").forEach(btn=>btn.addEventListener("click",toggleBgm));
 document.querySelectorAll(".betCard").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();placeBet(el.dataset.horse)}));
 document.querySelectorAll(".moveCard").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();moveHorse(el.dataset.horse)}));
+document.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>playEffect("click")));
 }
 
 await initFirebase().catch(err=>{console.warn("Firebase init failed",err);online=false});
