@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v43 payout table safe spacing / expanded commentary -->
+<!-- umauma-race v44 top gap 0 / balanced bottom spacing -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -15,7 +15,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
 button.good{background:linear-gradient(180deg,#40bd75,#198754)}
 button:disabled{opacity:.45;box-shadow:none}
 input,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:#fff;color:var(--ink)}
-.app{max-width:980px;margin:0 auto;padding:8px 6px 190px}
+.app{max-width:980px;margin:0 auto;padding:0 6px 120px}
 .hero{margin-bottom:8px;padding:11px 15px;border-radius:24px;background:linear-gradient(135deg,#ffb7c5,#ffd996 48%,#8bd98b);border:2px solid rgba(255,255,255,.75);box-shadow:var(--shadow);position:relative;overflow:hidden}
 .hero:after{content:"🐴";position:absolute;right:14px;top:-12px;font-size:60px;opacity:.25;transform:rotate(-8deg)}
 h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5)}
@@ -70,7 +70,7 @@ button.diceStageButton .diceCube{flex:0 0 auto}
 button.diceStageButton .diceText{font-size:17px;color:#fff}
 button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 
-.trackCard{padding:6px;margin-top:8px;border-radius:20px}
+.trackCard{padding:6px;margin-top:0;border-radius:20px}
 .trackBoard{position:relative;margin-top:0;aspect-ratio:2.12;border-radius:19px;background:linear-gradient(180deg,#5eb56b,#17723c);border:4px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);overflow:hidden}
 .trackBoard:before{content:"";position:absolute;inset:6% 1.5%;border-radius:15px;border:7px solid rgba(229,195,132,.92);background:linear-gradient(180deg,#2e8b4b,#146a34);box-shadow:inset 0 0 0 3px rgba(255,255,255,.26)}
 .trackBoard:after{content:"";position:absolute;inset:31% 18%;border-radius:13px;background:linear-gradient(180deg,#2b8448,#0f6330);border:2px solid rgba(255,255,255,.28)}
@@ -133,7 +133,7 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .betGuide{font-size:15px;font-weight:950;line-height:1.45;text-align:center;color:#fff}
 .log{max-height:150px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}
 .log div{padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
-.payoutGuideCard{margin-bottom:170px;scroll-margin-bottom:190px}
+.payoutGuideCard{margin-bottom:105px;scroll-margin-bottom:125px}
 
 .resultShow{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff8d7,#ffe8ef,#e7f8de);border:2px solid rgba(255,255,255,.9);border-radius:24px;padding:14px;text-align:center;animation:resultPop .55s ease both}
 .resultTitle{font-size:20px;font-weight:950;text-shadow:0 2px 0 rgba(255,255,255,.6)}
@@ -175,8 +175,8 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .homeHero{min-height:150px}
 .homeTitle{font-size:36px}
 .homeLead{font-size:13px;max-width:72%}
-.app{padding:6px 5px 210px}
-.card{padding:9px;border-radius:18px;margin-top:8px}
+.app{padding:0 5px 130px}
+.card{padding:9px;border-radius:18px;margin-top:6px}
 .trackCard{padding:4px}
 .actions{border-radius:18px}
 .trackBoard{aspect-ratio:2.24;border-width:4px;border-radius:15px}
@@ -211,7 +211,7 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 .winnerTrophy{font-size:46px}
 .podiumRank{font-size:20px}
 .podiumHorse{font-size:10px}
-.payoutGuideCard{margin-bottom:190px;scroll-margin-bottom:210px}
+.payoutGuideCard{margin-bottom:115px;scroll-margin-bottom:135px}
 }
 </style>
 </head>
@@ -443,7 +443,7 @@ localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
 history.replaceState(null,"","#"+roomCode);
-const base={version:43,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:44,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
