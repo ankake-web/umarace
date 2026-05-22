@@ -4,18 +4,32 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v42 larger track / live commentary -->
+<!-- umauma-race v43 top gap removed / larger race board / more commentary patterns -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:var(--ink);background:radial-gradient(circle at 12% 6%,#fff,transparent 24%),radial-gradient(circle at 90% 10%,#ffd1dc,transparent 28%),linear-gradient(135deg,#fff7e8,#ffe8ef 48%,#e7f8de);min-height:100vh}
+html,body,#app{margin:0;padding:0;min-height:100%}
+body{
+  margin:0;
+  padding-top:0!important;
+  font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  color:var(--ink);
+  background:radial-gradient(circle at 12% 6%,#fff,transparent 24%),radial-gradient(circle at 90% 10%,#ffd1dc,transparent 28%),linear-gradient(135deg,#fff7e8,#ffe8ef 48%,#e7f8de);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+main,.app,.game-screen,.board-area,.race-board{
+  margin-top:0!important;
+  padding-top:0!important;
+  top:0!important;
+}
 button,input,select{font:inherit}
 button{border:0;border-radius:999px;padding:10px 14px;background:linear-gradient(180deg,#9b6534,#774418);color:#fff;font-weight:900;box-shadow:0 5px 12px rgba(74,42,18,.18)}
 button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
 button.good{background:linear-gradient(180deg,#40bd75,#198754)}
 button:disabled{opacity:.45;box-shadow:none}
 input,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:#fff;color:var(--ink)}
-.app{max-width:980px;margin:0 auto;padding:8px 6px 132px}
+.app{max-width:980px;margin:0 auto;padding:0 6px 132px}
 .hero{margin-bottom:8px;padding:11px 15px;border-radius:24px;background:linear-gradient(135deg,#ffb7c5,#ffd996 48%,#8bd98b);border:2px solid rgba(255,255,255,.75);box-shadow:var(--shadow);position:relative;overflow:hidden}
 .hero:after{content:"🐴";position:absolute;right:14px;top:-12px;font-size:60px;opacity:.25;transform:rotate(-8deg)}
 h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5)}
@@ -32,7 +46,7 @@ h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .playerBox{background:#fff;border:1px solid var(--line);border-radius:17px;padding:10px}
 .chip{min-width:28px;height:28px;border-radius:999px;border:2px solid #444;display:inline-grid;place-items:center;font-size:12px;font-weight:950;background:#fff;color:#222}
 
-.homeHero{padding:18px;border-radius:32px;background:radial-gradient(circle at 18% 18%,rgba(255,255,255,.95),transparent 25%),radial-gradient(circle at 86% 24%,#ffeeb3,transparent 30%),linear-gradient(135deg,#ffb7c5,#ffd996 47%,#8bd98b);box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:165px;border:2px solid rgba(255,255,255,.82)}
+.homeHero{padding:18px;border-radius:32px;background:radial-gradient(circle at 18% 18%,rgba(255,255,255,.95),transparent 25%),radial-gradient(circle at 86% 24%,#ffeeb3,transparent 30%),linear-gradient(135deg,#ffb7c5,#ffd996 47%,#8bd98b);box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:165px;border:2px solid rgba(255,255,255,.82);margin-top:8px}
 .homeHero:before{content:"";position:absolute;left:-35px;right:-35px;bottom:-88px;height:128px;border:18px solid rgba(255,255,255,.32);border-top:0;border-radius:0 0 50% 50%;transform:rotate(-5deg)}
 .homeHero:after{content:"🐴";position:absolute;right:6px;bottom:-14px;font-size:104px;opacity:.38;filter:drop-shadow(0 8px 12px rgba(91,55,22,.18));transform:rotate(-8deg)}
 .homeCopy{position:relative;z-index:2}
@@ -70,17 +84,30 @@ button.diceStageButton .diceCube{flex:0 0 auto}
 button.diceStageButton .diceText{font-size:17px;color:#fff}
 button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 
-.trackCard{padding:6px;margin-top:8px;border-radius:20px}
-.trackBoard{position:relative;margin-top:0;aspect-ratio:2.12;border-radius:19px;background:linear-gradient(180deg,#5eb56b,#17723c);border:4px solid #9a6330;box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);overflow:hidden}
-.trackBoard:before{content:"";position:absolute;inset:6% 1.5%;border-radius:15px;border:7px solid rgba(229,195,132,.92);background:linear-gradient(180deg,#2e8b4b,#146a34);box-shadow:inset 0 0 0 3px rgba(255,255,255,.26)}
-.trackBoard:after{content:"";position:absolute;inset:31% 18%;border-radius:13px;background:linear-gradient(180deg,#2b8448,#0f6330);border:2px solid rgba(255,255,255,.28)}
-.trackSpace{position:absolute;width:8.15%;height:16.3%;transform:translate(-50%,-50%);border-radius:7px;background:linear-gradient(180deg,#ffe0a5,#d7a05b);border:1px solid rgba(77,45,18,.42);box-shadow:inset 0 2px 0 rgba(255,255,255,.36);z-index:2}
+.trackCard{
+  padding:2px 4px 5px!important;
+  margin-top:0!important;
+  border-radius:18px;
+}
+.trackBoard{
+  position:relative;
+  margin-top:0!important;
+  aspect-ratio:1.96;
+  border-radius:19px;
+  background:linear-gradient(180deg,#5eb56b,#17723c);
+  border:4px solid #9a6330;
+  box-shadow:inset 0 0 0 3px rgba(255,255,255,.22),var(--shadow);
+  overflow:hidden;
+}
+.trackBoard:before{content:"";position:absolute;inset:4.5% 1.2%;border-radius:15px;border:7px solid rgba(229,195,132,.92);background:linear-gradient(180deg,#2e8b4b,#146a34);box-shadow:inset 0 0 0 3px rgba(255,255,255,.26)}
+.trackBoard:after{content:"";position:absolute;inset:30% 17%;border-radius:13px;background:linear-gradient(180deg,#2b8448,#0f6330);border:2px solid rgba(255,255,255,.28)}
+.trackSpace{position:absolute;width:8.45%;height:17.1%;transform:translate(-50%,-50%);border-radius:7px;background:linear-gradient(180deg,#ffe0a5,#d7a05b);border:1px solid rgba(77,45,18,.42);box-shadow:inset 0 2px 0 rgba(255,255,255,.36);z-index:2}
 .trackSpace.finish{background:linear-gradient(180deg,#fff07a,#dba020)}
 .trackSpace.pace{outline:2px solid #fff178}
 .num{position:absolute;left:2px;top:1px;font-size:8px;font-weight:950;color:rgba(49,35,20,.72);z-index:2}
 .lab{position:absolute;right:2px;bottom:1px;font-size:6px;font-weight:950;color:rgba(49,35,20,.72);z-index:2}
 .slot{position:absolute;inset:10px 1px 1px;display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:1px;z-index:4}
-.pony{width:17px;height:17px;display:grid;place-items:center;border-radius:999px;background:#fff;border:2px solid var(--horse-color);box-shadow:0 3px 8px rgba(0,0,0,.2);font-size:10px;transition:transform .18s ease}
+.pony{width:18px;height:18px;display:grid;place-items:center;border-radius:999px;background:#fff;border:2px solid var(--horse-color);box-shadow:0 3px 8px rgba(0,0,0,.2);font-size:11px;transition:transform .18s ease}
 .pony.anim{transform:scale(1.18);box-shadow:0 0 0 4px rgba(255,235,59,.7),0 6px 12px rgba(0,0,0,.24)}
 .pony.latest{animation:horseHop .8s ease both}
 .pony.blocked{animation:blockedBounce .95s ease both}
@@ -96,9 +123,9 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .waitLine{text-align:center;font-size:14px;font-weight:950}
 .commentaryBox{font-size:13px;font-weight:950;text-align:center;line-height:1.45}
 .commentaryLabel{display:inline-block;margin-bottom:3px;padding:2px 7px;border-radius:999px;background:#fff2d6;border:1px solid #ead8bc;font-size:10px;color:#6b451e}
-.moveBanner{margin-bottom:6px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
+.moveBanner{margin-bottom:5px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
 
-.cardStrip{margin-top:8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
+.cardStrip{margin-top:7px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .horseGrid{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
 .horseCard{background:linear-gradient(180deg,#fff,#fffaf0);border:1px solid var(--line);border-radius:18px;padding:9px;font-size:12px;transition:transform .15s,box-shadow .15s,outline .15s}
 .horseCard.clickable{cursor:pointer}
@@ -171,17 +198,17 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .homePanel,.two,.scoreGrid{grid-template-columns:1fr}
 .horseGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
 .cardStrip{grid-template-columns:repeat(3,minmax(0,1fr));gap:5px}
-.homeHero{min-height:150px}
+.homeHero{min-height:150px;margin-top:6px}
 .homeTitle{font-size:36px}
 .homeLead{font-size:13px;max-width:72%}
-.app{padding:6px 5px 132px}
+.app{padding:0 4px 132px}
 .card{padding:9px;border-radius:18px;margin-top:8px}
-.trackCard{padding:4px}
+.trackCard{padding:1px 3px 5px!important;margin-top:0!important}
 .actions{border-radius:18px}
-.trackBoard{aspect-ratio:2.24;border-width:4px;border-radius:15px}
-.trackBoard:before{inset:6% 1.2%;border-width:6px;border-radius:13px}
-.trackBoard:after{inset:31% 17%;border-radius:11px}
-.trackSpace{width:8.35%;height:16.8%;border-radius:5px}
+.trackBoard{aspect-ratio:2.03;border-width:4px;border-radius:15px}
+.trackBoard:before{inset:4.5% 1%;border-width:6px;border-radius:13px}
+.trackBoard:after{inset:30% 16.5%;border-radius:11px}
+.trackSpace{width:8.55%;height:17.3%;border-radius:5px}
 .num{font-size:7px}
 .lab{font-size:5px}
 .pony{width:14px;height:14px;font-size:8px;border-width:2px}
@@ -350,27 +377,85 @@ const best=shuffle(cards.filter(c=>(MOOD[c.mood]?.score||1)===maxScore))[0];
 const patterns=[
 `本日の気配なら ${best.name}。パドックの雰囲気がかなり良さそうです！`,
 `解説席は ${best.name} に注目。返し馬の動きが軽い！`,
-`人気に関係なく、状態面で光るのは ${best.name} でしょうか。`,
+`状態面で光るのは ${best.name} でしょうか。`,
 `${best.name}、今日は前向きな雰囲気。BET候補に入れておきたい一頭です！`
 ];
 return patterns[Math.floor(Math.random()*patterns.length)];
 }
+
 function moveCommentary(r,horseId,move,beforePos,finalPos,blocked,goal,gotPace){
 const name=horseDisplayName(horseId,r);
+const pick=arr=>arr[Math.floor(Math.random()*arr.length)];
+
 if(goal){
-return `${name}、最後まで走り切ってゴール！${r.race.horses[horseId].rank}着に飛び込みました！`;
+return pick([
+`${name}、最後まで走り切ってゴール！${r.race.horses[horseId].rank}着に飛び込みました！`,
+`${name}、一気にゴール板を駆け抜けた！${r.race.horses[horseId].rank}着確定です！`,
+`${name}、ここでゴールイン！最後まで脚色は衰えませんでした！`,
+`${name}、ゴール到達！${r.race.horses[horseId].rank}着争いを制しました！`
+]);
 }
+
 if(gotPace){
-return `${name} が18マスを通過！ここでペースホース獲得、レースを引っ張ります！`;
+return pick([
+`${name} が18マスを通過！ここでペースホース獲得、レースを引っ張ります！`,
+`${name}、先に18マスを越えた！ペースホースの権利を取りました！`,
+`${name} がレースの主導権を握る！18マス通過でペースホースです！`,
+`${name}、ここでペースホース！このボーナスが後々効いてくるか！`
+]);
 }
+
 if(blocked){
-return `${name}、${move}マス進む勢いでしたが前が詰まった！${finalPos}マスで踏みとどまります。`;
+return pick([
+`${name}、${move}マス進む勢いでしたが前が詰まった！${finalPos}マスで踏みとどまります。`,
+`${name}、前方に馬群！行き場をなくして${finalPos}マスまで戻されます。`,
+`${name}、伸びかけたところでスペースなし！${finalPos}マスでストップです。`,
+`${name}、これは惜しい！進路が塞がり、${finalPos}マスで待機となります。`
+]);
 }
-if(move>=11)return `${name}、これは大きい！一気に${move}マス前進、場内がどよめきます！`;
-if(move>=8)return `${name}、いい脚です！${move}マス進んで好位置を狙います。`;
-if(move>=5)return `${name}、着実に${move}マス前進。まだまだ勝負圏内です。`;
-if(move>=3)return `${name}、${move}マス前進。ここは落ち着いた運びです。`;
-return `${name}、今回は控えめに${move}マス。次の出目に期待です。`;
+
+if(move>=11){
+return pick([
+`${name}、これは大きい！一気に${move}マス前進、場内がどよめきます！`,
+`${name}、豪快な伸び脚！${move}マス進んで一気に流れを変えた！`,
+`${name}、これは強烈！${move}マス前進で一気に存在感を示します！`,
+`${name}、大ジャンプの${move}マス！勝負どころで大きく前へ出ました！`
+]);
+}
+
+if(move>=8){
+return pick([
+`${name}、いい脚です！${move}マス進んで好位置を狙います。`,
+`${name}、軽快に${move}マス前進！じわりと上位をうかがいます。`,
+`${name}、ここでしっかり${move}マス！流れに乗ってきました。`,
+`${name}、悪くない伸び！${move}マス進んでチャンスを広げます。`
+]);
+}
+
+if(move>=5){
+return pick([
+`${name}、着実に${move}マス前進。まだまだ勝負圏内です。`,
+`${name}、堅実な走りで${move}マス。位置取りを整えます。`,
+`${name}、無理せず${move}マス前へ。次の一手につながる走りです。`,
+`${name}、まずまずの前進！${move}マス進んで態勢を作ります。`
+]);
+}
+
+if(move>=3){
+return pick([
+`${name}、${move}マス前進。ここは落ち着いた運びです。`,
+`${name}、小刻みに${move}マス。まだ脚を溜めているか。`,
+`${name}、派手さはないが${move}マス前進。じっくり進めます。`,
+`${name}、ここは控えめに${move}マス。次の出目で巻き返したいところ。`
+]);
+}
+
+return pick([
+`${name}、今回は控えめに${move}マス。次の出目に期待です。`,
+`${name}、なかなか伸びない！${move}マス前進にとどまります。`,
+`${name}、ここは我慢の${move}マス。まだ勝負はこれからです。`,
+`${name}、少し足踏み気味か。${move}マスだけ進んで次を待ちます。`
+]);
 }
 
 async function saveRoom(next){
@@ -384,7 +469,7 @@ localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
 history.replaceState(null,"","#"+roomCode);
-const base={version:42,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:43,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
@@ -782,10 +867,10 @@ const top=[30,31,32,33,34,35,36,1,2,3,4,5,6];
 const right=[7,8,9,10,11];
 const bottom=[12,13,14,15,16,17,18,19,20,21,22,23,24];
 const left=[25,26,27,28,29];
-top.forEach((no,i)=>arr.push({no,x:4+i*(92/12),y:9}));
-right.forEach((no,i)=>arr.push({no,x:96,y:23+i*(54/4)}));
-bottom.forEach((no,i)=>arr.push({no,x:96-i*(92/12),y:91}));
-left.forEach((no,i)=>arr.push({no,x:4,y:77-i*(54/4)}));
+top.forEach((no,i)=>arr.push({no,x:4+i*(92/12),y:8.5}));
+right.forEach((no,i)=>arr.push({no,x:96,y:22.5+i*(55/4)}));
+bottom.forEach((no,i)=>arr.push({no,x:96-i*(92/12),y:92}));
+left.forEach((no,i)=>arr.push({no,x:4,y:78.5-i*(55/4)}));
 return arr;
 }
 const displayPosition=(hid,fallback)=>animationState&&animationState.horse===hid?animationState.pos:fallback;
