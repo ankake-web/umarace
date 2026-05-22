@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v44 top gap 0 / balanced bottom spacing -->
+<!-- umauma-race v45 compact bottom spacing / no move banner -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -15,7 +15,7 @@ button.secondary{background:#fff;color:var(--ink);border:1px solid var(--line)}
 button.good{background:linear-gradient(180deg,#40bd75,#198754)}
 button:disabled{opacity:.45;box-shadow:none}
 input,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:#fff;color:var(--ink)}
-.app{max-width:980px;margin:0 auto;padding:0 6px 120px}
+.app{max-width:980px;margin:0 auto;padding:0 6px 88px}
 .hero{margin-bottom:8px;padding:11px 15px;border-radius:24px;background:linear-gradient(135deg,#ffb7c5,#ffd996 48%,#8bd98b);border:2px solid rgba(255,255,255,.75);box-shadow:var(--shadow);position:relative;overflow:hidden}
 .hero:after{content:"🐴";position:absolute;right:14px;top:-12px;font-size:60px;opacity:.25;transform:rotate(-8deg)}
 h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5)}
@@ -96,7 +96,6 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .waitLine{text-align:center;font-size:14px;font-weight:950}
 .commentaryBox{font-size:13px;font-weight:950;text-align:center;line-height:1.45}
 .commentaryLabel{display:inline-block;margin-bottom:3px;padding:2px 7px;border-radius:999px;background:#fff2d6;border:1px solid #ead8bc;font-size:10px;color:#6b451e}
-.moveBanner{margin-bottom:6px;padding:8px 10px;border-radius:14px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
 
 .cardStrip{margin-top:8px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:6px}
 .horseGrid{margin-top:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
@@ -124,7 +123,7 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .cardStrip .tiny,.cardStrip .mood,.cardStrip .actionSlot{display:none!important}
 .secretHorse{background:linear-gradient(180deg,#fff7fc,#ffe0f0)!important;outline:2px dashed rgba(255,105,180,.65)}
 
-.actions{position:fixed;left:50%;bottom:calc(8px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 16px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:24px;padding:10px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeUp .45s ease both}
+.actions{position:fixed;left:50%;bottom:calc(4px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 8px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeUp .45s ease both}
 .actions.betActions{background:linear-gradient(180deg,#45c979,#15884b);border:2px solid rgba(255,255,255,.75);color:#fff}
 .actions.betActions .small{color:rgba(255,255,255,.9)}
 @keyframes fadeUp{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -133,7 +132,7 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .betGuide{font-size:15px;font-weight:950;line-height:1.45;text-align:center;color:#fff}
 .log{max-height:150px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:16px;padding:8px}
 .log div{padding:4px 0;border-bottom:1px dashed #eee;font-size:12px}
-.payoutGuideCard{margin-bottom:105px;scroll-margin-bottom:125px}
+.payoutGuideCard{margin-bottom:68px;scroll-margin-bottom:88px}
 
 .resultShow{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff8d7,#ffe8ef,#e7f8de);border:2px solid rgba(255,255,255,.9);border-radius:24px;padding:14px;text-align:center;animation:resultPop .55s ease both}
 .resultTitle{font-size:20px;font-weight:950;text-shadow:0 2px 0 rgba(255,255,255,.6)}
@@ -175,10 +174,10 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .homeHero{min-height:150px}
 .homeTitle{font-size:36px}
 .homeLead{font-size:13px;max-width:72%}
-.app{padding:0 5px 130px}
+.app{padding:0 5px 94px}
 .card{padding:9px;border-radius:18px;margin-top:6px}
 .trackCard{padding:4px}
-.actions{border-radius:18px}
+.actions{border-radius:14px;padding:7px;bottom:calc(3px + env(safe-area-inset-bottom));width:calc(100vw - 6px)}
 .trackBoard{aspect-ratio:2.24;border-width:4px;border-radius:15px}
 .trackBoard:before{inset:6% 1.2%;border-width:6px;border-radius:13px}
 .trackBoard:after{inset:31% 17%;border-radius:11px}
@@ -211,7 +210,7 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 .winnerTrophy{font-size:46px}
 .podiumRank{font-size:20px}
 .podiumHorse{font-size:10px}
-.payoutGuideCard{margin-bottom:115px;scroll-margin-bottom:135px}
+.payoutGuideCard{margin-bottom:74px;scroll-margin-bottom:94px}
 }
 </style>
 </head>
@@ -443,7 +442,7 @@ localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
 history.replaceState(null,"","#"+roomCode);
-const base={version:44,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
+const base={version:45,title:GAME_TITLE,code:roomCode,hostId:localId,phase:"lobby",raceNo:0,turnIndex:0,starterIndex:0,settings:{cpuLevel:"normal",singleDevice},players:[{id:localId,name:localName,type:"human",color:PLAYER_COLORS[0],money:0,seat:0}],race:null,createdAt:Date.now(),updatedAt:Date.now()};
 await openRoom(roomCode);
 await saveRoom(base);
 }
@@ -1013,7 +1012,7 @@ return`<div class="centerInfo"><b>🎲 ${dice.icon} ${dice.label}</b><div class=
 return`<div class="centerInfo"><div class="commentaryBox"><span class="commentaryLabel">実況</span><br>${escapeHtml(room.race.commentary||"レースは静かに進行中です。")}</div></div>`;
 }
 function renderTrack(){
-const lastMove=room.race.lastMove||{},placed={};
+const placed={};
 for(const hid of Object.keys(room.race.horses)){
 const s=room.race.horses[hid];
 if(s.status==="finished"&&animationState?.horse!==hid)continue;
@@ -1021,7 +1020,7 @@ const pos=displayPosition(hid,horseDisplayPos(s));
 placed[pos]??=[];
 placed[pos].push(hid);
 }
-return`<section class="card trackCard">${lastMove.blocked?`<div class="moveBanner">${horseDisplayName(lastMove.horse)}：マスが埋まっていたため${lastMove.finalTarget}へ戻りました</div>`:""}<div class="trackBoard">${renderCenter()}${trackSpaces().map(sp=>{const horses=placed[sp.no]||[],cls=`trackSpace ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}" style="left:${sp.x}%;top:${sp.y}%"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),latest=lastMove.horse===hid;return`<span class="pony ${room.race.paceHorse===hid?"paceLeader":""} ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${c?.name||hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div>${renderHorseCards()}</section>`;
+return`<section class="card trackCard"><div class="trackBoard">${renderCenter()}${trackSpaces().map(sp=>{const horses=placed[sp.no]||[],cls=`trackSpace ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;return`<div class="${cls}" style="left:${sp.x}%;top:${sp.y}%"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),lastMove=room.race.lastMove||{},latest=lastMove.horse===hid;return`<span class="pony ${room.race.paceHorse===hid?"paceLeader":""} ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" title="${c?.name||hi.label}">🐴</span>`}).join("")}</div></div>`}).join("")}</div>${renderHorseCards()}</section>`;
 }
 function renderHorseCards(){
 const isBet=room.phase==="betting"&&canControlPlayer(currentBetPlayer(room));
