@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v48 scroll top / stable random order / watchdog CPU proxy / premium desktop track -->
+<!-- umauma-race v49 / presence heartbeat / stable CPU proxy / public-ready base -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -16,22 +16,23 @@ button.good{background:linear-gradient(180deg,#40bd75,#198754)}
 button:disabled{opacity:.45;box-shadow:none}
 input,select{width:100%;border:1px solid var(--line);border-radius:16px;padding:12px 13px;background:#fff;color:var(--ink)}
 .app{max-width:980px;margin:0 auto;padding:0 6px 88px}
-.hero{margin-bottom:8px;padding:11px 15px;border-radius:24px;background:linear-gradient(135deg,#ffb7c5,#ffd996 48%,#8bd98b);border:2px solid rgba(255,255,255,.75);box-shadow:var(--shadow);position:relative;overflow:hidden}
-.hero:after{content:"🐴";position:absolute;right:14px;top:-12px;font-size:60px;opacity:.25;transform:rotate(-8deg)}
-h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5)}
-.grid{display:grid;gap:10px}
-.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .card{background:rgba(255,253,247,.96);border:1px solid rgba(234,216,188,.96);border-radius:22px;padding:12px;margin-top:10px;box-shadow:var(--shadow)}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .between{justify-content:space-between}
+.grid{display:grid;gap:10px}
+.two{grid-template-columns:repeat(2,minmax(0,1fr))}
 .small{font-size:12px;color:var(--muted)}
 .tiny{font-size:11px;color:var(--muted)}
 .pill{display:inline-flex;align-items:center;gap:5px;border:1px solid var(--line);background:#fff;border-radius:999px;padding:5px 9px;font-size:12px;font-weight:900}
+.notice{padding:10px;border-radius:16px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
 .money{font-variant-numeric:tabular-nums;font-weight:950}
 .current{outline:3px solid rgba(255,159,189,.45)}
 .playerBox{background:#fff;border:1px solid var(--line);border-radius:17px;padding:10px}
 .chip{min-width:28px;height:28px;border-radius:999px;border:2px solid #444;display:inline-grid;place-items:center;font-size:12px;font-weight:950;background:#fff;color:#222}
-.notice{padding:10px;border-radius:16px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
+
+.hero{margin-bottom:8px;padding:11px 15px;border-radius:24px;background:linear-gradient(135deg,#ffb7c5,#ffd996 48%,#8bd98b);border:2px solid rgba(255,255,255,.75);box-shadow:var(--shadow);position:relative;overflow:hidden}
+.hero h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255,255,.5)}
+.hero:after{content:"🐴";position:absolute;right:14px;top:-12px;font-size:60px;opacity:.25;transform:rotate(-8deg)}
 
 .homeHero{padding:18px;border-radius:32px;background:radial-gradient(circle at 18% 18%,rgba(255,255,255,.95),transparent 25%),radial-gradient(circle at 86% 24%,#ffeeb3,transparent 30%),linear-gradient(135deg,#ffb7c5,#ffd996 47%,#8bd98b);box-shadow:var(--shadow);position:relative;overflow:hidden;min-height:165px;border:2px solid rgba(255,255,255,.82)}
 .homeHero:before{content:"";position:absolute;left:-35px;right:-35px;bottom:-88px;height:128px;border:18px solid rgba(255,255,255,.32);border-top:0;border-radius:0 0 50% 50%;transform:rotate(-5deg)}
@@ -41,6 +42,9 @@ h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .homeLead{max-width:650px;margin-top:10px;font-weight:850;font-size:14px;line-height:1.55;text-shadow:0 1px 0 rgba(255,255,255,.5)}
 .homePanel{margin-top:12px;display:grid;grid-template-columns:1fr;gap:12px}
 .homeForm,.homeHow{background:rgba(255,253,247,.96);border:1px solid rgba(234,216,188,.96);border-radius:24px;padding:14px;box-shadow:var(--shadow)}
+.modeBox{background:#fff;border:1px solid var(--line);border-radius:17px;padding:10px}
+.modeCheck{display:flex;gap:8px;align-items:center;font-weight:900}
+.modeCheck input{width:auto}
 .ruleBlock{display:grid;gap:9px;margin-top:10px}
 .ruleItem{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;line-height:1.55}
 .ruleItem b{display:block;margin-bottom:3px;color:#5c381b}
@@ -49,13 +53,8 @@ h1{margin:0;font-size:23px;letter-spacing:.04em;text-shadow:0 2px 0 rgba(255,255
 .payout th{background:#fff2d6}
 .homeTip{margin-top:10px;padding:10px;border-radius:15px;background:#fff7d6;border:1px solid #e3c765;font-size:12px;font-weight:850}
 
-.modeBox{background:#fff;border:1px solid var(--line);border-radius:17px;padding:10px}
-.modeCheck{display:flex;gap:8px;align-items:center;font-weight:900}
-.modeCheck input{width:auto}
 .nameEdit{max-width:110px;padding:8px 10px;border-radius:12px;font-weight:900}
-
 .scoreGrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-.mood{display:none!important}
 
 .dicePanel{margin-top:10px;display:flex;justify-content:center}
 .diceStage{display:inline-flex;gap:10px;align-items:center;background:#fff;border:1px solid var(--line);border-radius:20px;padding:10px 14px;box-shadow:0 6px 16px rgba(0,0,0,.12)}
@@ -121,7 +120,6 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .cardStrip .moves i{font-style:normal;font-size:13px;line-height:1}
 .cardStrip .moves b{font-size:11px;line-height:1}
 .cardStrip .paceBadge{font-size:9px;padding:2px 5px;margin-top:4px}
-.cardStrip .tiny,.cardStrip .mood,.cardStrip .actionSlot{display:none!important}
 .secretHorse{background:linear-gradient(180deg,#fff7fc,#ffe0f0)!important;outline:2px dashed rgba(255,105,180,.65)}
 
 .actions{position:fixed;left:50%;bottom:calc(4px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 8px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeUp .45s ease both}
@@ -145,23 +143,11 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .lastCard{margin-top:10px;background:#fff;border:1px dashed #b38b5a;border-radius:18px;padding:8px;font-size:13px;font-weight:950}
 .resultHold{font-size:14px;font-weight:950;text-align:center;color:var(--ink)}
 @keyframes resultPop{from{opacity:0;transform:scale(.94) translateY(10px)}to{opacity:1;transform:scale(1) translateY(0)}}
-
 .winnerCelebration{position:relative;overflow:hidden;background:linear-gradient(135deg,#fff7c2,#ffd1dc,#c9f7c9);border:3px solid rgba(255,255,255,.9);border-radius:24px;padding:18px;text-align:center;box-shadow:0 14px 30px rgba(91,55,22,.18)}
 .winnerTrophy{font-size:54px;animation:trophyPop 1.05s ease-in-out infinite alternate;filter:drop-shadow(0 8px 10px rgba(0,0,0,.18))}
 .winnerName{font-size:28px;font-weight:950;margin-top:4px;text-shadow:0 2px 0 rgba(255,255,255,.65)}
 .winnerSub{font-size:14px;font-weight:900;color:#654321;margin-top:5px}
-.confetti{position:absolute;top:-16px;width:10px;height:18px;border-radius:3px;animation:fall 2.8s linear infinite}
-.confetti:nth-child(1){left:8%;background:#ff6b6b;animation-delay:0s}
-.confetti:nth-child(2){left:18%;background:#ffd93d;animation-delay:.25s}
-.confetti:nth-child(3){left:28%;background:#6bcB77;animation-delay:.5s}
-.confetti:nth-child(4){left:39%;background:#4d96ff;animation-delay:.75s}
-.confetti:nth-child(5){left:51%;background:#ff8fab;animation-delay:1s}
-.confetti:nth-child(6){left:63%;background:#845ec2;animation-delay:.35s}
-.confetti:nth-child(7){left:74%;background:#00c9a7;animation-delay:.65s}
-.confetti:nth-child(8){left:86%;background:#ff9671;animation-delay:.95s}
-@keyframes fall{0%{transform:translateY(-20px) rotate(0deg);opacity:1}100%{transform:translateY(220px) rotate(360deg);opacity:.15}}
 @keyframes trophyPop{from{transform:translateY(0) scale(1)}to{transform:translateY(-6px) scale(1.08)}}
-
 .goalConfettiLayer{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
 .goalConfettiPiece{position:absolute;top:-22px;width:9px;height:16px;border-radius:3px;opacity:.95;animation-name:goalConfettiFall;animation-timing-function:ease-out;animation-fill-mode:forwards}
 .goalConfettiLayer.rank1 .goalConfettiPiece{animation-duration:1.55s}
@@ -179,32 +165,20 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 aspect-ratio:2.24;
 border-radius:28px;
 border:7px solid #6b3f17;
-background:
-radial-gradient(circle at 50% 50%,rgba(255,255,255,.08),transparent 28%),
-linear-gradient(135deg,#2f8d48 0%,#176d34 42%,#0c5428 100%);
-box-shadow:
-inset 0 0 0 4px rgba(255,255,255,.22),
-inset 0 0 42px rgba(0,0,0,.22),
-0 18px 36px rgba(61,35,12,.22);
+background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.08),transparent 28%),linear-gradient(135deg,#2f8d48 0%,#176d34 42%,#0c5428 100%);
+box-shadow:inset 0 0 0 4px rgba(255,255,255,.22),inset 0 0 42px rgba(0,0,0,.22),0 18px 36px rgba(61,35,12,.22);
 }
 .trackBoard:before{
 inset:5.4% 1.1%;
 border-radius:23px;
 border:10px solid #d6a96a;
-background:
-repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 18px,rgba(0,0,0,.025) 18px 36px),
-linear-gradient(180deg,#3aa05a,#146b34);
-box-shadow:
-inset 0 0 0 4px rgba(255,255,255,.26),
-inset 0 0 22px rgba(31,85,35,.35),
-0 0 0 2px rgba(84,49,20,.25);
+background:repeating-linear-gradient(90deg,rgba(255,255,255,.055) 0 18px,rgba(0,0,0,.025) 18px 36px),linear-gradient(180deg,#3aa05a,#146b34);
+box-shadow:inset 0 0 0 4px rgba(255,255,255,.26),inset 0 0 22px rgba(31,85,35,.35),0 0 0 2px rgba(84,49,20,.25);
 }
 .trackBoard:after{
 inset:31% 18%;
 border-radius:20px;
-background:
-radial-gradient(circle at 50% 48%,rgba(255,255,255,.09),transparent 34%),
-linear-gradient(180deg,#237a3f,#0d5429);
+background:radial-gradient(circle at 50% 48%,rgba(255,255,255,.09),transparent 34%),linear-gradient(180deg,#237a3f,#0d5429);
 border:3px solid rgba(255,255,255,.32);
 box-shadow:inset 0 0 18px rgba(0,0,0,.16)
 }
@@ -214,23 +188,14 @@ height:16.7%;
 border-radius:11px;
 background:linear-gradient(180deg,#ffeec2 0%,#e8bc78 48%,#bd7a36 100%);
 border:2px solid rgba(72,39,13,.5);
-box-shadow:
-inset 0 3px 0 rgba(255,255,255,.42),
-inset 0 -4px 0 rgba(92,45,12,.18),
-0 4px 10px rgba(40,24,9,.16);
+box-shadow:inset 0 3px 0 rgba(255,255,255,.42),inset 0 -4px 0 rgba(92,45,12,.18),0 4px 10px rgba(40,24,9,.16);
 }
 .trackSpace.finish{background:linear-gradient(135deg,#fff9a8,#d9a22e 48%,#fff0a4)}
 .trackSpace.pace{outline:3px solid #fff06c;box-shadow:0 0 15px rgba(255,230,80,.55),inset 0 3px 0 rgba(255,255,255,.42)}
 .num{font-size:11px;left:4px;top:3px}
 .lab{font-size:8px;right:4px;bottom:2px}
 .slot{inset:16px 3px 3px;gap:2px}
-.pony{
-width:38px;
-height:38px;
-font-size:22px;
-border-width:3px;
-box-shadow:0 7px 14px rgba(0,0,0,.28),inset 0 2px 0 rgba(255,255,255,.75)
-}
+.pony{width:38px;height:38px;font-size:22px;border-width:3px;box-shadow:0 7px 14px rgba(0,0,0,.28),inset 0 2px 0 rgba(255,255,255,.75)}
 .centerInfo{font-size:16px;padding:11px 14px;border-radius:18px;max-width:660px}
 .centerInfo b{font-size:16px}
 .moveLine{font-size:15px}
@@ -249,7 +214,6 @@ box-shadow:0 7px 14px rgba(0,0,0,.28),inset 0 2px 0 rgba(255,255,255,.75)
 .resultTitle{font-size:24px}
 .podiumHorse{font-size:15px}
 }
-
 @media(max-width:560px){
 .homePanel,.two,.scoreGrid{grid-template-columns:1fr}
 .horseGrid{grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}
@@ -303,7 +267,7 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import{getFirestore,doc,setDoc,getDoc,onSnapshot}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+import{getFirestore,doc,setDoc,getDoc,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig={
 apiKey:"AIzaSyCxHux7rE19LCvV-2sNwhEMtGABf3tZgDs",
@@ -320,6 +284,7 @@ const MAX_PLAYERS=6,GOAL_LINE=36,PACE_SPACE=18;
 const DISCONNECT_TIMEOUT_MS=60000;
 const HEARTBEAT_MS=8000;
 const WATCHDOG_MS=5000;
+const ROOM_TTL_MS=1000*60*60*24*3;
 
 const FACE={horse:"🐎",cap:"🧢",carrot:"🥕",weather:"☀️"};
 const DICE=[
@@ -559,8 +524,18 @@ return pick([
 
 async function saveRoom(next){
 room=next;
-if(online&&roomCode){await setDoc(roomRef,next)}
-else{localStorage.setItem("umaRaceLocalRoom",JSON.stringify(next));maybeStartMoveAnimation();render();maybeRunCpu()}
+if(online&&roomCode&&roomRef){
+const toSave=clone(next);
+delete toSave.presence;
+toSave.updatedAt=Date.now();
+toSave.expiresAt=Date.now()+ROOM_TTL_MS;
+await setDoc(roomRef,toSave,{merge:true});
+}else{
+localStorage.setItem("umaRaceLocalRoom",JSON.stringify(next));
+maybeStartMoveAnimation();
+render();
+maybeRunCpu();
+}
 }
 
 async function createRoom(){
@@ -570,8 +545,10 @@ localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
 history.replaceState(null,"","#"+roomCode);
+roomRef=online?doc(db,"rooms",roomCode):null;
+const now=Date.now();
 const base={
-version:48,
+version:49,
 title:GAME_TITLE,
 code:roomCode,
 hostId:localId,
@@ -582,21 +559,28 @@ starterIndex:0,
 settings:{cpuLevel:"normal",singleDevice},
 players:[{
 id:localId,
-name:localName,
+name:localName||"名無",
 type:"human",
 color:PLAYER_COLORS[0],
 money:0,
 seat:0,
 rejoinKey:getLocalRejoinKey(),
-lastSeen:Date.now(),
+joinedAt:now,
 proxy:false
 }],
 race:null,
-createdAt:Date.now(),
-updatedAt:Date.now()
+presence:{[localId]:{lastSeen:now,name:localName||"名無"}},
+createdAt:now,
+updatedAt:now,
+expiresAt:now+ROOM_TTL_MS
 };
+if(online){
+await setDoc(roomRef,base,{merge:false});
 await openRoom(roomCode);
-await saveRoom(base);
+}else{
+room=base;
+render();
+}
 }
 
 async function joinRoom(){
@@ -625,19 +609,22 @@ await openRoom(roomCode);
 async function openRoom(code){
 roomCode=code;
 if(unsubscribe)unsubscribe();
+clearInterval(heartbeatTimer);
+clearInterval(watchdogTimer);
+heartbeatTimer=null;
+watchdogTimer=null;
 if(online){
 roomRef=doc(db,"rooms",roomCode);
 unsubscribe=onSnapshot(roomRef,async snap=>{
 if(!snap.exists()){
 room=null;
-if(location.hash.replace("#","").trim().toUpperCase()===roomCode&&roomCode){
 homeMessage=`部屋番号「${roomCode}」の部屋はまだありません。`;
-}
 render();
 return;
 }
 room=snap.data();
 room.settings=room.settings||{cpuLevel:"normal",singleDevice:false};
+room.presence=room.presence||{};
 await maybeJoinAsHuman();
 startHeartbeat();
 startWatchdog();
@@ -666,11 +653,12 @@ if(me){
 if(me.type==="cpu"&&me.proxy){
 me.type="human";
 me.proxy=false;
-me.name=(localName||me.name).replace(/^代/,"");
+me.name=(localName||me.name).replace(/^代/,"")||me.name;
 next.race?.log?.unshift(`${me.name} が再入室しました。`);
 changed=true;
 }
 if(!me.rejoinKey){me.rejoinKey=key;changed=true}
+if(!me.joinedAt){me.joinedAt=Date.now();changed=true}
 if(changed)await saveRoom(next);
 return;
 }
@@ -681,8 +669,8 @@ localId=returning.id;
 localStorage.setItem("umaRacePlayerId",localId);
 returning.type="human";
 returning.proxy=false;
-returning.name=(localName||returning.name).replace(/^代/,"");
-returning.lastSeen=Date.now();
+returning.name=(localName||returning.name).replace(/^代/,"")||returning.name;
+returning.joinedAt=returning.joinedAt||Date.now();
 next.race?.log?.unshift(`${returning.name} が再入室しました。`);
 await saveRoom(next);
 return;
@@ -699,10 +687,9 @@ color:PLAYER_COLORS[next.players.length],
 money:0,
 seat:next.players.length,
 rejoinKey:key,
-lastSeen:Date.now(),
+joinedAt:Date.now(),
 proxy:false
 });
-next.updatedAt=Date.now();
 await saveRoom(next);
 }
 
@@ -710,11 +697,16 @@ async function sendHeartbeat(){
 if(!online||!room||!roomRef)return;
 const me=room.players.find(p=>p.id===localId);
 if(!me||me.type!=="human")return;
-const players=room.players.map(p=>{
-if(p.id!==localId)return p;
-return{...p,lastSeen:Date.now(),type:"human",proxy:false};
+try{
+await updateDoc(roomRef,{
+[`presence.${localId}.lastSeen`]:Date.now(),
+[`presence.${localId}.name`]:me.name||localName||"名無",
+updatedAt:Date.now(),
+expiresAt:Date.now()+ROOM_TTL_MS
 });
-await setDoc(roomRef,{players,updatedAt:Date.now()},{merge:true});
+}catch(e){
+console.warn("heartbeat failed",e);
+}
 }
 function startHeartbeat(){
 if(heartbeatTimer)return;
@@ -731,13 +723,18 @@ maybeRunCpu();
 },WATCHDOG_MS);
 }
 
+function playerLastSeen(r,p){
+const v=r.presence?.[p.id]?.lastSeen;
+return Number(v||p.lastSeen||p.joinedAt||r.createdAt||0);
+}
 async function maybeTakeOverHost(){
 if(!room||!online||!roomRef)return;
 const host=room.players.find(p=>p.id===room.hostId);
 const me=room.players.find(p=>p.id===localId&&p.type==="human");
 if(!me||!host||host.id===localId)return;
 const now=Date.now();
-if(host.lastSeen&&now-host.lastSeen>DISCONNECT_TIMEOUT_MS){
+const last=playerLastSeen(room,host);
+if(last&&now-last>DISCONNECT_TIMEOUT_MS){
 const next=clone(room);
 next.hostId=localId;
 next.race?.log?.unshift(`${me.name} が進行役を引き継ぎました。`);
@@ -752,12 +749,11 @@ const next=clone(room);
 let changed=false;
 for(const p of next.players){
 if(p.type==="human"&&p.id!==localId){
-const stale=!p.lastSeen||(now-p.lastSeen>DISCONNECT_TIMEOUT_MS);
-if(stale){
+const last=playerLastSeen(next,p);
+if(last&&now-last>DISCONNECT_TIMEOUT_MS){
 p.type="cpu";
 p.proxy=true;
 p.name=p.name.startsWith("代")?p.name:`代${p.name.slice(0,2)}`;
-p.lastSeen=0;
 changed=true;
 next.race?.log?.unshift(`${p.name} が通信切れのためCPU代理になりました。`);
 }
@@ -773,7 +769,7 @@ const used=new Set(next.players.map(p=>p.name));
 const candidates=CPU_NAMES.filter(n=>!used.has(n));
 const pool=candidates.length?candidates:CPU_NAMES;
 const name=pool[Math.floor(Math.random()*pool.length)];
-next.players.push({id:"cpu-"+crypto.randomUUID(),name,type:"cpu",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,proxy:false});
+next.players.push({id:"cpu-"+crypto.randomUUID(),name,type:"cpu",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false});
 await saveRoom(next);
 }
 async function removeCpu(){
@@ -789,7 +785,7 @@ async function addLocalPlayer(){
 if(!isHost()||!room||room.phase!=="lobby"||room.players.length>=MAX_PLAYERS)return;
 const next=clone(room);
 const n=next.players.filter(p=>p.type==="local").length+2;
-next.players.push({id:"local-"+crypto.randomUUID(),name:String(n)+"P",type:"local",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,proxy:false});
+next.players.push({id:"local-"+crypto.randomUUID(),name:String(n)+"P",type:"local",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false});
 next.settings.singleDevice=true;
 await saveRoom(next);
 }
@@ -1490,7 +1486,7 @@ const podium=room.race.finishOrder.slice(0,3);
 const last=room.race.lastHorse;
 const winner=[...room.players].sort((a,b)=>b.money-a.money)[0];
 const raceResult=`<section class="card resultShow"><div class="resultTitle">第${room.raceNo}レース 結果発表</div><div class="podiumGrid">${podium.map((hid,i)=>`<div class="podiumCard ${i===0?"first":""}"><div class="podiumRank">${i===0?"🥇":i===1?"🥈":"🥉"}</div><div class="podiumHorse">${escapeHtml(horseDisplayName(hid))}</div></div>`).join("")}</div><div class="lastCard">ビリ：${last?escapeHtml(horseDisplayName(last)):"-"}</div></section>`;
-const winnerBlock=room.phase==="gameover"?`<section class="card winnerCelebration"><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><span class="confetti"></span><div class="winnerTrophy">🏆</div><div class="winnerName">${escapeHtml(winner.name)} 優勝！</div><div class="winnerSub">最終所持金 ¥${winner.money}</div></section>`:"";
+const winnerBlock=room.phase==="gameover"?`<section class="card winnerCelebration"><div class="winnerTrophy">🏆</div><div class="winnerName">${escapeHtml(winner.name)} 優勝！</div><div class="winnerSub">最終所持金 ¥${winner.money}</div></section>`:"";
 return`${raceResult}${winnerBlock}<section class="card"><b>${room.phase==="gameover"?"最終結果":"払い戻し"}</b><div class="grid" style="margin-top:10px">${room.race.payout.playerResults.map(res=>`<div class="playerBox"><div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net>=0?"+":""}${res.net} → ¥${res.after}</span></div><div class="tiny">${res.details.length?escapeHtml(res.details.join(" / ")):"的中・支払いなし"}</div></div>`).join("")}</div></section>`;
 }
 
