@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v51 / presence + inactivity CPU proxy / tap to resume / public-ready base -->
+<!-- umauma-race v53 / no fixed-bar flicker / App Check reCAPTCHA v3 / public-ready base -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -122,7 +122,7 @@ button.diceStageButton .diceFaces{color:rgba(255,255,255,.85)}
 .cardStrip .paceBadge{font-size:9px;padding:2px 5px;margin-top:4px}
 .secretHorse{background:linear-gradient(180deg,#fff7fc,#ffe0f0)!important;outline:2px dashed rgba(255,105,180,.65)}
 
-.actions{position:fixed;left:50%;bottom:calc(4px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 8px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(8px);animation:fadeUp .45s ease both}
+.actions{position:fixed;left:50%;bottom:calc(4px + env(safe-area-inset-bottom));transform:translateX(-50%);z-index:10;width:min(980px,calc(100vw - 8px));background:rgba(255,253,247,.96);border:1px solid var(--line);border-radius:18px;padding:8px;box-shadow:var(--shadow);backdrop-filter:blur(8px)}
 .actions.betActions{background:linear-gradient(180deg,#45c979,#15884b);border:2px solid rgba(255,255,255,.75);color:#fff}
 .actions.betActions .small{color:rgba(255,255,255,.9)}
 @keyframes fadeUp{from{opacity:0;transform:translate(-50%,18px)}to{opacity:1;transform:translate(-50%,0)}}
@@ -267,6 +267,7 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 <script type="module">
 import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
 import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
+import{initializeAppCheck,ReCaptchaV3Provider}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app-check.js";
 import{getFirestore,doc,setDoc,getDoc,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
 
 const firebaseConfig={
@@ -280,6 +281,7 @@ measurementId:"G-0E7DM5B4VB"
 };
 
 const GAME_TITLE="うまうまレース";
+const RECAPTCHA_V3_SITE_KEY="6LeJi_osAAAAAHouHTc0RJyG29zmfCKYtGRKC5uP";
 const MAX_PLAYERS=6,GOAL_LINE=36,PACE_SPACE=18;
 const DISCONNECT_TIMEOUT_MS=60000;
 const HEARTBEAT_MS=8000;
@@ -327,6 +329,14 @@ let suggestedCode=randomCode();
 
 async function initFirebase(){
 const app=initializeApp(firebaseConfig);
+try{
+initializeAppCheck(app,{
+provider:new ReCaptchaV3Provider(RECAPTCHA_V3_SITE_KEY),
+isTokenAutoRefreshEnabled:true
+});
+}catch(e){
+console.warn("App Check init failed",e);
+}
 const auth=getAuth(app);
 await signInAnonymously(auth);
 db=getFirestore(app);
@@ -562,7 +572,7 @@ history.replaceState(null,"","#"+roomCode);
 roomRef=online?doc(db,"rooms",roomCode):null;
 const now=Date.now();
 const base={
-version:51,
+version:53,
 title:GAME_TITLE,
 code:roomCode,
 hostId:localId,
@@ -1381,9 +1391,16 @@ return`${room.code}-${room.phase}-${room.raceNo}`;
 function renderStateKey(r){
 if(!r)return"home";
 const copy=clone(r);
+
+// presence / 自動更新だけのフィールドは画面描画に使わない。
+// ここを除外しないと、heartbeatのたびに固定バーまで再生成されて点滅して見える。
 delete copy.presence;
 delete copy.updatedAt;
 delete copy.expiresAt;
+
+// 今後フィールドが増えても、自動更新系の差分で再描画しないための保険
+delete copy.lastHeartbeatAt;
+
 return JSON.stringify(copy);
 }
 function renderIfGameChanged(){
@@ -1429,7 +1446,7 @@ ${homeMessage?`<div class="notice">${escapeHtml(homeMessage)}</div>`:""}
 <div class="ruleItem"><b>③ レース</b>スタートは30〜36マス。サイコロは 🐎馬×3 / 🧢ジョッキー / 🥕人参 / ☀️天候。コースを1周してゴールします。同じマスに複数の馬は止まれません。</div>
 <div class="ruleItem"><b>④ オッズ</b>その馬に集まったBETチップ総数で賞金が変わります。人気馬ほど低配当、人気薄ほど高配当です。</div>
 <div class="ruleItem"><b>⑤ ペースホース</b>最初に18マス目を通過した馬がペースホース。ペースホースが1〜3着に入ると、その馬にBETした人は <b>100 × BET数</b> のボーナスをもらえます。</div>
-<div class="ruleItem"><b>⑥ 特別馬</b>たまに特別馬が出現します。特別馬は配当が倍になります。</div>
+<div class="ruleItem"><b>⑥ 特別馬</b>低確率で特別馬が出現します。特別馬は配当が倍になります。</div>
 <div class="ruleItem"><b>⑦ ビリペナルティ</b>最後方の馬にBETしていた場合は <b>-100 × チップ数</b>。3レース目は賞金・ボーナス・ペナルティがすべて2倍です。</div>
 </div>
 ${payoutTable()}
