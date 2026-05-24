@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>うまうまレース</title>
-<!-- umauma-race v49 / presence heartbeat / stable CPU proxy / public-ready base -->
+<!-- umauma-race v51 / presence + inactivity CPU proxy / tap to resume / public-ready base -->
 <style>
 :root{--ink:#3b2a1b;--muted:#806f61;--line:#ead8bc;--shadow:0 12px 26px rgba(91,55,22,.14)}
 *{box-sizing:border-box}
@@ -284,6 +284,7 @@ const MAX_PLAYERS=6,GOAL_LINE=36,PACE_SPACE=18;
 const DISCONNECT_TIMEOUT_MS=60000;
 const HEARTBEAT_MS=8000;
 const WATCHDOG_MS=5000;
+const ACTION_TIMEOUT_MS=60000;
 const ROOM_TTL_MS=1000*60*60*24*3;
 
 const FACE={horse:"🐎",cap:"🧢",carrot:"🥕",weather:"☀️"};
@@ -321,7 +322,7 @@ let room=null,db=null,online=false,roomRef=null,unsubscribe=null;
 let cpuTimer=null,animationState=null,animationTimer=null,lastAnimatedMoveTs=null;
 let goalBurstUntil=0,goalBurstRank=0,goalBurstTimer=null,goalBurstPieces=[];
 let audioCtx=null,bgmOn=false,bgmTimer=null,bgmStep=0;
-let heartbeatTimer=null,watchdogTimer=null,homeMessage="",lastViewKey="";
+let heartbeatTimer=null,watchdogTimer=null,homeMessage="",lastViewKey="",lastRenderStateKey="",resumeInProgress=false;
 let suggestedCode=randomCode();
 
 async function initFirebase(){
@@ -380,6 +381,19 @@ return order[r.race.bets.length%order.length];
 function advanceTurnOrder(r){
 const order=orderedPlayers(r,"turnOrder");
 r.turnIndex=(r.turnIndex+1)%order.length;
+}
+
+function markActionStart(r){
+if(r?.race)r.race.actionStartedAt=Date.now();
+}
+function currentActionPlayer(r=room){
+if(!r)return null;
+if(r.phase==="betting")return currentBetPlayer(r);
+if(r.phase==="racing")return currentPlayer(r);
+return null;
+}
+function restorePlayerName(p){
+return p.originalName||String(p.name||"").replace(/^代/,"")||p.name||"名無";
 }
 
 function cpuConfig(r=room,cpu=null){
@@ -533,7 +547,7 @@ await setDoc(roomRef,toSave,{merge:true});
 }else{
 localStorage.setItem("umaRaceLocalRoom",JSON.stringify(next));
 maybeStartMoveAnimation();
-render();
+renderIfGameChanged();
 maybeRunCpu();
 }
 }
@@ -548,7 +562,7 @@ history.replaceState(null,"","#"+roomCode);
 roomRef=online?doc(db,"rooms",roomCode):null;
 const now=Date.now();
 const base={
-version:49,
+version:51,
 title:GAME_TITLE,
 code:roomCode,
 hostId:localId,
@@ -566,7 +580,8 @@ money:0,
 seat:0,
 rejoinKey:getLocalRejoinKey(),
 joinedAt:now,
-proxy:false
+proxy:false,
+proxyReason:null
 }],
 race:null,
 presence:{[localId]:{lastSeen:now,name:localName||"名無"}},
@@ -630,7 +645,7 @@ startHeartbeat();
 startWatchdog();
 await maybeTakeOverHost();
 maybeStartMoveAnimation();
-render();
+renderIfGameChanged();
 maybeRunCpu();
 });
 }else{
@@ -650,10 +665,11 @@ let changed=false;
 
 let me=next.players.find(p=>p.id===localId);
 if(me){
-if(me.type==="cpu"&&me.proxy){
+if(me.type==="cpu"&&me.proxy&&me.proxyReason!=="inactive"){
 me.type="human";
 me.proxy=false;
-me.name=(localName||me.name).replace(/^代/,"")||me.name;
+me.proxyReason=null;
+me.name=(localName||restorePlayerName(me));
 next.race?.log?.unshift(`${me.name} が再入室しました。`);
 changed=true;
 }
@@ -669,7 +685,8 @@ localId=returning.id;
 localStorage.setItem("umaRacePlayerId",localId);
 returning.type="human";
 returning.proxy=false;
-returning.name=(localName||returning.name).replace(/^代/,"")||returning.name;
+returning.proxyReason=null;
+returning.name=(localName||restorePlayerName(returning));
 returning.joinedAt=returning.joinedAt||Date.now();
 next.race?.log?.unshift(`${returning.name} が再入室しました。`);
 await saveRoom(next);
@@ -688,7 +705,8 @@ money:0,
 seat:next.players.length,
 rejoinKey:key,
 joinedAt:Date.now(),
-proxy:false
+proxy:false,
+proxyReason:null
 });
 await saveRoom(next);
 }
@@ -696,7 +714,8 @@ await saveRoom(next);
 async function sendHeartbeat(){
 if(!online||!room||!roomRef)return;
 const me=room.players.find(p=>p.id===localId);
-if(!me||me.type!=="human")return;
+if(!me)return;
+if(me.type!=="human"&&!(me.proxy&&me.proxyReason==="inactive"))return;
 try{
 await updateDoc(roomRef,{
 [`presence.${localId}.lastSeen`]:Date.now(),
@@ -719,6 +738,7 @@ watchdogTimer=setInterval(async()=>{
 if(!room)return;
 await maybeTakeOverHost();
 await proxyDisconnectedPlayers();
+await proxyInactiveCurrentPlayer();
 maybeRunCpu();
 },WATCHDOG_MS);
 }
@@ -753,6 +773,8 @@ const last=playerLastSeen(next,p);
 if(last&&now-last>DISCONNECT_TIMEOUT_MS){
 p.type="cpu";
 p.proxy=true;
+p.proxyReason="disconnect";
+p.originalName=p.originalName||String(p.name||"").replace(/^代/,"");
 p.name=p.name.startsWith("代")?p.name:`代${p.name.slice(0,2)}`;
 changed=true;
 next.race?.log?.unshift(`${p.name} が通信切れのためCPU代理になりました。`);
@@ -762,6 +784,47 @@ next.race?.log?.unshift(`${p.name} が通信切れのためCPU代理になりま
 if(changed)await saveRoom(next);
 }
 
+
+async function proxyInactiveCurrentPlayer(){
+if(!room||!isHost()||!["betting","racing"].includes(room.phase)||!room.race?.actionStartedAt)return;
+const p=currentActionPlayer(room);
+if(!p||p.type!=="human")return;
+if(Date.now()-room.race.actionStartedAt<ACTION_TIMEOUT_MS)return;
+const next=clone(room);
+const target=next.players.find(x=>x.id===p.id);
+if(!target||target.type!=="human")return;
+target.type="cpu";
+target.proxy=true;
+target.proxyReason="inactive";
+target.originalName=target.originalName||String(target.name||"").replace(/^代/,"");
+target.name=target.name.startsWith("代")?target.name:`代${target.name.slice(0,2)}`;
+markActionStart(next);
+next.race?.log?.unshift(`${target.name} が1分以上操作しなかったためCPU代理になりました。`);
+await saveRoom(next);
+}
+
+async function resumeLocalIfInactive(){
+if(resumeInProgress||!room)return;
+const me=room.players.find(p=>p.id===localId);
+if(!me||!(me.type==="cpu"&&me.proxy&&me.proxyReason==="inactive"))return;
+resumeInProgress=true;
+try{
+const next=clone(room);
+const target=next.players.find(p=>p.id===localId);
+if(!target)return;
+target.type="human";
+target.proxy=false;
+target.proxyReason=null;
+target.name=restorePlayerName(target);
+markActionStart(next);
+next.race?.log?.unshift(`${target.name} が操作を再開しました。`);
+await saveRoom(next);
+await sendHeartbeat();
+}finally{
+setTimeout(()=>{resumeInProgress=false},700);
+}
+}
+
 async function addCpu(){
 if(!isHost()||!room||room.players.length>=MAX_PLAYERS)return;
 const next=clone(room);
@@ -769,7 +832,7 @@ const used=new Set(next.players.map(p=>p.name));
 const candidates=CPU_NAMES.filter(n=>!used.has(n));
 const pool=candidates.length?candidates:CPU_NAMES;
 const name=pool[Math.floor(Math.random()*pool.length)];
-next.players.push({id:"cpu-"+crypto.randomUUID(),name,type:"cpu",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false});
+next.players.push({id:"cpu-"+crypto.randomUUID(),name,type:"cpu",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false,proxyReason:null});
 await saveRoom(next);
 }
 async function removeCpu(){
@@ -785,7 +848,7 @@ async function addLocalPlayer(){
 if(!isHost()||!room||room.phase!=="lobby"||room.players.length>=MAX_PLAYERS)return;
 const next=clone(room);
 const n=next.players.filter(p=>p.type==="local").length+2;
-next.players.push({id:"local-"+crypto.randomUUID(),name:String(n)+"P",type:"local",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false});
+next.players.push({id:"local-"+crypto.randomUUID(),name:String(n)+"P",type:"local",color:PLAYER_COLORS[next.players.length],money:0,seat:next.players.length,joinedAt:Date.now(),proxy:false,proxyReason:null});
 next.settings.singleDevice=true;
 await saveRoom(next);
 }
@@ -843,6 +906,7 @@ lastHorse:null,
 payout:null,
 lastMove:null,
 resultReadyAt:null,
+actionStartedAt:Date.now(),
 betOrder:rotatedPlayerOrder(r.players),
 turnOrder:rotatedPlayerOrder(r.players),
 commentary:makeBetCommentary(cards),
@@ -888,6 +952,7 @@ r.race.log.unshift("チップ配置終了。レース開始！");
 }else{
 r.race.log.unshift(`次は ${currentBetPlayer(r).name} の番です。`);
 }
+markActionStart(r);
 }
 
 async function rollDice(){
@@ -896,6 +961,7 @@ if(!room||room.phase!=="racing"||!canControlPlayer(p)||room.race.dice||room.race
 const next=clone(room);
 next.race.dice=null;
 next.race.diceRolling=true;
+markActionStart(next);
 next.race.commentary=`${currentPlayer(next).name}、サイコロを手に取りました。何が出るか！`;
 next.race.log.unshift(`${currentPlayer(next).name} がサイコロを振っています…`);
 await saveRoom(next);
@@ -906,6 +972,7 @@ const latest=clone(room);
 const d=DICE[Math.floor(Math.random()*DICE.length)];
 latest.race.dice=d.key;
 latest.race.diceRolling=false;
+markActionStart(latest);
 latest.race.commentary=`出目は${d.label}！どの馬を動かすか、ここが勝負どころです。`;
 latest.race.log.unshift(`${currentPlayer(latest).name} の出目：${d.label}`);
 await saveRoom(latest);
@@ -989,6 +1056,7 @@ activeCards(r);
 advanceTurnOrder(r);
 r.race.dice=null;
 r.race.diceRolling=false;
+markActionStart(r);
 }
 
 function finishRace(r){
@@ -1069,6 +1137,8 @@ const me=next.players.find(p=>p.id===localId);
 if(me&&next.phase!=="lobby"){
 me.type="cpu";
 me.proxy=true;
+me.proxyReason="quit";
+me.originalName=me.originalName||String(me.name||"").replace(/^代/,"");
 me.name=me.name.startsWith("代")?me.name:`代${me.name.slice(0,2)}`;
 }
 const other=next.players.find(p=>p.type==="human"&&p.id!==localId);
@@ -1185,7 +1255,10 @@ return opts[0]?.horse;
 function maybeRunCpu(){
 clearTimeout(cpuTimer);
 if(!room)return;
-if(isHost())proxyDisconnectedPlayers();
+if(isHost()){
+proxyDisconnectedPlayers();
+proxyInactiveCurrentPlayer();
+}
 if(!isHost())return;
 const act=async()=>{
 if(!room||!isHost())return;
@@ -1305,7 +1378,22 @@ if(!room)return"home";
 if(room.phase==="lobby")return`lobby-${room.code}`;
 return`${room.code}-${room.phase}-${room.raceNo}`;
 }
+function renderStateKey(r){
+if(!r)return"home";
+const copy=clone(r);
+delete copy.presence;
+delete copy.updatedAt;
+delete copy.expiresAt;
+return JSON.stringify(copy);
+}
+function renderIfGameChanged(){
+const key=renderStateKey(room);
+if(key===lastRenderStateKey)return;
+lastRenderStateKey=key;
+render();
+}
 function render(){
+lastRenderStateKey=renderStateKey(room);
 const key=viewKey();
 const shouldScroll=key!==lastViewKey;
 lastViewKey=key;
@@ -1341,7 +1429,7 @@ ${homeMessage?`<div class="notice">${escapeHtml(homeMessage)}</div>`:""}
 <div class="ruleItem"><b>③ レース</b>スタートは30〜36マス。サイコロは 🐎馬×3 / 🧢ジョッキー / 🥕人参 / ☀️天候。コースを1周してゴールします。同じマスに複数の馬は止まれません。</div>
 <div class="ruleItem"><b>④ オッズ</b>その馬に集まったBETチップ総数で賞金が変わります。人気馬ほど低配当、人気薄ほど高配当です。</div>
 <div class="ruleItem"><b>⑤ ペースホース</b>最初に18マス目を通過した馬がペースホース。ペースホースが1〜3着に入ると、その馬にBETした人は <b>100 × BET数</b> のボーナスをもらえます。</div>
-<div class="ruleItem"><b>⑥ 特別馬</b>低確率で特別馬が出現します。特別馬は配当が倍になります。</div>
+<div class="ruleItem"><b>⑥ 特別馬</b>たまに特別馬が出現します。特別馬は配当が倍になります。</div>
 <div class="ruleItem"><b>⑦ ビリペナルティ</b>最後方の馬にBETしていた場合は <b>-100 × チップ数</b>。3レース目は賞金・ボーナス・ペナルティがすべて2倍です。</div>
 </div>
 ${payoutTable()}
@@ -1381,7 +1469,7 @@ return`${renderGoalConfetti()}${renderTrack()}${renderPayout()}<section class="c
 }
 function renderScoreBoard(){
 const sorted=[...room.players].sort((a,b)=>b.money-a.money);
-return`<section class="card scoreGrid">${sorted.map(p=>`<div class="playerBox ${currentPlayer()?.id===p.id&&room.phase==="racing"?"current":""}"><div class="row between"><b>${escapeHtml(p.name)}</b><span class="money">¥${p.money}</span></div><div class="small">${p.id===localId?"あなた":p.proxy?"CPU代理":room.settings?.singleDevice&&p.type==="local"?"同画面":""}</div></div>`).join("")}</section>`;
+return`<section class="card scoreGrid">${sorted.map(p=>`<div class="playerBox ${currentPlayer()?.id===p.id&&room.phase==="racing"?"current":""}"><div class="row between"><b>${escapeHtml(p.name)}</b><span class="money">¥${p.money}</span></div><div class="small">${p.id===localId?(p.proxyReason==="inactive"?"あなた：CPU代理中":"あなた"):p.proxy?"CPU代理":room.settings?.singleDevice&&p.type==="local"?"同画面":""}</div></div>`).join("")}</section>`;
 }
 function renderRaceControl(){
 return`<section class="card"><div class="row between"><b>第${room.raceNo}レース</b><span class="pill">${room.raceNo===3?"3R：すべて2倍":"通常レース"}</span></div><div class="row" style="margin-top:8px"><button id="toggleBgm" class="secondary">🎺 BGM ${bgmOn?"OFF":"ON"}</button><button id="quitToTop" class="secondary">ゲームをやめる</button></div></section>`;
@@ -1438,6 +1526,9 @@ function resultIsReady(){if(!room?.race?.resultReadyAt)return true;return Date.n
 function scheduleResultRefresh(){if(!room?.race?.resultReadyAt)return;const wait=Math.max(0,room.race.resultReadyAt-Date.now())+40;setTimeout(()=>{if(room)render()},wait)}
 function cpuOperatingLabel(p,phaseText){
 if(!p)return"CPU操作中…";
+if(p.id===localId&&p.proxyReason==="inactive"){
+return"1分以上操作がなかったためCPU代理中です。画面をタップすると復帰します。";
+}
 return`${escapeHtml(p.name)} がCPU操作中です。${phaseText}`;
 }
 function renderActionPanel(){
@@ -1551,6 +1642,8 @@ document.querySelectorAll(".betCard").forEach(el=>el.addEventListener("click",e=
 document.querySelectorAll(".moveCard").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();moveHorse(el.dataset.horse)}));
 document.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>playEffect("click")));
 }
+document.addEventListener("pointerdown",()=>resumeLocalIfInactive(),{passive:true});
+document.addEventListener("keydown",()=>resumeLocalIfInactive());
 
 await initFirebase().catch(err=>{console.warn("Firebase init failed",err);online=false});
 if(roomCode)await openRoom(roomCode);
