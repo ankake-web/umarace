@@ -5,80 +5,106 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>わいわいボードゲーム集</title>
   <style>
-    :root{--bg:#f6f1e7;--card:#fffdf8;--ink:#2d241c;--accent:#7a4b2a;--line:#e5d8c8}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#f6f1e7,#efe6da)}
-    .wrap{max-width:960px;margin:0 auto;padding:12px 12px 90px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}
-    h1,h2,h3,p{margin:0}.grid{display:grid;gap:12px}.games{grid-template-columns:1fr}.btn{border:0;border-radius:999px;padding:12px 16px;font-weight:800;background:#7a4b2a;color:#fff}
-    .btn.sub{background:#fff;color:var(--ink);border:1px solid var(--line)} .btn:disabled{opacity:.45}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.small{font-size:12px;opacity:.8}.pill{display:inline-block;border:1px solid var(--line);padding:4px 8px;border-radius:999px;font-size:12px}
-    .hidden{display:none!important}.actions{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(960px,calc(100vw - 16px));background:rgba(255,253,248,.95);padding:8px;border:1px solid var(--line);border-radius:14px}
-    .dice{display:flex;gap:8px}.die{width:52px;height:52px;border-radius:12px;border:2px solid #544;display:grid;place-items:center;font-size:28px;background:#fff}.rolling{animation:r .15s infinite alternate}@keyframes r{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
-    .paths{display:grid;gap:8px}.path{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center}.bar{height:14px;background:#ddd;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#5cb85c,#2b7)}
-    .bar>em{display:block;height:100%;background:rgba(40,120,220,.5);margin-top:-14px}
-    iframe{width:100%;height:80vh;border:0;border-radius:14px;background:#fff}
-    @media(min-width:760px){.games{grid-template-columns:repeat(2,1fr)}}
+    :root{--bg:#f3e9da;--panel:#fffaf1;--ink:#2f2418;--line:#dcc7ad;--accent:#8a5630;--ok:#2f9e5f;--bad:#bf4a4a}
+    *{box-sizing:border-box} body{margin:0;font-family:system-ui,sans-serif;background:radial-gradient(circle at 20% 0,#fff8ef,#f3e9da);color:var(--ink)}
+    .app{max-width:1100px;margin:0 auto;padding:10px 10px 96px}.card{background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:12px;margin:10px 0;box-shadow:0 8px 20px rgba(80,48,17,.08)}
+    .top{display:flex;justify-content:space-between;gap:8px;align-items:center;flex-wrap:wrap}.grid{display:grid;gap:10px}.games{grid-template-columns:1fr}.small{font-size:12px;opacity:.82}
+    .btn{border:0;border-radius:999px;padding:12px 16px;font-weight:800;background:var(--accent);color:#fff}.btn.sub{background:#fff;color:var(--ink);border:1px solid var(--line)}.btn:disabled{opacity:.45}
+    .tag{display:inline-block;padding:4px 8px;border:1px solid var(--line);border-radius:999px;font-size:11px;background:#fff}
+    .hidden{display:none!important}.actions{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(1100px,calc(100vw - 16px));background:rgba(255,250,241,.97);border:1px solid var(--line);border-radius:14px;padding:8px}
+    .log{max-height:130px;overflow:auto;background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;font-size:12px}.log div{padding:3px 0;border-bottom:1px dashed #eee}
+    .board{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}.tile{background:#fff;border:1px solid var(--line);border-radius:12px;padding:8px;min-height:78px;position:relative}.num{position:absolute;right:8px;top:8px;background:#fff;border:1px solid var(--line);border-radius:50%;width:24px;height:24px;display:grid;place-items:center;font-size:12px}
+    .hl{outline:3px solid #f4b66f}.cpu{background:#ffe7e7}.me{background:#e8fff0}.dice{display:flex;gap:8px}.die{width:52px;height:52px;background:#fff;border:2px solid #433;border-radius:12px;display:grid;place-items:center;font-size:28px}
+    .path{display:grid;grid-template-columns:28px 1fr;gap:8px;align-items:center}.bar{height:14px;background:#ddd;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:#2f9e5f}.bar em{display:block;height:100%;background:rgba(47,80,210,.45);margin-top:-14px}.bar b{display:block;height:100%;background:rgba(210,70,70,.45);margin-top:-14px}
+    .pair{padding:10px;border-radius:14px;border:1px solid var(--line);background:#fff}
+    iframe{width:100%;height:78vh;border:0;border-radius:14px;background:#fff}
+    @media(min-width:780px){.games{grid-template-columns:repeat(2,1fr)}}
   </style>
 </head>
 <body>
-<div class="wrap">
-  <div id="homeView">
-    <div class="card">
-      <div class="top"><h1>🎲 わいわいボードゲーム集</h1><button id="soundToggle" class="btn sub">🔊 Sound ON</button></div>
-      <p class="small" style="margin-top:8px">スマホ縦持ちで遊びやすい、短時間で楽しめるゲーム集。</p>
-    </div>
-    <div class="grid games" id="gameCards"></div>
-  </div>
-
-  <div id="umaView" class="hidden card"><div class="top"><h2>🐴 うまうまレース</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><iframe src="./umauma-race.html"></iframe></div>
-
-  <div id="diceView" class="hidden"></div>
-  <div id="treasureView" class="hidden"></div>
+<div class="app">
+<div id="homeView">
+  <div class="card"><div class="top"><h1>🎲 わいわいボードゲーム集</h1><button id="soundToggle" class="btn sub">🔊 Sound ON</button></div><p>ボードゲームカフェ風の5ゲーム集。スマホ縦でも遊びやすく調整。</p></div>
+  <div id="gameCards" class="grid games"></div>
+</div>
+<div id="umaView" class="hidden card"><div class="top"><h2>🐴 うまうまレース</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><iframe src="./umauma-race.html"></iframe></div>
+<div id="islandView" class="hidden"></div><div id="diceView" class="hidden"></div><div id="treasureView" class="hidden"></div><div id="secretView" class="hidden"></div>
 </div>
 <script>
-const S=(()=>{let on=localStorage.getItem('sound')!=='off',ctx,bgm;const n=document.getElementById('soundToggle');const upd=()=>n.textContent=on?'🔊 Sound ON':'🔈 Sound OFF';upd();
-function a(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();}
-function tone(f=440,d=.08,t='sine',v=.04){if(!on)return;a();const o=ctx.createOscillator(),g=ctx.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}
-function seq(arr,step=.16,type='triangle',v=.02){if(!on)return;a();arr.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(ctx.destination);const st=ctx.currentTime+i*step;o.start(st);g.gain.setValueAtTime(v,st);g.gain.exponentialRampToValueAtTime(0.0001,st+step*.95);o.stop(st+step)})}
-n.onclick=()=>{on=!on;localStorage.setItem('sound',on?'on':'off');upd();tone(on?780:240,.07,'square',.03)};return{tone,seq,click:()=>tone(520,.04,'square',.03),start:()=>seq([392,523,659],.12),win:()=>seq([523,659,784,988],.1),lose:()=>seq([370,294,220],.15,'sawtooth'),dice:()=>tone(180,.1,'sawtooth',.05),card:()=>tone(720,.05),toggle:n};})();
+const S=(()=>{let on=localStorage.getItem('sound')!=='off',ctx;const n=document.getElementById('soundToggle');const u=()=>n.textContent=on?'🔊 Sound ON':'🔈 Sound OFF';u();
+const a=()=>{if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();};
+const t=(f=440,d=.08,tp='sine',v=.04)=>{if(!on)return;a();const o=ctx.createOscillator(),g=ctx.createGain();o.type=tp;o.frequency.value=f;o.connect(g);g.connect(ctx.destination);o.start();g.gain.value=v;g.gain.exponentialRampToValueAtTime(.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)};
+const seq=(arr)=>arr.forEach((f,i)=>setTimeout(()=>t(f,.1,'triangle',.025),i*80)); n.onclick=()=>{on=!on;localStorage.setItem('sound',on?'on':'off');u();t(on?700:250,.07,'square',.03)};
+return{click:()=>t(520,.05,'square',.03),dice:()=>t(180,.1,'sawtooth',.05),card:()=>t(720,.05),build:()=>seq([350,500,660]),win:()=>seq([523,659,784,988]),lose:()=>seq([370,294,220])};})();
 
-const cards=[
-{key:'uma',title:'🐴 うまうまレース',genre:'レース×予想',desc:'既存ゲームをそのまま収録。',feat:'完成',play:()=>openView('umaView')},
-{key:'dice',title:'⛰️ ダイス登山',genre:'ダイス×チキンレース',desc:'4ダイスを2組に分けて山道を制覇。',feat:'完成',play:()=>startDice()},
-{key:'tre',title:'💰 押しつけ財宝',genre:'カード×押し引き',desc:'数字カードを押しつけ合う。',feat:'完成',play:()=>startTreasure()},
-{key:'sec',title:'🕯️ 密書カードバトル',genre:'心理戦カード',desc:'今回は未実装（次回予定）',feat:'未実装',play:null}
+const views=['homeView','umaView','islandView','diceView','treasureView','secretView']; const openView=id=>views.forEach(v=>document.getElementById(v).classList.toggle('hidden',v!==id));
+function goHome(){S.click();openView('homeView')} window.goHome=goHome;
+const games=[
+{title:'🐴 うまうまレース',meta:'レース・予想 / 10分 / 中',desc:'既存ゲームを維持し統合。',play:()=>openView('umaView')},
+{title:'🏝️ 島の開拓者',meta:'資源・建設 / 15分 / 中',desc:'ダイス資源と建設で7点先取。',play:()=>startIsland()},
+{title:'⛰️ ダイス登山',meta:'ダイス・度胸 / 12分 / 中',desc:'4ダイスの分割で3ルート制覇。',play:()=>startDice()},
+{title:'💰 押しつけ財宝',meta:'カード・押し引き / 10分 / 軽',desc:'パスか引き取りで高得点を狙う。',play:()=>startTreasure()},
+{title:'🕯️ 密書カードバトル',meta:'推理カード / 10分 / 中',desc:'1枚保持の読み合い、3ラウンド先取。',play:()=>startSecret()}
 ];
-const gc=document.getElementById('gameCards');cards.forEach(c=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<h3>${c.title}</h3><p class='small' style='margin:6px 0'>${c.genre}</p><p>${c.desc}</p><div class='top' style='margin-top:8px'><span class='pill'>${c.feat}</span>${c.play?`<button class='btn'>開始</button>`:'<button class="btn" disabled>準備中</button>'}</div>`;if(c.play)el.querySelector('button').onclick=()=>{S.click();S.start();c.play()};gc.appendChild(el)});
-function openView(id){['homeView','umaView','diceView','treasureView'].forEach(v=>document.getElementById(v).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
-function goHome(){S.click();S.tone(460,.06);openView('homeView')} window.goHome=goHome;
+const gc=document.getElementById('gameCards');games.forEach(g=>{const e=document.createElement('div');e.className='card';e.innerHTML=`<h3>${g.title}</h3><p class='small'>${g.meta}</p><p>${g.desc}</p><div class='top'><span class='tag'>完成</span><button class='btn'>開始</button></div>`;e.querySelector('button').onclick=()=>{S.click();g.play()};gc.appendChild(e)});
+
+function startIsland(){openView('islandView');const r=document.getElementById('islandView');
+const tiles=[['森','木',5],['丘','レンガ',8],['平地','麦',6],['山','鉱石',9],['牧草','羊',4],['森','木',10],['丘','レンガ',3],['平地','麦',11],['山','鉱石',5],['牧草','羊',8]];
+const st={turn:'p',goal:7,res:{p:{木:2,レンガ:2,麦:2,鉱石:1,羊:1},c:{木:2,レンガ:2,麦:2,鉱石:1,羊:1}},node:Array(10).fill(null),road:Array(9).fill(null),upg:Array(10).fill(false),log:['ゲーム開始']}; st.node[0]='p';st.node[9]='c';
+const cost={road:{木:1,レンガ:1},village:{木:1,レンガ:1,麦:1,羊:1},town:{麦:2,鉱石:3}};
+const score=w=>st.node.reduce((s,o,i)=>s+(o===w?(st.upg[i]?2:1):0),0); const can=(w,tp,i)=>{if(tp==='road')return i<9&&!st.road[i]&&(st.node[i]===w||st.node[i+1]===w||st.road[i-1]===w||st.road[i+1]===w); if(tp==='village')return !st.node[i]&&(st.road[i]===w||st.road[i-1]===w); return st.node[i]===w&&!st.upg[i]};
+const has=(w,c)=>Object.entries(c).every(([k,v])=>st.res[w][k]>=v),pay=(w,c)=>Object.entries(c).forEach(([k,v])=>st.res[w][k]-=v);
+const gain=sum=>{let txt=[];tiles.forEach((t,i)=>{if(t[2]!==sum)return; if(st.node[i]==='p'){st.res.p[t[1]]+=st.upg[i]?2:1;txt.push(`あなた+${t[1]}`)} if(st.node[i]==='c'){st.res.c[t[1]]+=st.upg[i]?2:1;txt.push(`CPU+${t[1]}`)} }); st.log.unshift(`🎲${sum}: ${txt.join(' / ')||'資源なし'}`)};
+const miss=(w,c)=>Object.entries(c).filter(([k,v])=>st.res[w][k]<v).map(([k,v])=>`${k}${v-st.res[w][k]}`);
+const render=()=>{r.innerHTML=`<div class='card'><div class='top'><h2>🏝️ 島の開拓者</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p>得点 あなた${score('p')} - CPU${score('c')} / 先に7点</p></div>
+<div class='card'><div class='top'><div>資源 あなた ${Object.entries(st.res.p).map(([k,v])=>`${k}${v}`).join(' / ')}</div><div>CPU ${Object.entries(st.res.c).map(([k,v])=>`${k}${v}`).join(' / ')}</div></div><div class='dice' style='margin-top:6px'><div class='die'>${st.lastA||'?'}</div><div class='die'>${st.lastB||'?'}</div></div></div>
+<div class='card'><div class='board'>${tiles.map((t,i)=>`<button class='tile ${st.node[i]==='p'?'me':''} ${st.node[i]==='c'?'cpu':''} ${can('p','village',i)?'hl':''}' data-i='${i}'><b>${t[0]}</b><div>${t[1]}</div><div class='num'>${t[2]}</div><div class='small'>${st.node[i]?st.node[i]==='p'?(st.upg[i]?'あなた町':'あなた村'):(st.upg[i]?'CPU町':'CPU村'):'空地'}</div></button>`).join('')}</div><p class='small'>道: ${st.road.map((o,i)=>`[${i}]${o?o==='p'?'あなた':'CPU':'空'}`).join(' ')}</p></div>
+<div class='card'><div class='log'>${st.log.slice(0,8).map(l=>`<div>${l}</div>`).join('')}</div></div>
+<div class='actions top'><button class='btn' id='roll'>🎲 ダイス</button><button class='btn sub' id='road'>道建設</button><button class='btn sub' id='vill'>村建設</button><button class='btn sub' id='town'>町化</button><button class='btn sub' id='retry'>🔁</button></div>`;
+r.querySelector('#rule').onclick=()=>alert('ダイス2個で資源発生。資源で道/村/町を建設し7点先取。村1点、町2点。');
+r.querySelector('#roll').onclick=()=>{if(st.turn!=='p')return;st.lastA=1+Math.floor(Math.random()*6);st.lastB=1+Math.floor(Math.random()*6);S.dice();gain(st.lastA+st.lastB);st.turn='build';render()};
+r.querySelector('#road').onclick=()=>{if(!has('p',cost.road)){st.log.unshift('不足: '+miss('p',cost.road).join(','));render();return}const i=st.road.findIndex((_,i)=>can('p','road',i));if(i<0){st.log.unshift('建設可能な道なし');render();return}pay('p',cost.road);st.road[i]='p';st.log.unshift(`あなたは道${i}を建設`);S.build();endTurn()};
+r.querySelector('#vill').onclick=()=>{if(!has('p',cost.village)){st.log.unshift('不足: '+miss('p',cost.village).join(','));render();return}const i=st.node.findIndex((_,i)=>can('p','village',i));if(i<0){st.log.unshift('建設可能な村なし');render();return}pay('p',cost.village);st.node[i]='p';st.log.unshift(`あなたは村(${i})建設`);S.build();endTurn()};
+r.querySelector('#town').onclick=()=>{if(!has('p',cost.town)){st.log.unshift('不足: '+miss('p',cost.town).join(','));render();return}const i=st.node.findIndex((_,i)=>can('p','town',i));if(i<0){st.log.unshift('町化不可');render();return}pay('p',cost.town);st.upg[i]=true;st.log.unshift(`あなたは町(${i})に強化`);S.build();endTurn()};
+r.querySelector('#retry').onclick=()=>startIsland();
+};
+const cpu=()=>{st.turn='c';st.lastA=1+Math.floor(Math.random()*6);st.lastB=1+Math.floor(Math.random()*6);gain(st.lastA+st.lastB);if(has('c',cost.town)){const i=st.node.findIndex((_,i)=>can('c','town',i));if(i>=0){pay('c',cost.town);st.upg[i]=true;st.log.unshift(`CPUは町(${i})強化`)}}
+else if(has('c',cost.village)){const i=st.node.findIndex((_,i)=>can('c','village',i));if(i>=0){pay('c',cost.village);st.node[i]='c';st.log.unshift(`CPUは村(${i})建設`)}}
+else if(has('c',cost.road)){const i=st.road.findIndex((_,i)=>can('c','road',i));if(i>=0){pay('c',cost.road);st.road[i]='c';st.log.unshift(`CPUは道${i}建設`)}}
+check();st.turn='p';render();};
+const check=()=>{if(score('p')>=7){st.log.unshift('🎉 あなたの勝利');S.win();st.turn='end'}if(score('c')>=7){st.log.unshift('💥 CPUの勝利');S.lose();st.turn='end'}};
+const endTurn=()=>{check();if(st.turn==='end'){render();return}setTimeout(cpu,500);render()};render();}
 
 function mountainLen(n){return ({2:3,12:3,3:5,11:5,4:7,10:7,5:9,9:9,6:11,8:11,7:13})[n]}
-function startDice(){openView('diceView');const root=document.getElementById('diceView');root.innerHTML=`<div class='card'><div class='top'><h2>⛰️ ダイス登山</h2><div><button class='btn sub' id='ruleBtn'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='status' style='margin-top:8px'>あなたのターン。まず振る！</p></div><div class='card'><div class='dice' id='dice'></div><div id='pairs' class='grid' style='margin-top:10px'></div></div><div class='card'><h3>進行状況（緑=確定 / 青=このターン仮進行）</h3><div id='paths' class='paths' style='margin-top:8px'></div></div><div class='actions top'><button class='btn' id='roll'>🎲 振る</button><button class='btn sub' id='bank'>✅ 確定</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
-const st={turn:'p',perm:{p:{},c:{}},tmp:{},claim:{},active:new Set(),dice:[1,1,1,1],over:false};for(let i=2;i<=12;i++){st.perm.p[i]=0;st.perm.c[i]=0}
-const dE=root.querySelector('#dice'),pE=root.querySelector('#pairs'),pathE=root.querySelector('#paths'),sE=root.querySelector('#status');
-const render=()=>{dE.innerHTML=st.dice.map(v=>`<div class='die'>${['⚀','⚁','⚂','⚃','⚄','⚅'][v-1]}</div>`).join('');pathE.innerHTML='';for(let i=2;i<=12;i++){const m=st.perm.p[i],t=st.tmp[i]||0,len=mountainLen(i),c=st.perm.c[i],cl=st.claim[i];pathE.innerHTML+=`<div class='path'><b>${i}</b><div><div class='bar'><i style='width:${(m/len)*100}%'></i><em style='width:${(Math.min(len,m+t)/len)*100}%'></em></div><div class='small'>あなた ${m+t}/${len} ・ CPU ${c}/${len} ${cl?`・🏁${cl==='p'?'あなた':'CPU'}制覇`:''}</div></div></div>`;}}
-const allPairs=(d)=>[[d[0]+d[1],d[2]+d[3]],[d[0]+d[2],d[1]+d[3]],[d[0]+d[3],d[1]+d[2]]];
-function canUse(n){if(st.claim[n])return false;return st.active.has(n)||st.active.size<3}
-function burstCheck(opts){return !opts.some(([a,b])=>canUse(a)||canUse(b))}
-function applyChoice(a,b,isCpu=false){[a,b].forEach(n=>{if(!canUse(n))return;st.active.add(n);st.tmp[n]=(st.tmp[n]||0)+1});if(isCpu)S.tone(370,.05)}
-function bank(who){for(const n of st.active){if(st.claim[n])continue;const base=st.perm[who][n];const add=st.tmp[n]||0;st.perm[who][n]=Math.min(mountainLen(n),base+add);if(st.perm[who][n]>=mountainLen(n)&&!st.claim[n])st.claim[n]=who;}st.tmp={};st.active.clear();}
-function wins(w){return Object.values(st.claim).filter(v=>v===w).length>=3}
-function cpuTurn(){st.turn='c';sE.textContent='CPU思考中...';setTimeout(()=>{let push=0;const step=()=>{st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));render();const opts=allPairs(st.dice);if(burstCheck(opts)){S.lose();sE.textContent='CPUがバースト！あなたの番';st.tmp={};st.active.clear();st.turn='p';return}
-const choice=opts.sort((x,y)=>(+canUse(y[0])+(+canUse(y[1])))-(+canUse(x[0])+(+canUse(x[1]))))[0];applyChoice(choice[0],choice[1],true);push+=2;const near=Object.keys(st.active).some(n=>st.perm.c[n]+(st.tmp[n]||0)>=mountainLen(+n)-1);const risky=st.active.size>=3&&push>=3;const shouldBank=near||push>=3||risky||(Math.random()<0.35&&push>=2);render();if(shouldBank){bank('c');if(wins('c')){st.over=true;S.lose();sE.textContent='敗北…CPUが3本制覇';}else{sE.textContent='CPUが確定。あなたの番';st.turn='p';S.tone(520,.05);}render();return}else{setTimeout(step,500)}};step();},450)}
-root.querySelector('#roll').onclick=()=>{if(st.turn!=='p'||st.over)return;S.dice();st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));dE.querySelectorAll('.die').forEach(el=>el.classList.add('rolling'));setTimeout(()=>dE.querySelectorAll('.die').forEach(el=>el.classList.remove('rolling')),260);const opts=allPairs(st.dice);pE.innerHTML='';if(burstCheck(opts)){S.lose();st.tmp={};st.active.clear();render();sE.textContent='バースト！このターンの仮進行は失われた';setTimeout(cpuTurn,700);return}
-opts.forEach(o=>{const b=document.createElement('button');b.className='btn sub';b.textContent=`${o[0]} と ${o[1]} を進める`;b.onclick=()=>{S.click();applyChoice(o[0],o[1]);render();sE.textContent='続けて振るか、確定するか選んでください';pE.innerHTML='';};pE.appendChild(b)});render();};
-root.querySelector('#bank').onclick=()=>{if(st.turn!=='p'||st.over)return;bank('p');render();if(wins('p')){st.over=true;S.win();sE.textContent='勝利！3本制覇達成！';return}sE.textContent='確定しました。CPUの番';cpuTurn()};
-root.querySelector('#retry').onclick=()=>{S.start();startDice()}; root.querySelector('#ruleBtn').onclick=()=>alert('4つのダイスを2組に分けて進む山道を選びます。\n同時挑戦は最大3本。バースト前に確定で保存。\n先に3本制覇で勝利。'); render();}
+function startDice(){/* reuse existing simplified improved */ openView('diceView'); const r=document.getElementById('diceView'); r.innerHTML='<div class="card"><div class="top"><h2>⛰️ ダイス登山</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><p>先に3本制覇で勝利</p><div id="dice"></div><div id="pairs" class="grid"></div><div id="paths"></div><div id="log" class="log"></div></div><div class="actions top"><button id="roll" class="btn">🎲振る</button><button id="bank" class="btn sub">確定</button><button id="retry" class="btn sub">🔁</button></div>';
+const st={perm:{p:{},c:{}},tmp:{},claim:{},act:new Set(),turn:'p',d:[1,1,1,1],log:[]}; for(let i=2;i<=12;i++){st.perm.p[i]=0;st.perm.c[i]=0}
+const all=d=>[[d[0]+d[1],d[2]+d[3]],[d[0]+d[2],d[1]+d[3]],[d[0]+d[3],d[1]+d[2]]],can=n=>!st.claim[n]&&(st.act.has(n)||st.act.size<3);
+const ren=()=>{r.querySelector('#dice').innerHTML=`<div class='dice'>${st.d.map(v=>`<div class='die'>${['⚀','⚁','⚂','⚃','⚄','⚅'][v-1]}</div>`).join('')}</div>`; r.querySelector('#paths').innerHTML=[...Array(11)].map((_,k)=>k+2).map(i=>`<div class='path'><b>${i}</b><div><div class='bar'><i style='width:${(st.perm.p[i]/mountainLen(i))*100}%'></i><em style='width:${(Math.min(mountainLen(i),st.perm.p[i]+(st.tmp[i]||0))/mountainLen(i))*100}%'></em><b style='width:${(st.perm.c[i]/mountainLen(i))*100}%'></b></div></div></div>`).join(''); r.querySelector('#log').innerHTML=st.log.slice(0,8).map(v=>`<div>${v}</div>`).join('')};
+const bank=w=>{for(const n of st.act){st.perm[w][n]=Math.min(mountainLen(n),st.perm[w][n]+(st.tmp[n]||0));if(st.perm[w][n]>=mountainLen(n)&&!st.claim[n])st.claim[n]=w;}st.tmp={};st.act.clear()}; const win=w=>Object.values(st.claim).filter(v=>v===w).length>=3;
+const cpu=()=>{st.turn='c'; st.d=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6)); const opts=all(st.d); const v=opts.find(o=>can(o[0])||can(o[1])); if(!v){st.log.unshift('CPUバースト');st.tmp={};st.act.clear();st.turn='p';ren();return} [v[0],v[1]].forEach(n=>{if(can(n)){st.act.add(n);st.tmp[n]=(st.tmp[n]||0)+1}}); bank('c'); st.log.unshift('CPU確定'); if(win('c')){st.log.unshift('CPU勝利');S.lose();st.turn='end'} else st.turn='p'; ren();};
+r.querySelector('#roll').onclick=()=>{if(st.turn!=='p')return; st.d=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6)); S.dice(); const opts=all(st.d); const p=r.querySelector('#pairs'); p.innerHTML=''; const ok=opts.some(o=>can(o[0])||can(o[1])); if(!ok){st.log.unshift('あなたバースト');st.tmp={};st.act.clear();setTimeout(cpu,500);ren();return} opts.forEach(o=>{const b=document.createElement('button');b.className='pair';b.textContent=`${o[0]} / ${o[1]}`;b.onclick=()=>{[o[0],o[1]].forEach(n=>{if(can(n)){st.act.add(n);st.tmp[n]=(st.tmp[n]||0)+1}});st.log.unshift(`仮進行 ${o[0]},${o[1]}`);p.innerHTML='';ren()};p.appendChild(b)});ren();};
+r.querySelector('#bank').onclick=()=>{if(st.turn!=='p')return;bank('p');if(win('p')){st.log.unshift('あなた勝利');S.win();st.turn='end';ren();return}setTimeout(cpu,400);ren()}; r.querySelector('#retry').onclick=()=>startDice(); ren();}
 
-function startTreasure(){openView('treasureView');const root=document.getElementById('treasureView');root.innerHTML=`<div class='card'><div class='top'><h2>💰 押しつけ財宝</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='msg' style='margin-top:8px'>場札を引き取るか、チップ1枚でパス！</p></div><div class='card'><div id='board'></div></div><div class='actions top'><button class='btn sub' id='pass'>🪙 パス</button><button class='btn' id='take'>📦 引き取る</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
-let deck=[...Array(35)].map((_,i)=>i+1).sort(()=>Math.random()-.5),table=deck.pop(),pile=0,p={chips:11,cards:[]},c={chips:11,cards:[]},over=false;
-const m=root.querySelector('#msg'),b=root.querySelector('#board');
-const sc=o=>{const s=[...o.cards].sort((a,b)=>a-b);let minus=0;for(let i=0;i<s.length;i++)if(i===0||s[i]!==s[i-1]+1)minus+=s[i];return o.chips-minus};
-const r=()=>{b.innerHTML=`<h3>場札: ${table??'-'} / 積みチップ: ${pile}</h3><p>あなた: チップ${p.chips} / 点数${sc(p)}<br>CPU: チップ${c.chips} / 点数${sc(c)}</p><p class='small'>あなたの獲得: ${p.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><p class='small'>CPUの獲得: ${c.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><p class='small'>残り山札: ${deck.length}</p>`;if(over){root.querySelector('#pass').disabled=true;root.querySelector('#take').disabled=true}};
-function next(){if(deck.length===0){over=true;const ps=sc(p),cs=sc(c);if(ps>cs){S.win();m.textContent=`終了！あなたの勝ち (${ps} - ${cs})`}else if(ps<cs){S.lose();m.textContent=`終了！CPUの勝ち (${ps} - ${cs})`}else m.textContent=`引き分け (${ps})`;r();return}table=deck.pop();pile=0;r()}
-function cpu(){if(over)return;const chain=c.cards.includes(table-1)||c.cards.includes(table+1);const take=(table<=10)||(pile>=3)||(chain&&pile>=1)||(c.chips===0);if(take){c.cards.push(table);c.chips+=pile;S.card();m.textContent='CPUは引き取りを選択';next()}else{c.chips--;pile++;S.tone(320,.05);m.textContent='CPUはパスしてチップを積んだ';}}
-root.querySelector('#pass').onclick=()=>{if(over)return;if(p.chips<=0){m.textContent='チップ不足。引き取りのみ可能';return}p.chips--;pile++;S.tone(300,.05);cpu();r()};
-root.querySelector('#take').onclick=()=>{if(over)return;p.cards.push(table);p.chips+=pile;S.card();m.textContent='あなたは引き取った';next();if(!over){setTimeout(()=>{cpu();r()},300)}r()};
-root.querySelector('#retry').onclick=()=>startTreasure();root.querySelector('#rule').onclick=()=>alert('カードはマイナス点、チップはプラス点。\nパスでチップを積み、引き取るとカード+チップ獲得。\n連番は最小値だけ減点。高得点で勝利。');r()}
+function startTreasure(){openView('treasureView');const r=document.getElementById('treasureView');let deck=[...Array(35)].map((_,i)=>i+1).sort(()=>Math.random()-.5),table=deck.pop(),pile=0,p={chips:11,cards:[]},c={chips:11,cards:[]},over=false,log=[];
+const sc=o=>{const s=[...o.cards].sort((a,b)=>a-b);let m=0;for(let i=0;i<s.length;i++)if(i===0||s[i]!==s[i-1]+1)m+=s[i];return o.chips-m};
+const ren=()=>{r.innerHTML=`<div class='card'><div class='top'><h2>💰 押しつけ財宝</h2><div><button class='btn sub' id='rule'>ルール</button><button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><div class='card' style='text-align:center'><div style='font-size:48px'>🃏${table??'-'}</div><div>積みチップ: ${'🪙'.repeat(Math.min(12,pile))} ${pile}</div></div><p>あなた 点${sc(p)} チップ${p.chips} / CPU 点${sc(c)} チップ${c.chips}</p><p class='small'>あなた札: ${p.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><p class='small'>CPU札: ${c.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><div class='log'>${log.slice(0,8).map(v=>`<div>${v}</div>`).join('')}</div></div><div class='actions top'><button class='btn sub' id='pass'>パス</button><button class='btn' id='take'>引き取り</button><button class='btn sub' id='retry'>🔁</button></div>`;
+if(over)return; r.querySelector('#rule').onclick=()=>alert('数字カードは減点。パスでチップを積み、引き取るとカードとチップ獲得。連番は最小値のみ減点。');
+r.querySelector('#pass').onclick=()=>{if(p.chips<=0){log.unshift('チップ不足');ren();return}p.chips--;pile++;log.unshift('あなたはパス');cpu();ren()};
+r.querySelector('#take').onclick=()=>{p.cards.push(table);p.chips+=pile;S.card();log.unshift('あなたは引き取り');next();if(!over)cpu();ren()};r.querySelector('#retry').onclick=()=>startTreasure();};
+const next=()=>{if(deck.length===0){over=true;const ps=sc(p),cs=sc(c);log.unshift(ps===cs?'引き分け':ps>cs?'あなた勝利':'CPU勝利');ps>cs?S.win():S.lose();return}table=deck.pop();pile=0};
+const cpu=()=>{if(over)return;const good=c.cards.includes(table-1)||c.cards.includes(table+1);const take=table<10||pile>=3||good||c.chips===0;if(take){c.cards.push(table);c.chips+=pile;log.unshift('CPUは引き取り');next()}else{c.chips--;pile++;log.unshift('CPUはパス(将来得点狙い)')}};ren();}
+
+function startSecret(){openView('secretView'); const r=document.getElementById('secretView'); const cards=[{n:'密偵',v:1,e:'guess'},{n:'監視者',v:2,e:'peek'},{n:'決闘者',v:3,e:'duel'},{n:'守護者',v:4,e:'shield'},{n:'策士',v:5,e:'draw2'},{n:'王印',v:8,e:'risk'}];
+let deck=[],p=[],c=[],pWin=0,cWin=0,round=1,shield={p:false,c:false},out={p:false,c:false},log=[];const shuf=()=>cards.flatMap(x=>[x,x]).sort(()=>Math.random()-.5);
+const draw=w=>{const x=deck.pop();if(x)(w==='p'?p:c).push(x)};const startRound=()=>{deck=shuf();p=[];c=[];out={p:false,c:false};shield={p:false,c:false};draw('p');draw('c');draw('p');log.unshift(`Round${round}開始`);ren()};
+const resolve=(who,card,targetGuess)=>{const opp=who==='p'?'c':'p',my=who==='p'?p:c,op=who==='p'?c:p;my.splice(my.indexOf(card),1); if(card.e==='guess'){if(op[0]&&op[0].v===targetGuess&&!shield[opp])out[opp]=true; log.unshift(`${who==='p'?'あなた':'CPU'} 密偵`)}
+if(card.e==='peek'&&who==='p')log.unshift(`CPU手札: ${op[0]?.n||'なし'}`);
+if(card.e==='duel'&&op[0]&&my[0]){if(my[0].v<op[0].v&&!shield[who])out[who]=true; if(op[0].v<my[0].v&&!shield[opp])out[opp]=true; log.unshift('決闘発生')}
+if(card.e==='shield')shield[who]=true; if(card.e==='draw2'){draw(who); if((who==='p'?p:c).length>2)(who==='p'?p:c).splice(0,1)} if(card.e==='risk'&&op[0]&&op[0].v===1&&!shield[who])out[who]=true;};
+const settle=()=>{let w=''; if(out.p&&!out.c)w='c'; else if(out.c&&!out.p)w='p'; else w=(p[0]?.v||0)>=(c[0]?.v||0)?'p':'c'; if(w==='p'){pWin++;S.win();log.unshift('ラウンド勝利')} else {cWin++;S.lose();log.unshift('ラウンド敗北')} if(pWin>=3||cWin>=3){log.unshift(pWin>=3?'総合勝利':'総合敗北');ren();return} round++;startRound();};
+const cpuTurn=()=>{if(out.p||out.c)return settle();draw('c');const cand=c.sort((a,b)=>a.v-b.v)[0];resolve('c',cand,p[0]?.v); if(!out.p&&!out.c&&p.length){/* no-op */} settle();};
+const ren=()=>{r.innerHTML=`<div class='card'><div class='top'><h2>🕯️ 密書カードバトル</h2><div><button class='btn sub' id='rule'>ルール</button><button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p>Round ${round} / 勝利 あなた${pWin}-CPU${cWin}</p><p class='small'>CPU手札: ${c.length}枚</p><div class='grid'>${p.map((x,i)=>`<button class='card btn sub play' data-i='${i}' style='text-align:left'><b>${x.n}</b> (${x.v})<br><span class='small'>効果:${x.e}</span></button>`).join('')}</div><div class='log'>${log.slice(0,10).map(v=>`<div>${v}</div>`).join('')}</div></div><div class='actions top'><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
+r.querySelector('#rule').onclick=()=>alert('毎手番1枚引いて1枚使う。脱落しなければ残り数字が高い方がラウンド勝利。3ラウンド先取。'); r.querySelector('#retry').onclick=()=>{pWin=0;cWin=0;round=1;startRound()}; r.querySelectorAll('.play').forEach(b=>b.onclick=()=>{const i=+b.dataset.i,card=p[i];const guess=card.e==='guess'?Number(prompt('予想数字を入力(1,2,3,4,5,8)','2')):null;resolve('p',card,guess);S.card();cpuTurn();});}; startRound();}
 </script>
 </body>
 </html>
