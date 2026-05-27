@@ -5,79 +5,114 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>わいわいボードゲーム集</title>
   <style>
-    :root{--bg:#f6f1e7;--card:#fffdf8;--ink:#2d241c;--accent:#7a4b2a;--line:#e5d8c8}
-    *{box-sizing:border-box} body{margin:0;font-family:system-ui,sans-serif;color:var(--ink);background:linear-gradient(180deg,#f6f1e7,#efe6da)}
-    .wrap{max-width:960px;margin:0 auto;padding:12px 12px 90px}.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:12px;margin:10px 0}
-    h1,h2,h3,p{margin:0}.grid{display:grid;gap:12px}.games{grid-template-columns:1fr}.btn{border:0;border-radius:999px;padding:12px 16px;font-weight:800;background:#7a4b2a;color:#fff}
-    .btn.sub{background:#fff;color:var(--ink);border:1px solid var(--line)} .btn:disabled{opacity:.45}
-    .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}.small{font-size:12px;opacity:.8}.pill{display:inline-block;border:1px solid var(--line);padding:4px 8px;border-radius:999px;font-size:12px}
-    .hidden{display:none!important}.actions{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(960px,calc(100vw - 16px));background:rgba(255,253,248,.95);padding:8px;border:1px solid var(--line);border-radius:14px}
-    .dice{display:flex;gap:8px}.die{width:52px;height:52px;border-radius:12px;border:2px solid #544;display:grid;place-items:center;font-size:28px;background:#fff}.rolling{animation:r .15s infinite alternate}@keyframes r{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
-    .paths{display:grid;gap:8px}.path{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center}.bar{height:14px;background:#ddd;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#5cb85c,#2b7)}
-    .bar>em{display:block;height:100%;background:rgba(40,120,220,.5);margin-top:-14px}
-    iframe{width:100%;height:80vh;border:0;border-radius:14px;background:#fff}
-    @media(min-width:760px){.games{grid-template-columns:repeat(2,1fr)}}
+    :root{
+      --bg:#1f1728;--bg2:#2d1f3b;--panel:#fff9f1;--panel-2:#fffefb;--ink:#2d2236;--muted:#6f6378;--line:#e7d8c4;
+      --primary:#8e56ff;--primary-2:#6f39e0;--success:#2fa56f;--warn:#f0a62a;--danger:#d65b66;
+      --shadow:0 14px 28px rgba(22,8,42,.24);--radius:22px;
+    }
+    *{box-sizing:border-box}
+    body{margin:0;color:var(--ink);font-family:"Hiragino Sans","Noto Sans JP",system-ui,sans-serif;background:
+      radial-gradient(circle at 8% 5%,rgba(255,210,105,.22),transparent 24%),
+      radial-gradient(circle at 95% 12%,rgba(147,112,255,.24),transparent 28%),
+      linear-gradient(160deg,var(--bg),var(--bg2) 45%,#1b253d);min-height:100vh}
+    h1,h2,h3,p{margin:0}
+    .wrap{max-width:1120px;margin:0 auto;padding:14px 12px 100px}
+    .hidden{display:none!important}
+
+    .hero{position:relative;overflow:hidden;padding:18px;border-radius:28px;background:linear-gradient(135deg,#ffe1b2,#ffc0d8 40%,#b3f0bc);border:2px solid rgba(255,255,255,.7);box-shadow:var(--shadow)}
+    .hero:after{content:"🎲";position:absolute;right:8px;bottom:-18px;font-size:120px;opacity:.2;transform:rotate(-10deg)}
+    .hero-top{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center;position:relative;z-index:2}
+    .title{font-size:clamp(30px,8vw,58px);font-weight:900;letter-spacing:.05em;line-height:1}
+    .lead{margin-top:10px;max-width:680px;font-weight:700;line-height:1.6;position:relative;z-index:2}
+
+    .sound{border:0;border-radius:999px;padding:11px 18px;background:rgba(255,255,255,.86);font-weight:900;box-shadow:0 8px 14px rgba(51,19,82,.14)}
+    .sound:active{transform:translateY(1px)}
+
+    .games{margin-top:14px;display:grid;grid-template-columns:1fr;gap:12px}
+    .game-card{border-radius:var(--radius);padding:14px;background:var(--panel);border:1px solid var(--line);box-shadow:var(--shadow);position:relative;overflow:hidden;display:grid;gap:10px}
+    .game-card::before{content:"";position:absolute;inset:0;background:linear-gradient(120deg,var(--tone-a),var(--tone-b));opacity:.16;pointer-events:none}
+    .game-head{display:flex;justify-content:space-between;gap:8px;align-items:flex-start;position:relative;z-index:1}
+    .game-title{font-size:23px;font-weight:900}
+    .badge{display:inline-flex;align-items:center;padding:4px 10px;border-radius:999px;font-size:12px;font-weight:900;border:1px solid rgba(0,0,0,.08);background:#fff}
+    .meta{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;position:relative;z-index:1}
+    .meta-item{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:8px;font-size:12px}
+    .meta-item b{display:block;font-size:11px;color:var(--muted);margin-bottom:2px}
+    .desc{position:relative;z-index:1;line-height:1.6;font-weight:600}
+
+    .btn{border:0;border-radius:14px;padding:12px 14px;font-weight:900;color:#fff;background:linear-gradient(180deg,var(--primary),var(--primary-2));box-shadow:0 8px 14px rgba(82,42,163,.35)}
+    .btn:hover{filter:brightness(1.03)}
+    .btn:active{transform:translateY(1px) scale(.995)}
+    .btn:disabled{opacity:.5;box-shadow:none}
+    .btn.sub{background:#fff;color:var(--ink);border:1px solid var(--line);box-shadow:none}
+    .btn.success{background:linear-gradient(180deg,#42be82,var(--success))}
+    .btn.warn{background:linear-gradient(180deg,#ffc34b,var(--warn));color:#503200}
+    .btn.danger{background:linear-gradient(180deg,#ef7b84,var(--danger))}
+
+    .panel{margin-top:10px;background:var(--panel);border:1px solid var(--line);border-radius:20px;padding:12px;box-shadow:var(--shadow)}
+    .top{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap}
+    iframe{width:100%;height:80vh;border:0;border-radius:16px;background:#fff}
+
+    .dice-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px}
+    .die{height:66px;border-radius:16px;border:2px solid #544;display:grid;place-items:center;font-size:34px;background:radial-gradient(circle at 30% 20%,#fff,#ece9f6 45%,#d5cfeb);box-shadow:0 8px 0 #bbb5cc}
+    .rolling{animation:r .15s infinite alternate}@keyframes r{from{transform:rotate(-6deg)}to{transform:rotate(6deg)}}
+    .paths{display:grid;gap:8px}.path{display:grid;grid-template-columns:30px 1fr;gap:8px;align-items:center}.bar{height:15px;background:#ddd;border-radius:999px;overflow:hidden}.bar>i{display:block;height:100%;background:linear-gradient(90deg,#37c17a,#1d9a64)}.bar>em{display:block;height:100%;background:rgba(80,128,255,.52);margin-top:-15px}
+
+    .log{display:grid;gap:6px}.logline{padding:8px 10px;background:#fff;border:1px solid var(--line);border-radius:12px;font-size:13px}
+    .actions{position:fixed;left:50%;transform:translateX(-50%);bottom:8px;width:min(1100px,calc(100vw - 12px));background:rgba(255,253,248,.95);padding:8px;border:1px solid var(--line);border-radius:14px;backdrop-filter:blur(8px)}
+
+    @media(min-width:880px){.games{grid-template-columns:repeat(2,minmax(0,1fr))}}
+    @media(max-width:600px){.wrap{padding:10px 8px 105px}.game-title{font-size:20px}.lead{font-size:14px}.meta{grid-template-columns:1fr}.btn{min-height:46px}.actions{bottom:calc(8px + env(safe-area-inset-bottom))}}
   </style>
 </head>
 <body>
 <div class="wrap">
   <div id="homeView">
-    <div class="card">
-      <div class="top"><h1>🎲 わいわいボードゲーム集</h1><button id="soundToggle" class="btn sub">🔊 Sound ON</button></div>
-      <p class="small" style="margin-top:8px">スマホ縦持ちで遊びやすい、短時間で楽しめるゲーム集。</p>
-    </div>
-    <div class="grid games" id="gameCards"></div>
+    <section class="hero">
+      <div class="hero-top"><h1 class="title">わいわいボードゲーム集</h1><button id="soundToggle" class="sound">🔊 Sound ON</button></div>
+      <p class="lead">夫婦や友達とサクッと盛り上がれる、スマホ縦画面最適化のボードゲーム風アプリ。駆け引き・運・逆転のワクワクを、1プレイ10〜20分で楽しめます。</p>
+    </section>
+    <div class="games" id="gameCards"></div>
   </div>
 
-  <div id="umaView" class="hidden card"><div class="top"><h2>🐴 うまうまレース</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><iframe src="./umauma-race.html"></iframe></div>
-
+  <div id="umaView" class="hidden panel"><div class="top"><h2>🐴 うまうまレース</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><iframe src="./umauma-race.html"></iframe></div>
   <div id="diceView" class="hidden"></div>
   <div id="treasureView" class="hidden"></div>
 </div>
 <script>
-const S=(()=>{let on=localStorage.getItem('sound')!=='off',ctx,bgm;const n=document.getElementById('soundToggle');const upd=()=>n.textContent=on?'🔊 Sound ON':'🔈 Sound OFF';upd();
-function a(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();}
+const S=(()=>{let on=localStorage.getItem('sound')!=='off',ctx;const n=document.getElementById('soundToggle');const upd=()=>n.textContent=on?'🔊 Sound ON':'🔈 Sound OFF';upd();function a(){if(!ctx)ctx=new(window.AudioContext||window.webkitAudioContext)();if(ctx.state==='suspended')ctx.resume();}
 function tone(f=440,d=.08,t='sine',v=.04){if(!on)return;a();const o=ctx.createOscillator(),g=ctx.createGain();o.type=t;o.frequency.value=f;g.gain.value=v;o.connect(g);g.connect(ctx.destination);o.start();g.gain.exponentialRampToValueAtTime(0.0001,ctx.currentTime+d);o.stop(ctx.currentTime+d)}
 function seq(arr,step=.16,type='triangle',v=.02){if(!on)return;a();arr.forEach((f,i)=>{const o=ctx.createOscillator(),g=ctx.createGain();o.type=type;o.frequency.value=f;o.connect(g);g.connect(ctx.destination);const st=ctx.currentTime+i*step;o.start(st);g.gain.setValueAtTime(v,st);g.gain.exponentialRampToValueAtTime(0.0001,st+step*.95);o.stop(st+step)})}
-n.onclick=()=>{on=!on;localStorage.setItem('sound',on?'on':'off');upd();tone(on?780:240,.07,'square',.03)};return{tone,seq,click:()=>tone(520,.04,'square',.03),start:()=>seq([392,523,659],.12),win:()=>seq([523,659,784,988],.1),lose:()=>seq([370,294,220],.15,'sawtooth'),dice:()=>tone(180,.1,'sawtooth',.05),card:()=>tone(720,.05),toggle:n};})();
+n.onclick=()=>{on=!on;localStorage.setItem('sound',on?'on':'off');upd();tone(on?780:240,.07,'square',.03)};return{tone,seq,click:()=>tone(520,.04,'square',.03),start:()=>seq([392,523,659],.12),win:()=>seq([523,659,784,988],.1),lose:()=>seq([370,294,220],.15,'sawtooth'),dice:()=>tone(180,.1,'sawtooth',.05),card:()=>tone(720,.05)};})();
 
 const cards=[
-{key:'uma',title:'🐴 うまうまレース',genre:'レース×予想',desc:'既存ゲームをそのまま収録。',feat:'完成',play:()=>openView('umaView')},
-{key:'dice',title:'⛰️ ダイス登山',genre:'ダイス×チキンレース',desc:'4ダイスを2組に分けて山道を制覇。',feat:'完成',play:()=>startDice()},
-{key:'tre',title:'💰 押しつけ財宝',genre:'カード×押し引き',desc:'数字カードを押しつけ合う。',feat:'完成',play:()=>startTreasure()},
-{key:'sec',title:'🕯️ 密書カードバトル',genre:'心理戦カード',desc:'今回は未実装（次回予定）',feat:'未実装',play:null}
+{key:'uma',title:'🐴 うまうまレース',genre:'レース×予想',desc:'ポップでにぎやかな実況付きレース。どの馬を軸にするかの読み合いが熱い。',difficulty:'★★☆',time:'10-15分',feel:'予想と逆転',feat:'完成',toneA:'#ffd2e3',toneB:'#fff0b3',play:()=>openView('umaView')},
+{key:'dice',title:'⛰️ ダイス登山',genre:'ダイス×チキンレース',desc:'4ダイスを2組で分け、3ルート先取を狙う。攻めるか確定するかの決断が命。',difficulty:'★★★',time:'8-12分',feel:'挑戦とヒリつき',feat:'完成',toneA:'#c9f4ff',toneB:'#dcd4ff',play:()=>startDice()},
+{key:'tre',title:'💰 押しつけ財宝',genre:'カード×押し引き',desc:'チップを積んで押しつけるコミカル心理戦。連番を作って減点を最小化せよ。',difficulty:'★★☆',time:'10-18分',feel:'押し引きと笑い',feat:'完成',toneA:'#ffe5b5',toneB:'#ffd2d2',play:()=>startTreasure()},
+{key:'sec',title:'🕯️ 密書カードバトル',genre:'秘密×推理カード',desc:'雰囲気重視で近日強化予定。伏せ情報で読み合う1vsCPUの短期決戦。',difficulty:'★★★',time:'12-20分',feel:'秘密と読み合い',feat:'試作',toneA:'#ddd2ff',toneB:'#ccd9ff',play:null}
 ];
-const gc=document.getElementById('gameCards');cards.forEach(c=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<h3>${c.title}</h3><p class='small' style='margin:6px 0'>${c.genre}</p><p>${c.desc}</p><div class='top' style='margin-top:8px'><span class='pill'>${c.feat}</span>${c.play?`<button class='btn'>開始</button>`:'<button class="btn" disabled>準備中</button>'}</div>`;if(c.play)el.querySelector('button').onclick=()=>{S.click();S.start();c.play()};gc.appendChild(el)});
+const gc=document.getElementById('gameCards');cards.forEach(c=>{const el=document.createElement('article');el.className='game-card';el.style.setProperty('--tone-a',c.toneA);el.style.setProperty('--tone-b',c.toneB);el.innerHTML=`<div class='game-head'><h3 class='game-title'>${c.title}</h3><span class='badge'>${c.feat}</span></div><p class='desc'>${c.desc}</p><div class='meta'><div class='meta-item'><b>ジャンル</b>${c.genre}</div><div class='meta-item'><b>プレイ感</b>${c.feel}</div><div class='meta-item'><b>難易度</b>${c.difficulty}</div><div class='meta-item'><b>プレイ時間</b>${c.time}</div></div>${c.play?`<button class='btn'>ゲームを始める</button>`:'<button class="btn sub" disabled>準備中</button>'}`;if(c.play)el.querySelector('button').onclick=()=>{S.click();S.start();c.play()};gc.appendChild(el)});
 function openView(id){['homeView','umaView','diceView','treasureView'].forEach(v=>document.getElementById(v).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
 function goHome(){S.click();S.tone(460,.06);openView('homeView')} window.goHome=goHome;
-
 function mountainLen(n){return ({2:3,12:3,3:5,11:5,4:7,10:7,5:9,9:9,6:11,8:11,7:13})[n]}
-function startDice(){openView('diceView');const root=document.getElementById('diceView');root.innerHTML=`<div class='card'><div class='top'><h2>⛰️ ダイス登山</h2><div><button class='btn sub' id='ruleBtn'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='status' style='margin-top:8px'>あなたのターン。まず振る！</p></div><div class='card'><div class='dice' id='dice'></div><div id='pairs' class='grid' style='margin-top:10px'></div></div><div class='card'><h3>進行状況（緑=確定 / 青=このターン仮進行）</h3><div id='paths' class='paths' style='margin-top:8px'></div></div><div class='actions top'><button class='btn' id='roll'>🎲 振る</button><button class='btn sub' id='bank'>✅ 確定</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
+function startDice(){openView('diceView');const root=document.getElementById('diceView');root.innerHTML=`<div class='panel'><div class='top'><h2>⛰️ ダイス登山</h2><div><button class='btn sub' id='ruleBtn'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='status' style='margin-top:8px;font-weight:700'>あなたのターン。まず振る！</p></div><div class='panel'><div class='dice-grid' id='dice'></div><div id='pairs' class='log' style='margin-top:10px'></div></div><div class='panel'><h3>進行状況（緑=確定 / 青=このターン仮進行）</h3><div id='paths' class='paths' style='margin-top:8px'></div></div><div class='actions top'><button class='btn success' id='roll'>🎲 振る</button><button class='btn warn' id='bank'>✅ 確定</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
 const st={turn:'p',perm:{p:{},c:{}},tmp:{},claim:{},active:new Set(),dice:[1,1,1,1],over:false};for(let i=2;i<=12;i++){st.perm.p[i]=0;st.perm.c[i]=0}
 const dE=root.querySelector('#dice'),pE=root.querySelector('#pairs'),pathE=root.querySelector('#paths'),sE=root.querySelector('#status');
-const render=()=>{dE.innerHTML=st.dice.map(v=>`<div class='die'>${['⚀','⚁','⚂','⚃','⚄','⚅'][v-1]}</div>`).join('');pathE.innerHTML='';for(let i=2;i<=12;i++){const m=st.perm.p[i],t=st.tmp[i]||0,len=mountainLen(i),c=st.perm.c[i],cl=st.claim[i];pathE.innerHTML+=`<div class='path'><b>${i}</b><div><div class='bar'><i style='width:${(m/len)*100}%'></i><em style='width:${(Math.min(len,m+t)/len)*100}%'></em></div><div class='small'>あなた ${m+t}/${len} ・ CPU ${c}/${len} ${cl?`・🏁${cl==='p'?'あなた':'CPU'}制覇`:''}</div></div></div>`;}}
-const allPairs=(d)=>[[d[0]+d[1],d[2]+d[3]],[d[0]+d[2],d[1]+d[3]],[d[0]+d[3],d[1]+d[2]]];
-function canUse(n){if(st.claim[n])return false;return st.active.has(n)||st.active.size<3}
-function burstCheck(opts){return !opts.some(([a,b])=>canUse(a)||canUse(b))}
+const render=()=>{dE.innerHTML=st.dice.map(v=>`<div class='die'>${['⚀','⚁','⚂','⚃','⚄','⚅'][v-1]}</div>`).join('');pathE.innerHTML='';for(let i=2;i<=12;i++){const m=st.perm.p[i],t=st.tmp[i]||0,len=mountainLen(i),c=st.perm.c[i],cl=st.claim[i];pathE.innerHTML+=`<div class='path'><b>${i}</b><div><div class='bar'><i style='width:${(m/len)*100}%'></i><em style='width:${(Math.min(len,m+t)/len)*100}%'></em></div><div style='font-size:12px;color:#6c6077'>あなた ${m+t}/${len} ・ CPU ${c}/${len} ${cl?`・🏁${cl==='p'?'あなた':'CPU'}制覇`:''}</div></div></div>`;}}
+const allPairs=(d)=>[[d[0]+d[1],d[2]+d[3]],[d[0]+d[2],d[1]+d[3]],[d[0]+d[3],d[1]+d[2]]]; const canUse=(n)=>!st.claim[n]&&(st.active.has(n)||st.active.size<3); const burstCheck=(opts)=>!opts.some(([a,b])=>canUse(a)||canUse(b));
 function applyChoice(a,b,isCpu=false){[a,b].forEach(n=>{if(!canUse(n))return;st.active.add(n);st.tmp[n]=(st.tmp[n]||0)+1});if(isCpu)S.tone(370,.05)}
-function bank(who){for(const n of st.active){if(st.claim[n])continue;const base=st.perm[who][n];const add=st.tmp[n]||0;st.perm[who][n]=Math.min(mountainLen(n),base+add);if(st.perm[who][n]>=mountainLen(n)&&!st.claim[n])st.claim[n]=who;}st.tmp={};st.active.clear();}
-function wins(w){return Object.values(st.claim).filter(v=>v===w).length>=3}
-function cpuTurn(){st.turn='c';sE.textContent='CPU思考中...';setTimeout(()=>{let push=0;const step=()=>{st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));render();const opts=allPairs(st.dice);if(burstCheck(opts)){S.lose();sE.textContent='CPUがバースト！あなたの番';st.tmp={};st.active.clear();st.turn='p';return}
-const choice=opts.sort((x,y)=>(+canUse(y[0])+(+canUse(y[1])))-(+canUse(x[0])+(+canUse(x[1]))))[0];applyChoice(choice[0],choice[1],true);push+=2;const near=Object.keys(st.active).some(n=>st.perm.c[n]+(st.tmp[n]||0)>=mountainLen(+n)-1);const risky=st.active.size>=3&&push>=3;const shouldBank=near||push>=3||risky||(Math.random()<0.35&&push>=2);render();if(shouldBank){bank('c');if(wins('c')){st.over=true;S.lose();sE.textContent='敗北…CPUが3本制覇';}else{sE.textContent='CPUが確定。あなたの番';st.turn='p';S.tone(520,.05);}render();return}else{setTimeout(step,500)}};step();},450)}
-root.querySelector('#roll').onclick=()=>{if(st.turn!=='p'||st.over)return;S.dice();st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));dE.querySelectorAll('.die').forEach(el=>el.classList.add('rolling'));setTimeout(()=>dE.querySelectorAll('.die').forEach(el=>el.classList.remove('rolling')),260);const opts=allPairs(st.dice);pE.innerHTML='';if(burstCheck(opts)){S.lose();st.tmp={};st.active.clear();render();sE.textContent='バースト！このターンの仮進行は失われた';setTimeout(cpuTurn,700);return}
-opts.forEach(o=>{const b=document.createElement('button');b.className='btn sub';b.textContent=`${o[0]} と ${o[1]} を進める`;b.onclick=()=>{S.click();applyChoice(o[0],o[1]);render();sE.textContent='続けて振るか、確定するか選んでください';pE.innerHTML='';};pE.appendChild(b)});render();};
+function bank(who){for(const n of st.active){if(st.claim[n])continue;const base=st.perm[who][n],add=st.tmp[n]||0;st.perm[who][n]=Math.min(mountainLen(n),base+add);if(st.perm[who][n]>=mountainLen(n)&&!st.claim[n])st.claim[n]=who;}st.tmp={};st.active.clear();}
+const wins=(w)=>Object.values(st.claim).filter(v=>v===w).length>=3;
+function cpuTurn(){st.turn='c';sE.textContent='CPU思考中...';setTimeout(()=>{let push=0;const step=()=>{st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));render();const opts=allPairs(st.dice);if(burstCheck(opts)){S.lose();sE.textContent='CPUがバースト！あなたの番';st.tmp={};st.active.clear();st.turn='p';return}const choice=opts.sort((x,y)=>(+canUse(y[0])+(+canUse(y[1])))-(+canUse(x[0])+(+canUse(x[1]))))[0];applyChoice(choice[0],choice[1],true);push+=2;const near=Object.keys(st.active).some(n=>st.perm.c[n]+(st.tmp[n]||0)>=mountainLen(+n)-1);const risky=st.active.size>=3&&push>=3;const shouldBank=near||push>=3||risky||(Math.random()<0.35&&push>=2);render();if(shouldBank){bank('c');if(wins('c')){st.over=true;S.lose();sE.textContent='敗北…CPUが3本制覇';}else{sE.textContent='CPUが確定。あなたの番';st.turn='p';S.tone(520,.05);}render();return}else setTimeout(step,500)};step();},450)}
+root.querySelector('#roll').onclick=()=>{if(st.turn!=='p'||st.over)return;S.dice();st.dice=[1,2,3,4].map(()=>1+Math.floor(Math.random()*6));dE.querySelectorAll('.die').forEach(el=>el.classList.add('rolling'));setTimeout(()=>dE.querySelectorAll('.die').forEach(el=>el.classList.remove('rolling')),260);const opts=allPairs(st.dice);pE.innerHTML='';if(burstCheck(opts)){S.lose();st.tmp={};st.active.clear();render();sE.textContent='バースト！このターンの仮進行は失われた';setTimeout(cpuTurn,700);return}opts.forEach(o=>{const b=document.createElement('button');b.className='btn sub';b.textContent=`${o[0]} と ${o[1]} を進める`;b.onclick=()=>{S.click();applyChoice(o[0],o[1]);render();sE.textContent='続けて振るか、確定するか選んでください';pE.innerHTML='';};pE.appendChild(b)});render();};
 root.querySelector('#bank').onclick=()=>{if(st.turn!=='p'||st.over)return;bank('p');render();if(wins('p')){st.over=true;S.win();sE.textContent='勝利！3本制覇達成！';return}sE.textContent='確定しました。CPUの番';cpuTurn()};
 root.querySelector('#retry').onclick=()=>{S.start();startDice()}; root.querySelector('#ruleBtn').onclick=()=>alert('4つのダイスを2組に分けて進む山道を選びます。\n同時挑戦は最大3本。バースト前に確定で保存。\n先に3本制覇で勝利。'); render();}
-
-function startTreasure(){openView('treasureView');const root=document.getElementById('treasureView');root.innerHTML=`<div class='card'><div class='top'><h2>💰 押しつけ財宝</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='msg' style='margin-top:8px'>場札を引き取るか、チップ1枚でパス！</p></div><div class='card'><div id='board'></div></div><div class='actions top'><button class='btn sub' id='pass'>🪙 パス</button><button class='btn' id='take'>📦 引き取る</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
+function startTreasure(){openView('treasureView');const root=document.getElementById('treasureView');root.innerHTML=`<div class='panel'><div class='top'><h2>💰 押しつけ財宝</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='msg' style='margin-top:8px;font-weight:700'>場札を引き取るか、チップ1枚でパス！</p></div><div class='panel'><div id='board' class='log'></div></div><div class='actions top'><button class='btn warn' id='pass'>🪙 パス</button><button class='btn success' id='take'>📦 引き取る</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
 let deck=[...Array(35)].map((_,i)=>i+1).sort(()=>Math.random()-.5),table=deck.pop(),pile=0,p={chips:11,cards:[]},c={chips:11,cards:[]},over=false;
-const m=root.querySelector('#msg'),b=root.querySelector('#board');
-const sc=o=>{const s=[...o.cards].sort((a,b)=>a-b);let minus=0;for(let i=0;i<s.length;i++)if(i===0||s[i]!==s[i-1]+1)minus+=s[i];return o.chips-minus};
-const r=()=>{b.innerHTML=`<h3>場札: ${table??'-'} / 積みチップ: ${pile}</h3><p>あなた: チップ${p.chips} / 点数${sc(p)}<br>CPU: チップ${c.chips} / 点数${sc(c)}</p><p class='small'>あなたの獲得: ${p.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><p class='small'>CPUの獲得: ${c.cards.sort((a,b)=>a-b).join(',')||'なし'}</p><p class='small'>残り山札: ${deck.length}</p>`;if(over){root.querySelector('#pass').disabled=true;root.querySelector('#take').disabled=true}};
+const m=root.querySelector('#msg'),b=root.querySelector('#board'); const sc=o=>{const s=[...o.cards].sort((a,b)=>a-b);let minus=0;for(let i=0;i<s.length;i++)if(i===0||s[i]!==s[i-1]+1)minus+=s[i];return o.chips-minus};
+const r=()=>{b.innerHTML=`<div class='logline'><b>場札:</b> ${table??'-'} / <b>積みチップ:</b> ${pile}</div><div class='logline'><b>あなた</b> チップ${p.chips} / 点数${sc(p)}<br><b>CPU</b> チップ${c.chips} / 点数${sc(c)}</div><div class='logline'><b>あなたの獲得:</b> ${p.cards.sort((a,b)=>a-b).join(',')||'なし'}</div><div class='logline'><b>CPUの獲得:</b> ${c.cards.sort((a,b)=>a-b).join(',')||'なし'}</div><div class='logline'><b>残り山札:</b> ${deck.length}</div>`;if(over){root.querySelector('#pass').disabled=true;root.querySelector('#take').disabled=true}};
 function next(){if(deck.length===0){over=true;const ps=sc(p),cs=sc(c);if(ps>cs){S.win();m.textContent=`終了！あなたの勝ち (${ps} - ${cs})`}else if(ps<cs){S.lose();m.textContent=`終了！CPUの勝ち (${ps} - ${cs})`}else m.textContent=`引き分け (${ps})`;r();return}table=deck.pop();pile=0;r()}
 function cpu(){if(over)return;const chain=c.cards.includes(table-1)||c.cards.includes(table+1);const take=(table<=10)||(pile>=3)||(chain&&pile>=1)||(c.chips===0);if(take){c.cards.push(table);c.chips+=pile;S.card();m.textContent='CPUは引き取りを選択';next()}else{c.chips--;pile++;S.tone(320,.05);m.textContent='CPUはパスしてチップを積んだ';}}
-root.querySelector('#pass').onclick=()=>{if(over)return;if(p.chips<=0){m.textContent='チップ不足。引き取りのみ可能';return}p.chips--;pile++;S.tone(300,.05);cpu();r()};
-root.querySelector('#take').onclick=()=>{if(over)return;p.cards.push(table);p.chips+=pile;S.card();m.textContent='あなたは引き取った';next();if(!over){setTimeout(()=>{cpu();r()},300)}r()};
+root.querySelector('#pass').onclick=()=>{if(over)return;if(p.chips<=0){m.textContent='チップ不足。引き取りのみ可能';return}p.chips--;pile++;S.tone(300,.05);cpu();r()}; root.querySelector('#take').onclick=()=>{if(over)return;p.cards.push(table);p.chips+=pile;S.card();m.textContent='あなたは引き取った';next();if(!over){setTimeout(()=>{cpu();r()},300)}r()};
 root.querySelector('#retry').onclick=()=>startTreasure();root.querySelector('#rule').onclick=()=>alert('カードはマイナス点、チップはプラス点。\nパスでチップを積み、引き取るとカード+チップ獲得。\n連番は最小値だけ減点。高得点で勝利。');r()}
 </script>
 </body>
