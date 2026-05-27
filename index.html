@@ -31,8 +31,10 @@
 
   <div id="umaView" class="hidden card"><div class="top"><h2>🐴 うまうまレース</h2><button class="btn sub" onclick="goHome()">トップへ戻る</button></div><iframe src="./umauma-race.html"></iframe></div>
 
+  <div id="islandView" class="hidden"></div>
   <div id="diceView" class="hidden"></div>
   <div id="treasureView" class="hidden"></div>
+  <div id="secretView" class="hidden"></div>
 </div>
 <script>
 const S=(()=>{let on=localStorage.getItem('sound')!=='off',ctx,bgm;const n=document.getElementById('soundToggle');const upd=()=>n.textContent=on?'🔊 Sound ON':'🔈 Sound OFF';upd();
@@ -45,11 +47,44 @@ const cards=[
 {key:'uma',title:'🐴 うまうまレース',genre:'レース×予想',desc:'既存ゲームをそのまま収録。',feat:'完成',play:()=>openView('umaView')},
 {key:'dice',title:'⛰️ ダイス登山',genre:'ダイス×チキンレース',desc:'4ダイスを2組に分けて山道を制覇。',feat:'完成',play:()=>startDice()},
 {key:'tre',title:'💰 押しつけ財宝',genre:'カード×押し引き',desc:'数字カードを押しつけ合う。',feat:'完成',play:()=>startTreasure()},
-{key:'sec',title:'🕯️ 密書カードバトル',genre:'心理戦カード',desc:'今回は未実装（次回予定）',feat:'未実装',play:null}
+{key:'isl',title:'🏝️ 島の開拓者',genre:'陣取り×資源管理',desc:'資源を集めて拠点を建て、先に4拠点を目指す。',feat:'完成',play:()=>startIsland()},
+{key:'sec',title:'🕯️ 密書カードバトル',genre:'心理戦カード',desc:'密書を見抜き、先に3勝を狙う読み合いバトル。',feat:'完成',play:()=>startSecret()}
 ];
 const gc=document.getElementById('gameCards');cards.forEach(c=>{const el=document.createElement('div');el.className='card';el.innerHTML=`<h3>${c.title}</h3><p class='small' style='margin:6px 0'>${c.genre}</p><p>${c.desc}</p><div class='top' style='margin-top:8px'><span class='pill'>${c.feat}</span>${c.play?`<button class='btn'>開始</button>`:'<button class="btn" disabled>準備中</button>'}</div>`;if(c.play)el.querySelector('button').onclick=()=>{S.click();S.start();c.play()};gc.appendChild(el)});
-function openView(id){['homeView','umaView','diceView','treasureView'].forEach(v=>document.getElementById(v).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
+function openView(id){['homeView','umaView','islandView','diceView','treasureView','secretView'].forEach(v=>document.getElementById(v).classList.add('hidden'));document.getElementById(id).classList.remove('hidden')}
 function goHome(){S.click();S.tone(460,.06);openView('homeView')} window.goHome=goHome;
+
+
+
+function startIsland(){openView('islandView');const root=document.getElementById('islandView');root.innerHTML=`<div class='card'><div class='top'><h2>🏝️ 島の開拓者</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='msg' style='margin-top:8px'>資源を貯めて拠点を建てよう（先に4拠点で勝利）。</p></div><div class='card'><div id='board'></div></div><div class='actions top'><button class='btn' id='gather'>🧺 採集</button><button class='btn sub' id='build'>🏠 拠点建設（木2+石2）</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
+let st={p:{wood:0,stone:0,base:0},c:{wood:0,stone:0,base:0},turn:'p',over:false,round:1};
+const m=root.querySelector('#msg'),b=root.querySelector('#board');
+const draw=()=>{b.innerHTML=`<h3>ラウンド ${st.round}</h3><p>あなた: 木${st.p.wood} / 石${st.p.stone} / 拠点${st.p.base}<br>CPU: 木${st.c.wood} / 石${st.c.stone} / 拠点${st.c.base}</p><p class='small'>毎ターン「採集」か「建設」。建設コスト: 木2+石2</p>`;};
+const gain=(t)=>{t.wood+=1+Math.floor(Math.random()*2);t.stone+=Math.random()<0.7?1:2};
+const canBuild=(t)=>t.wood>=2&&t.stone>=2;
+const build=(t)=>{if(!canBuild(t))return false;t.wood-=2;t.stone-=2;t.base++;return true};
+const check=()=>{if(st.p.base>=4||st.c.base>=4){st.over=true;const win=st.p.base>=4&&st.c.base<4;m.textContent=win?'勝利！島の開拓に成功':'敗北…CPUが先に4拠点';if(win)S.win();else S.lose();draw();}};
+const cpu=()=>{if(st.over)return;const shouldBuild=canBuild(st.c)&&(st.c.base>=st.p.base||Math.random()<0.65);if(shouldBuild){build(st.c);m.textContent='CPUは拠点を建設した';S.card();}else{gain(st.c);m.textContent='CPUは資源を採集した';S.tone(380,.05);}st.round++;draw();check();};
+root.querySelector('#gather').onclick=()=>{if(st.over)return;gain(st.p);m.textContent='あなたは資源を採集した';S.click();draw();check();if(!st.over)setTimeout(cpu,320)};
+root.querySelector('#build').onclick=()=>{if(st.over)return;if(!build(st.p)){m.textContent='資源不足（木2+石2が必要）';S.tone(260,.06);return}m.textContent='あなたは拠点を建設した';S.card();draw();check();if(!st.over)setTimeout(cpu,320)};
+root.querySelector('#retry').onclick=()=>startIsland();
+root.querySelector('#rule').onclick=()=>alert('採集で木と石を増やし、木2+石2で拠点を1つ建設。
+先に4拠点建設したプレイヤーの勝ち。');
+draw();}
+
+function startSecret(){openView('secretView');const root=document.getElementById('secretView');root.innerHTML=`<div class='card'><div class='top'><h2>🕯️ 密書カードバトル</h2><div><button class='btn sub' id='rule'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='msg' style='margin-top:8px'>3ラウンド先取で勝利。相手の心理を読もう。</p></div><div class='card'><div id='board'></div></div><div class='actions top'><button class='btn sub action' data-m='seal'>🛡️ 封印</button><button class='btn action' data-m='spy'>🕵️ 偵察</button><button class='btn sub action' data-m='steal'>🗡️ 奪取</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
+let st={p:0,c:0,r:1,over:false,lastCpu:'seal'};
+const m=root.querySelector('#msg'),b=root.querySelector('#board');
+const beats={seal:'steal',steal:'spy',spy:'seal'};
+const labels={seal:'封印',spy:'偵察',steal:'奪取'};
+const cpuPick=(pm)=>{if(Math.random()<0.45)return beats[pm];const arr=['seal','spy','steal'];return arr[Math.floor(Math.random()*3)];};
+const draw=()=>{b.innerHTML=`<h3>ラウンド ${st.r}</h3><p>あなた ${st.p} - ${st.c} CPU</p><p class='small'>三すくみ：封印＞奪取＞偵察＞封印</p><p class='small'>CPUの前回手: ${labels[st.lastCpu]}</p>`;};
+const end=()=>{if(st.p>=3||st.c>=3){st.over=true;if(st.p>st.c){m.textContent='勝利！密書を守り切った';S.win();}else{m.textContent='敗北…密書を読まれた';S.lose();}draw();}};
+root.querySelectorAll('.action').forEach(btn=>btn.onclick=()=>{if(st.over)return;const pm=btn.dataset.m,cm=cpuPick(pm);st.lastCpu=cm;if(pm===cm){m.textContent=`引き分け（${labels[pm]}）`;S.tone(420,.05);}else if(beats[pm]===cm){st.p++;m.textContent=`あなたの勝ち（${labels[pm]} vs ${labels[cm]}）`;S.card();}else{st.c++;m.textContent=`CPUの勝ち（${labels[cm]} vs ${labels[pm]}）`;S.tone(240,.07);}st.r++;draw();end();});
+root.querySelector('#retry').onclick=()=>startSecret();
+root.querySelector('#rule').onclick=()=>alert('毎ラウンド、封印・偵察・奪取から1つ選ぶ三すくみバトル。
+先に3勝で勝利。');
+draw();}
 
 function mountainLen(n){return ({2:3,12:3,3:5,11:5,4:7,10:7,5:9,9:9,6:11,8:11,7:13})[n]}
 function startDice(){openView('diceView');const root=document.getElementById('diceView');root.innerHTML=`<div class='card'><div class='top'><h2>⛰️ ダイス登山</h2><div><button class='btn sub' id='ruleBtn'>ルール</button> <button class='btn sub' onclick='goHome()'>トップへ戻る</button></div></div><p id='status' style='margin-top:8px'>あなたのターン。まず振る！</p></div><div class='card'><div class='dice' id='dice'></div><div id='pairs' class='grid' style='margin-top:10px'></div></div><div class='card'><h3>進行状況（緑=確定 / 青=このターン仮進行）</h3><div id='paths' class='paths' style='margin-top:8px'></div></div><div class='actions top'><button class='btn' id='roll'>🎲 振る</button><button class='btn sub' id='bank'>✅ 確定</button><button class='btn sub' id='retry'>🔁 リトライ</button></div>`;
