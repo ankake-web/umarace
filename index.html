@@ -1179,10 +1179,7 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 <div id="raceCutin" aria-hidden="true"></div>
 
 <script type="module">
-import{initializeApp}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app.js";
-import{getAuth,signInAnonymously}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-auth.js";
-import{initializeAppCheck,ReCaptchaV3Provider}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-app-check.js";
-import{getFirestore,doc,setDoc,getDoc,onSnapshot,updateDoc}from"https://www.gstatic.com/firebasejs/10.12.5/firebase-firestore.js";
+let doc,setDoc,getDoc,onSnapshot,updateDoc,runTransaction;
 
 const firebaseConfig={
 apiKey:"AIzaSyCxHux7rE19LCvV-2sNwhEMtGABf3tZgDs",
@@ -1240,7 +1237,8 @@ let appEl=document.getElementById("app");
 let localId=localStorage.getItem("umaRacePlayerId")||crypto.randomUUID();
 localStorage.setItem("umaRacePlayerId",localId);
 let localName=localStorage.getItem("umaRacePlayerName")||"";
-let roomCode=new URL(location.href).hash.replace("#","").trim().toUpperCase();
+const initialHash=location.hash.slice(1);
+let roomCode=initialHash.replace(/^local-/i,"").trim().toUpperCase();
 
 let room=null,db=null,online=false,roomRef=null,unsubscribe=null;
 let cpuTimer=null,animationState=null,animationTimer=null,lastAnimatedMoveTs=null;
@@ -1250,6 +1248,12 @@ let heartbeatTimer=null,watchdogTimer=null,homeMessage="",lastViewKey="",lastRen
 let suggestedCode=randomCode();
 
 async function initFirebase(){
+if(db)return;
+const base="https://www.gstatic.com/firebasejs/10.12.5/";
+const [{initializeApp},{getAuth,signInAnonymously},{initializeAppCheck,ReCaptchaV3Provider},fs]=await Promise.all([
+import(base+"firebase-app.js"),import(base+"firebase-auth.js"),import(base+"firebase-app-check.js"),import(base+"firebase-firestore.js")
+]);
+({doc,setDoc,getDoc,onSnapshot,updateDoc,runTransaction}=fs);
 const app=initializeApp(firebaseConfig);
 try{
 initializeAppCheck(app,{
@@ -1261,8 +1265,7 @@ console.warn("App Check init failed",e);
 }
 const auth=getAuth(app);
 await signInAnonymously(auth);
-db=getFirestore(app);
-online=true;
+db=fs.getFirestore(app);
 }
 
 const clone=x=>JSON.parse(JSON.stringify(x));
@@ -1296,7 +1299,7 @@ function horseDisplayName(hid,r=room){return horseCard(hid,r)?.name||horseInfo(h
 function horseShort(hid,r=room){const c=horseCard(hid,r);if(c?.secret)return"特別";return horseInfo(hid)?.short||hid}
 const displayPosFromDistance=d=>((d-1)%GOAL_LINE)+1;
 const horseDisplayPos=s=>displayPosFromDistance(Number(s.distance??s.pos??1));
-function canControlPlayer(p){return !!p&&(p.id===localId||(room?.settings?.singleDevice&&p.type==="local"))}
+function canControlPlayer(p){return !!p&&p.type!=="cpu"&&(p.id===localId||(room?.settings?.singleDevice&&isHost()&&p.type==="local"))}
 
 function orderedPlayers(r,field){
 const ids=r.race?.[field]||r.players.map(p=>p.id);
@@ -1342,7 +1345,7 @@ if(level==="strong")return{skill:2.65,random:1.5,level:"strong"};
 return{skill:1.18,random:8,level:"normal"};
 }
 function cpuDelay(r=room){
-const speed=r?.settings?.cpuSpeed||"fast";
+const speed=r?.settings?.cpuSpeed||"normal";
 if(speed==="instant")return 70+Math.random()*110;
 if(speed==="normal")return 1000+Math.random()*600;
 return 420+Math.random()*280; // fast（既定）
@@ -1488,7 +1491,7 @@ toSave.updatedAt=Date.now();
 toSave.expiresAt=Date.now()+ROOM_TTL_MS;
 await setDoc(roomRef,toSave,{merge:true});
 }else{
-localStorage.setItem("umaRaceLocalRoom",JSON.stringify(next));
+localStorage.setItem("umaRaceLocalRoom",JSON.stringify({...next,localOnly:true}));
 maybeStartMoveAnimation();
 renderIfGameChanged();
 maybeRunCpu();
@@ -1501,7 +1504,9 @@ localName=(document.getElementById("playerName")?.value||"名無").trim().slice(
 localStorage.setItem("umaRacePlayerName",localName);
 roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
 const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
-history.replaceState(null,"","#"+roomCode);
+if(!/^\d{4}$/.test(roomCode)){asobibaToast("部屋番号は半角数字4桁で入力してください");return}
+online=!singleDevice;
+if(online)await initFirebase();
 roomRef=online?doc(db,"rooms",roomCode):null;
 const now=Date.now();
 const base={
@@ -1513,7 +1518,7 @@ phase:"lobby",
 raceNo:0,
 turnIndex:0,
 starterIndex:0,
-settings:{cpuLevel:"normal",cpuSpeed:"fast",singleDevice},
+settings:{cpuLevel:"normal",cpuSpeed:"normal",singleDevice},
 players:[{
 id:localId,
 name:localName||"名無",
@@ -1533,11 +1538,17 @@ updatedAt:now,
 expiresAt:now+ROOM_TTL_MS
 };
 if(online){
-await setDoc(roomRef,base,{merge:false});
+await runTransaction(db,async tx=>{
+const existing=await tx.get(roomRef);
+if(existing.exists()&&!(existing.data().expiresAt<now))throw new Error("ROOM_IN_USE");
+tx.set(roomRef,base);
+});
+history.replaceState(null,"","#"+roomCode);
 await openRoom(roomCode);
 }else{
-room=base;
-render();
+if(unsubscribe){unsubscribe();unsubscribe=null}
+history.replaceState(null,"","#local-"+roomCode);
+await saveRoom(base);
 }
 }
 
@@ -1551,7 +1562,10 @@ homeMessage="部屋番号を入れてください。";
 render();
 return;
 }
-if(online){
+if(!/^\d{4}$/.test(roomCode)){asobibaToast("部屋番号は半角数字4桁で入力してください");return}
+online=true;
+await initFirebase();
+{
 const ref=doc(db,"rooms",roomCode);
 const snap=await getDoc(ref);
 if(!snap.exists()){
@@ -1574,6 +1588,7 @@ watchdogTimer=null;
 if(online){
 roomRef=doc(db,"rooms",roomCode);
 unsubscribe=onSnapshot(roomRef,async snap=>{
+if(!online||roomCode!==code)return;
 if(!snap.exists()){
 room=null;
 homeMessage=`部屋番号「${roomCode}」の部屋はまだありません。`;
@@ -1590,10 +1605,17 @@ await maybeTakeOverHost();
 maybeStartMoveAnimation();
 renderIfGameChanged();
 maybeRunCpu();
+},()=>{
+if(!online||roomCode!==code)return;
+if(room){asobibaToast("部屋との同期が止まりました。通信を確認して再読み込みしてください。",{kind:"warn"});return}
+homeMessage="部屋を読み込めませんでした。通信を確認してもう一度参加してください。";
+render();
 });
 }else{
 const saved=localStorage.getItem("umaRaceLocalRoom");
-room=saved?JSON.parse(saved):null;
+const restored=saved?JSON.parse(saved):null;
+room=restored?.code===code?restored:null;
+if(!room)homeMessage="この端末にこの番号の対戦は保存されていません。";
 if(room)room.settings={cpuLevel:"normal",cpuSpeed:"fast",singleDevice:false,...(room.settings||{})};
 render();
 maybeRunCpu();
@@ -1920,6 +1942,30 @@ r.race.log.unshift(`次は ${currentBetPlayer(r).name} の番です。`);
 markActionStart(r);
 }
 
+let rollTimer=null,scheduledRoll="";
+function schedulePlayerRoll(){
+const player=room&&currentPlayer(room);
+const key=room?.phase==="racing"&&room.race.diceRolling&&player?.type!=="cpu"&&canControlPlayer(player)
+?JSON.stringify([room.code,room.raceNo,player.id,room.race.actionStartedAt]):"";
+if(key===scheduledRoll)return;
+clearTimeout(rollTimer);
+scheduledRoll=key;
+if(!key)return;
+const elapsed=Date.now()-(room.race.actionStartedAt||0);
+rollTimer=setTimeout(async()=>{
+if(scheduledRoll!==key)return;
+scheduledRoll="";
+if(!room||room.phase!=="racing"||!room.race.diceRolling||currentPlayer(room)?.type==="cpu"||!canControlPlayer(currentPlayer(room)))return;
+const latest=clone(room);
+const d=DICE[Math.floor(Math.random()*DICE.length)];
+latest.race.dice=d.key;
+latest.race.diceRolling=false;
+markActionStart(latest);
+latest.race.commentary=`出目は${d.label}！どの馬を動かすか、ここが勝負どころです。`;
+latest.race.log.unshift(`${currentPlayer(latest).name} の出目：${d.label}`);
+await saveRoom(latest);
+},Math.max(0,700-Math.max(0,elapsed)));
+}
 async function rollDice(){
 const p=currentPlayer(room);
 if(!room||room.phase!=="racing"||!canControlPlayer(p)||room.race.dice||room.race.diceRolling||animationState)return;
@@ -1931,17 +1977,6 @@ next.race.commentary=`${currentPlayer(next).name}、サイコロを手に取り�
 next.race.log.unshift(`${currentPlayer(next).name} がサイコロを振っています…`);
 await saveRoom(next);
 playEffect("dice");
-setTimeout(async()=>{
-if(!room||room.phase!=="racing"||!canControlPlayer(currentPlayer(room))||!room.race.diceRolling)return;
-const latest=clone(room);
-const d=DICE[Math.floor(Math.random()*DICE.length)];
-latest.race.dice=d.key;
-latest.race.diceRolling=false;
-markActionStart(latest);
-latest.race.commentary=`出目は${d.label}！どの馬を動かすか、ここが勝負どころです。`;
-latest.race.log.unshift(`${currentPlayer(latest).name} の出目：${d.label}`);
-await saveRoom(latest);
-},700);
 }
 
 function activeCards(r){
@@ -1967,6 +2002,7 @@ if(displayPosFromDistance(d)===space)return true;
 return false;
 }
 function doMoveHorse(r,horseId){
+const oldLogLength=r.race.log.length;
 const p=currentPlayer(r);
 const diceKey=r.race.dice;
 const card=r.race.cards.find(c=>c.horse===horseId);
@@ -1996,7 +2032,6 @@ h.rank=r.race.finishOrder.length+1;
 h.distance=finishDist;
 h.pos=GOAL_LINE;
 r.race.finishOrder.push(horseId);
-playEffect("goal");
 card.moved=true;
 r.race.commentary=moveCommentary(r,horseId,move,beforePos,GOAL_LINE,false,true,gotPace);
 r.race.lastMove={horse:horseId,from:beforePos,rawTarget:GOAL_LINE,finalTarget:GOAL_LINE,blocked:false,path:forwardPath,goal:true,rank:h.rank,ts:Date.now()};
@@ -2016,12 +2051,13 @@ r.race.lastMove={horse:horseId,from:beforePos,rawTarget:displayPosFromDistance(r
 r.race.log.unshift(blocked?`${p.name} が ${horseDisplayName(horseId,r)} を進めようとしましたが、埋まっていたため${h.pos}へ戻りました。`:`${p.name} が ${horseDisplayName(horseId,r)} を ${beforePos} → ${h.pos} に進めました。`);
 }
 
-if(r.race.finishOrder.length>=3){finishRace(r);return}
+if(r.race.finishOrder.length>=3){finishRace(r);r.race.lastMove.logCount=r.race.log.length-oldLogLength;return}
 activeCards(r);
 advanceTurnOrder(r);
 r.race.dice=null;
 r.race.diceRolling=false;
 markActionStart(r);
+r.race.lastMove.logCount=r.race.log.length-oldLogLength;
 }
 
 function finishRace(r){
@@ -2035,7 +2071,6 @@ r.race.resultReadyAt=Date.now()+2600;
 r.phase=r.raceNo>=3?"gameover":"payout";
 r.race.commentary=`第${r.raceNo}レース決着！着順を集計しています。`;
 r.race.log.unshift(`第${r.raceNo}レース終了。払い戻しを計算しました。`);
-playEffect(r.raceNo>=3?"winner":"raceEnd");
 }
 
 function calculatePayout(r){
@@ -2249,6 +2284,8 @@ return opts[0]?.horse;
 
 function maybeRunCpu(){
 clearTimeout(cpuTimer);
+schedulePlayerRoll();
+if(animationState)return;
 if(!room)return;
 if(isHost()){
 proxyDisconnectedPlayers();
@@ -2256,7 +2293,7 @@ proxyInactiveCurrentPlayer();
 }
 if(!isHost())return;
 const act=async()=>{
-if(!room||!isHost())return;
+if(!room||!isHost()||animationState)return;
 const next=clone(room);
 if(next.phase==="betting"){
 const p=currentBetPlayer(next);
@@ -2335,15 +2372,16 @@ const move=room?.race?.lastMove;
 if(!move?.ts||move.ts===lastAnimatedMoveTs)return;
 const path=Array.isArray(move.path)&&move.path.length?move.path:[move.finalTarget];
 lastAnimatedMoveTs=move.ts;
-maybeCutin(move,path);
+if(!move.goal)maybeCutin(move,path);
 clearTimeout(animationTimer);
 let idx=0;
 const step=()=>{
 if(!room?.race?.lastMove||room.race.lastMove.ts!==move.ts){animationState=null;return}
 if(idx<path.length){
 const currentPos=path[idx];
-animationState={horse:move.horse,pos:currentPos,ts:move.ts};
+animationState={horse:move.horse,pos:currentPos,ts:move.ts,arrived:idx===path.length-1};
 if(move.goal&&idx===path.length-1){
+maybeCutin(move,path);
 triggerGoalConfetti(move.rank||1);
 }
 idx++;
@@ -2353,6 +2391,8 @@ animationTimer=setTimeout(step,190);
 }else{
 animationState=null;
 render();
+if(move.goal&&(room.phase==="payout"||room.phase==="gameover"))playEffect(room.phase==="gameover"?"winner":"raceEnd");
+maybeRunCpu();
 }
 };
 step();
@@ -2509,10 +2549,12 @@ function renderLogSection(){
 if(isSecretBetPhase(room)){
 return`<section class="card"><b>ログ</b><div class="notice">3レース目のBET中は、選択内容が分からないようにログを非公開にしています。</div></section>`;
 }
-return`<section class="card"><b>ログ</b><div class="log">${room.race.log.slice(0,40).map(x=>`<div>${escapeHtml(x)}</div>`).join("")}</div></section>`;
+const hidden=animationState&&!animationState.arrived?(room.race.lastMove.logCount||0):0;
+return`<section class="card"><b>ログ</b><div class="log">${room.race.log.slice(hidden,hidden+40).map(x=>`<div>${escapeHtml(x)}</div>`).join("")}</div></section>`;
 }
 function renderScoreBoard(){
-const sorted=[...room.players].sort((a,b)=>b.money-a.money);
+const players=room.race.payout&&!resultIsReady()?room.players.map(p=>({...p,money:room.race.payout.playerResults.find(r=>r.playerId===p.id)?.before??p.money})):room.players;
+const sorted=[...players].sort((a,b)=>b.money-a.money);
 return`<section class="card scoreGrid">${sorted.map(p=>`<div class="playerBox ${currentPlayer()?.id===p.id&&room.phase==="racing"?"current":""}"><div class="row between"><b>${escapeHtml(p.name)}</b><span class="money">¥${p.money}</span></div><div class="small">${p.id===localId?(p.proxyReason==="inactive"?"あなた：CPU代理中":"あなた"):p.proxy?"CPU代理":room.settings?.singleDevice&&p.type==="local"?"同画面":""}</div></div>`).join("")}</section>`;
 }
 function renderRaceControl(){
@@ -2642,6 +2684,9 @@ const d=diceKey?diceObj(diceKey):null;
 return`<div class="diceStage">${die3d(d?("r-"+d.key):"idle")}<div><div class="diceText">${d?`出目：${d.label}`:"サイコロ待ち"}</div><div class="diceFaces">${face("horse")}×3<span>/</span>${face("cap")}<span>/</span>${face("carrot")}<span>/</span>${face("weather")}</div></div></div>`;
 }
 function renderCenter(){
+if(animationState&&!animationState.arrived){
+return`<div class="centerInfo"><div class="commentaryBox"><span class="commentaryLabel">実況</span><br>${escapeHtml(horseDisplayName(animationState.horse))}、${animationState.pos}マスを通過！</div></div>`;
+}
 if(room.race.diceRolling)return"";
 if(room.phase==="racing"&&room.race.dice){
 const dice=diceObj(room.race.dice);
@@ -2697,8 +2742,13 @@ hideBets?`<span class="pill">BET非公開</span>`:bets.map(b=>{const p=room.play
 }).join("")}</div>`;
 }
 function renderPayoutGuide(){return`<section class="card payoutGuideCard"><b>配当表</b>${payoutTable()}</section>`}
-function resultIsReady(){if(!room?.race?.resultReadyAt)return true;return Date.now()>=room.race.resultReadyAt}
-function scheduleResultRefresh(){if(!room?.race?.resultReadyAt)return;const wait=Math.max(0,room.race.resultReadyAt-Date.now())+40;setTimeout(()=>{if(room)render()},wait)}
+function resultIsReady(){return !animationState&&Date.now()>=(room?.race?.resultReadyAt||0)}
+let resultTimer=null;
+function scheduleResultRefresh(){
+clearTimeout(resultTimer);
+if(animationState||!room?.race?.resultReadyAt)return;
+resultTimer=setTimeout(()=>{if(room)render()},Math.max(0,room.race.resultReadyAt-Date.now())+40);
+}
 function cpuOperatingLabel(p,phaseText){
 if(!p)return"CPU操作中…";
 if(p.id===localId&&p.proxyReason==="inactive"){
@@ -2800,8 +2850,8 @@ function stopBgm(){bgmOn=false;clearInterval(bgmTimer);render()}
 function toggleBgm(){bgmOn?stopBgm():startBgm()}
 
 function bindEvents(){
-document.getElementById("createRoom")?.addEventListener("click",createRoom);
-document.getElementById("joinRoom")?.addEventListener("click",joinRoom);
+document.getElementById("createRoom")?.addEventListener("click",()=>enterRoom(createRoom));
+document.getElementById("joinRoom")?.addEventListener("click",()=>enterRoom(joinRoom));
 document.getElementById("addCpu")?.addEventListener("click",addCpu);
 document.getElementById("removeCpu")?.addEventListener("click",removeCpu);
 document.getElementById("addLocalPlayer")?.addEventListener("click",addLocalPlayer);
@@ -2838,9 +2888,31 @@ const guide=document.querySelector(".payoutGuideCard");
 if(guide)guide.scrollIntoView({behavior:"smooth",block:"center"});
 });
 
-await initFirebase().catch(err=>{console.warn("Firebase init failed",err);online=false});
-if(roomCode)await openRoom(roomCode);
+let entering=false;
+async function enterRoom(action){
+if(entering)return;
+entering=true;
+const buttons=["createRoom","joinRoom"].map(id=>document.getElementById(id)).filter(Boolean);
+buttons.forEach(b=>{b.disabled=true});
+try{await action()}catch(err){
+online=false;
+asobibaToast(err.message==="ROOM_IN_USE"?"この番号は使用中です。参加するか、別の番号で作成してください。":"接続できませんでした。通信を確認するか、オフライン対戦を選んでください。",{kind:"warn"});
+}finally{entering=false;buttons.forEach(b=>{b.disabled=false})}
+}
 render();
+if(roomCode)void enterRoom(async()=>{
+let local=/^local-/i.test(initialHash);
+if(!local){
+try{
+const saved=JSON.parse(localStorage.getItem("umaRaceLocalRoom"));
+local=!!saved&&!saved.localOnly&&saved.code===roomCode;
+if(local)history.replaceState(null,"","#local-"+roomCode);
+}catch{}
+}
+online=!local;
+if(online)await initFirebase();
+await openRoom(roomCode);
+});
 syncTopBgm();
 preloadSprites();
 </script>
