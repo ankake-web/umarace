@@ -816,9 +816,283 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 @media(max-width:560px){.pony.sprite{width:32px!important;height:24px!important}}
 @media(max-width:390px){.pony.sprite{width:26px!important;height:20px!important}}
 .slot{align-items:flex-end!important}
+
+/* Standalone presentation. Existing track positions and motion timing stay in the game styles. */
+:root {
+  --paper:#f5f0e1;
+  --paper2:#fffdf4;
+  --ink:#182e26;
+  --muted:#56685b;
+  --hair:#d2d9cb;
+  --line:#d2d9cb;
+  --gold:#e8ad57;
+  --gold-deep:#80561f;
+  --shadow-sm:0 4px 12px #152a2110;
+  --shadow:0 12px 30px #152a2122;
+}
+body { background:#f2f0e6 }
+[hidden] { display:none!important }
+button:not(:disabled),summary { touch-action:manipulation }
+:focus-visible { outline:3px solid #bd692d;outline-offset:3px }
+button:not(.topMenuItem):not(.stepBtn) { border-radius:10px }
+#createRoom,#backToLobby { background:#185842 }
+button.secondary { color:var(--ink);background:#fffdf4;border-color:var(--hair);box-shadow:none }
+button.good { color:#232c25;background:#f1bf6e;box-shadow:0 4px 0 #b77837 }
+button:disabled { cursor:default }
+input,select { background:#fffdfa;border-color:#b5c5b6;border-radius:9px }
+.asobibaTop { background:#132e25;border-color:#325046;box-shadow:none;padding-inline:max(12px,calc((100% - 1080px)/2));z-index:50 }
+.asobibaTop .topTitle { font-size:16px;text-shadow:none;color:#fffaf1 }
+.asobibaTop .topEmblem { border-color:#b8cdb7;background:var(--pony-art) center 62%/90% no-repeat,#e8c078;box-shadow:none }
+.topMenu { position:relative }
+.topMenu summary {
+  display:flex;align-items:center;gap:6px;padding:0 11px;min-height:42px;border:1px solid #6a857b;
+  border-radius:8px;cursor:pointer;font-size:13px;font-weight:700;color:#fffaf1;list-style:none
+}
+.topMenu summary::-webkit-details-marker { display:none }
+.topMenu summary .ic { width:18px;height:18px }
+.topMenuList {
+  position:absolute;right:0;top:calc(100% + 7px);min-width:185px;padding:5px;
+  border-radius:10px;background:var(--paper2);border:1px solid var(--hair);box-shadow:var(--shadow)
+}
+.topMenuItem {
+  display:flex;align-items:center;gap:7px;width:100%;text-align:left;
+  box-shadow:none;background:none;color:var(--ink);border-radius:7px;min-height:44px;padding:8px 10px;font-size:14px
+}
+.topMenuItem:hover { background:#e1ebdf }
+.app { width:min(1100px,100%);padding-inline:clamp(9px,2vw,18px);padding-top:calc(var(--topbar-h) + var(--sat) + 14px) }
+.app[data-view="home"],.app[data-view="lobby"] { padding-bottom:34px }
+.card { border-radius:13px;background:var(--paper2);box-shadow:var(--shadow-sm) }
+.homeHero {
+  isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,.9fr);align-items:center;
+  min-height:276px!important;padding:clamp(20px,4vw,48px);border:0!important;border-radius:16px;
+  background:#12392e!important;box-shadow:var(--shadow);color:#fbf1d7
+}
+.homeHero::after {
+  display:block!important;inset:auto 0 0;height:9px;transform:none;
+  background:repeating-linear-gradient(90deg,#e4af62 0 10px,#2e6650 10px 20px)
+}
+.homeCopy { z-index:2 }
+.homeTitle { color:#fff6e1!important;text-shadow:none!important;font-size:clamp(34px,6vw,68px);letter-spacing:-.015em;line-height:1.13 }
+.homeLead {
+  margin:13px 0 0;max-width:35em;font-size:clamp(13px,1.65vw,17px);
+  color:#ecf2de!important;text-shadow:none!important;font-weight:700;text-wrap:balance
+}
+.heroTurf {
+  pointer-events:none;position:absolute;z-index:-1;width:64%;right:-14%;top:-75%;height:240%;transform:rotate(-24deg);
+  border:2px solid #80a98c;border-radius:48%;background:repeating-linear-gradient(90deg,#24664d 0 42px,#286d52 42px 84px);
+  box-shadow:inset 0 0 0 12px #1b4938,inset 0 0 0 14px #80a98c,inset 0 0 0 27px #2c6752,inset 0 0 0 29px #80a98c
+}
+.heroHorses { min-height:170px;position:relative;align-self:stretch;z-index:1 }
+.heroHorses img {
+  position:absolute;display:block;width:70%;height:auto;max-height:190px;object-fit:contain;
+  filter:drop-shadow(0 8px 4px #0a2e25aa)
+}
+.heroHorses img:first-child { left:28%;bottom:29%;width:60%;transform:rotate(-10deg);opacity:.88 }
+.heroHorses img:last-child { left:6%;bottom:-4%;transform:rotate(-8deg) }
+.homePanel { margin-top:14px;gap:10px }
+.homeForm,.homeHow { padding:clamp(13px,2.2vw,23px);border-radius:12px;background:var(--paper2);box-shadow:var(--shadow-sm) }
+.homeForm { gap:13px }
+.homeForm .entryTitle,.lobbyTitle { margin:0;color:var(--ink);font-size:clamp(19px,2.8vw,26px);font-weight:900 }
+.entryTabs { display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px }
+.entryTabs button {
+  box-shadow:none;text-align:left;min-height:64px;padding:9px 12px;color:var(--ink);background:#edf0e5!important;
+  border:1px solid var(--hair);display:grid;gap:2px;align-content:center;line-height:1.25
+}
+.entryTabs button[aria-pressed="true"] { color:#fff8ea;border-color:#195943;background:#195943!important }
+.entryTabs button small { color:inherit;font-size:12px;font-weight:500 }
+.entryFields { display:grid;gap:11px;align-items:end }
+.entryFields label { min-width:0;display:grid;gap:5px;font-size:14px;font-weight:800 }
+.entryFields input { min-height:46px;padding-block:9px }
+.entryFields .roomField input { letter-spacing:.17em;font-variant-numeric:tabular-nums }
+.entryFields .entryButtons { display:flex;gap:8px }
+.entryFields .entryButtons button { flex:1;min-height:46px;padding-inline:10px }
+.entryHint,.roomHint { margin:0;color:var(--muted);font-size:13px;line-height:1.5 }
+details.homeHow summary { margin:-10px 0;min-height:44px }
+.homeHow[open] summary { margin-bottom:6px }
+.rulesLead { line-height:1.55;font-size:14px }
+.ruleBlock { margin-top:8px }
+.ruleItem { border-radius:8px;font-size:14px }
+.openSection { scroll-margin-top:calc(var(--topbar-h) + 17px) }
+.lobby { display:grid;gap:12px;max-width:770px;margin:0 auto }
+.lobby > .card,.lobby > .homeHow { margin:0 }
+.lobbyBanner {
+  display:flex;justify-content:space-between;align-items:center;gap:10px;
+  background:#153f32;color:#fdf5e0;border-radius:12px;padding:clamp(14px,3vw,24px)
+}
+.lobbyBanner .lobbyTitle { color:inherit }
+.lobbyBanner .roomHint { color:#dcebe1 }
+.lobbyRoomCode { text-align:right;font-weight:900;font-variant-numeric:tabular-nums;letter-spacing:.17em;font-size:27px }
+.lobbyInvite { display:flex;align-items:center;justify-content:space-between;gap:9px;margin-bottom:13px;padding-bottom:12px;border-bottom:1px solid var(--hair) }
+.lobbyInvite button { min-height:44px;flex:0 0 auto;padding-inline:12px }
+.lobbyRoster { display:grid;gap:7px;margin:8px 0 12px }
+.lobbyRoster .playerBox { border-radius:8px;background:#f4f6eb;padding:6px 8px }
+.lobbyRoster .nameEdit { min-height:38px;padding:5px 8px;max-width:8em }
+.lobbyRoster .row { min-width:0 }
+.lobbyRoster .chip { width:27px;height:27px }
+.stepperRow { border-radius:8px;margin-top:8px;background:#edf1e6 }
+.stepperRow .stepperLabel { color:var(--ink) }
+.stepperRow .stepBtn { box-shadow:none;border-radius:7px }
+.lobbySettings,.scoreSection,.raceExtras > details { margin-top:12px }
+.lobbySettings summary,.raceExtras summary { cursor:pointer;font-weight:800;min-height:44px;padding-block:11px }
+.lobbySettings > .two { gap:12px;margin-bottom:12px }
+.lobbySettings select { margin-top:5px }
+.lobbyStart { display:grid;gap:6px;margin-top:9px }
+.lobbyStart button { min-height:52px }
+.raceStatus {
+  display:flex;justify-content:space-between;align-items:center;gap:9px;color:#fff7e4;
+  background:#173d31;border-radius:11px 11px 0 0;padding:10px 13px;border-bottom:1px solid #4a7360
+}
+.raceStatus h1 { margin:0;font-size:clamp(19px,3vw,26px);font-weight:900;line-height:1.25;color:inherit }
+.raceStatus small { display:block;color:#e3eddb;font-size:12px;margin-top:2px }
+.raceSteps { display:flex;gap:4px;list-style:none;padding:0;margin:0;font-size:11px;font-weight:800 }
+.raceSteps li {
+  display:grid;place-items:center;min-width:31px;height:28px;padding:0 4px;
+  background:#204d3d;color:#edf2e3;border:1px solid #6d8a76;border-radius:5px;font-variant-numeric:tabular-nums
+}
+.raceSteps li.done { color:#fff9eb;background:#406455 }
+.raceSteps li[aria-current="step"] { background:#f0c075;color:#202d25;border-color:#f0c075 }
+.trackCard { margin-top:0;border-radius:0 0 11px 11px;padding:8px;background:#e3e9db }
+.trackBoard {
+  background:repeating-linear-gradient(90deg,#164e3a 0 34px,#1b5841 34px 68px)!important;
+  border:3px solid #143d31!important;border-radius:10px!important;
+  box-shadow:inset 0 0 20px #173d3155!important
+}
+.trackBoard:before { border:2px solid #7eaa8c!important;box-shadow:none!important;border-radius:14px }
+.trackBoard:after { border:1px solid #668f73!important;box-shadow:none!important;border-radius:10px }
+.trackSpace {
+  background:#f6e8c8!important;border:1px solid #988a64!important;
+  box-shadow:inset 0 -3px 0 #bbaa813c!important;border-radius:5px!important
+}
+.trackSpace.finish {
+  background:repeating-conic-gradient(#b68a43 0 25%,#ffe5af 0 50%) 0/12px 12px!important;
+  border-color:#e8b761!important;box-shadow:0 0 0 2px #f8d485!important
+}
+.trackSpace.finish .num { background:#f7e8c9;border-radius:3px;padding:0 1px }
+.trackSpace.finish .lab { color:#302b1e;background:#f2cb80;padding:1px 3px;border-radius:3px;font-size:9px }
+.trackSpace.pace { outline:2px solid #bcb3eb;box-shadow:none!important }
+.centerInfo { border-color:#9bad95;background:#f7f2e6;box-shadow:none }
+.trackBoard .centerInfo:has(.centerList) { top:57% }
+.diceArena.result .boardDie { margin-top:clamp(22px,6.5vw,65px);transform:scale(.34);transform-origin:top center }
+.diceArena.result .dieLabel { display:none }
+.commentaryLabel { border:0;border-radius:5px;background:#dce9db;color:#215e47 }
+.trackCard,.raceProgram { scroll-margin-top:calc(var(--topbar-h) + 11px) }
+.raceProgram { background:var(--paper2);border:1px solid var(--hair);border-radius:11px;margin-top:11px;padding:9px }
+.raceProgram header { display:flex;justify-content:space-between;align-items:baseline;gap:6px }
+.raceProgram h2 { margin:0;font-size:17px }
+.cardStrip { gap:7px;margin:7px 0 0 }
+.cardStrip .horseCard {
+  border-radius:8px;box-shadow:none;min-width:0;display:flex;flex-direction:column;position:relative;
+  overflow:hidden;background:#f6f4e8;border-color:#c6d2c2
+}
+.cardStrip .horseCard.clickable { border-color:#558370;box-shadow:inset 0 0 0 1px #558370 }
+.cardStrip .horseCard.clickable:hover { border-color:#195943;box-shadow:inset 0 0 0 2px #195943 }
+.cardStrip .horseCard.clickable:focus-visible { outline-offset:1px;z-index:1 }
+.cardStrip .horseCard.moved { opacity:.75 }
+.cardStrip .horseCard.selected { outline:0;border-color:#b77b37;box-shadow:inset 0 0 0 1px #b77b37 }
+.cardStrip .horseCard.paceHorseCard { outline:none;background:#ede8f5!important;box-shadow:inset 0 0 0 1px #9b8eb7!important }
+.cardStrip .horsePortrait {
+  height:clamp(52px,8vw,89px);margin:-3px -3px 5px;background:#dbe8d9;border-radius:5px;box-shadow:none
+}
+.cardStrip .horsePortrait::before { display:none }
+.cardStrip .horsePortrait::after { background-size:auto 110% }
+.cardStrip .horsePortrait.secret { background:#e4dbed }
+.cardStrip .horsePortrait .hpFlag { width:13px;height:13px;box-shadow:0 0 0 1px #294133 }
+.horseCaption { margin:2px 0;display:block;min-height:2.74em;font-size:13px;line-height:1.35;overflow-wrap:anywhere }
+.cardStrip .moves { margin-top:3px }
+.cardStrip .moves span { background:#e7ecdf;color:var(--ink);border-radius:5px }
+.cardStrip .moves span.rolled { background:#f1cc89;box-shadow:inset 0 0 0 1px #926436 }
+.cardStrip .betMini { min-height:0 }
+.betMini:empty { display:none }
+.cardStrip .paceBadge { align-self:start;color:#493b61;background:#e0d8ef;box-shadow:none;max-width:100% }
+.horseActionHint {
+  display:block;text-align:center;line-height:1.3;font-weight:900;font-size:12px;
+  padding:4px 3px;margin-top:6px;border-radius:5px;color:#fcf8ea;background:#26624b
+}
+.horseCard.selected .horseActionHint { background:#f3e0bc;color:#6d451c }
+.scoreSection h2 { margin:0 0 7px;font-size:17px }
+.scoreSection .scoreGrid { margin:0;box-shadow:none;padding:0;border:0;background:transparent;grid-template-columns:repeat(3,minmax(0,1fr)) }
+.scoreGrid .playerBox { padding:7px;background:#f0f2e8;border-radius:8px }
+.scoreGrid .current { outline:2px solid #b67332;box-shadow:none }
+.raceExtras .payoutGuideCard { margin:0 }
+.raceExtras .card { margin:7px 0 0 }
+.raceExtras .cpuControl { display:block;max-width:260px }
+.raceExtras .cpuControl select { margin:6px 0 }
+.raceExtras .log { border-radius:8px }
+.actions { background:#fffaf0;border-color:#aac0ab;border-radius:11px;box-shadow:0 -3px 14px #173d3122;width:min(720px,calc(100% - 16px));padding:8px }
+.actions.betActions { background:#153f32;border-color:#4c785e }
+.actions .betGuide { display:flex;align-items:center;justify-content:space-between;gap:9px;text-align:left }
+.actionCaption { display:grid;gap:2px;min-width:0 }
+.actionCaption strong { font-size:clamp(14px,2vw,17px);line-height:1.45 }
+.actionCaption small { color:inherit;opacity:.85;font-size:12px;font-weight:600;line-height:1.35 }
+.actions button[data-go-cards] { flex:0 0 auto;min-height:44px;padding:7px 10px;box-shadow:none;font-size:13px }
+.actions .diceStageButton { min-height:52px;justify-content:center;padding:6px 10px }
+.actions button.diceStageButton .die3d { --ds:31px }
+.actions button.diceStageButton .diceFaces { display:none }
+.actions .resultHold { padding:6px }
+.resultShow,.winnerCelebration {
+  border-radius:12px;border-color:#bfa87b;background:#f7ecd2;box-shadow:var(--shadow-sm)
+}
+.resultTitle,.winnerName { color:#67461e }
+.podiumCard { border-radius:7px;box-shadow:none }
+.podiumCard.first { background:#ffe8a9;box-shadow:none }
+.winnerCelebration .winnerTrophy { font-size:49px }
+.cutinCard {
+  background:var(--cutin-art) 73% 22%/auto 74% no-repeat,repeating-linear-gradient(108deg,#153f32 0 30px,#205642 30px 60px);
+  box-shadow:0 18px 38px #152e25aa,0 0 0 2px #d6ab61
+}
+.cutinCard .cutinChip { border-radius:7px;background:#f1c275 }
+.cutinCard .cutinBar { background:linear-gradient(0deg,#0c2d24,transparent) }
+@media (min-width:700px) {
+  .entryFields { grid-template-columns:minmax(0,1fr) minmax(0,1fr) minmax(240px,1.35fr) }
+  .entryFields:has(.roomField[hidden]) { grid-template-columns:1fr 1fr }
+  .entryFields:has(.roomField[hidden]) .entryButtons { grid-column:2 }
+  .homePanel .entryHint { min-height:20px }
+  .raceBoard {
+    display:grid;grid-template-columns:minmax(0,1fr) 270px;grid-template-rows:auto 1fr;
+    grid-template-areas:"track program" "scores program";gap:10px;align-items:start
+  }
+  .trackCard { grid-area:track }
+  .raceProgram { grid-area:program;margin:0 }
+  .raceBoard .scoreSection { grid-area:scores;margin:0 }
+  .raceProgram .cardStrip { grid-template-columns:repeat(2,minmax(0,1fr)) }
+  .raceProgram .horsePortrait { height:60px }
+  .trackBoard .pony.sprite { width:clamp(25px,4vw,52px)!important;height:clamp(19px,3.1vw,42px)!important }
+  .homeHero { min-height:306px!important }
+}
+@media (min-width:1000px) {
+  .raceBoard { grid-template-columns:minmax(0,1fr) 342px }
+  .raceProgram .cardStrip { grid-template-columns:repeat(3,minmax(0,1fr)) }
+}
+@media (max-width:699px) {
+  .homeHero { display:block;min-height:210px!important;padding:19px 14px }
+  .heroTurf { right:-20%;width:86%;top:-27%;height:180% }
+  .homeCopy { width:100% }
+  .homeLead { max-width:min(64%,24em);font-size:13px;text-wrap:pretty }
+  .heroHorses { position:absolute;min-height:0;width:52%;height:110px;right:1%;bottom:10px }
+  .heroHorses img:first-child { left:43%;bottom:34% }
+  .heroHorses img:last-child { left:12%;bottom:0 }
+  .homeForm,.homeHow { padding:12px }
+  .homePanel { margin-top:10px }
+  .entryFields { gap:8px }
+  .entryTabs button { padding-inline:9px }
+  .roomHint,.entryHint { font-size:12px }
+  .raceStatus { padding:7px 9px }
+  .trackCard { padding:5px }
+  .cardStrip .horseCard { padding:6px }
+  .cardStrip .horsePortrait { height:61px }
+  .commentaryBox { line-height:1.35 }
+  .lab { font-size:9px }
+  .horseCaption { font-size:12px }
+}
+@media (max-width:349px) {
+  .homeTitle { font-size:30px }
+  .heroHorses { width:45% }
+  .raceProgram .cardStrip { grid-template-columns:repeat(2,minmax(0,1fr)) }
+}
+
 </style>
 <meta name="description" content="馬の調子と能力を見て勝ち馬を予想。ひとりでも、友達とオンラインでも遊べる競馬ボードゲーム。">
-<meta name="theme-color" content="#188947">
+<meta name="theme-color" content="#132e25">
 <meta property="og:title" content="うまうまレース">
 <meta property="og:description" content="馬の調子と能力を見て勝ち馬を予想。ひとりでも、友達とオンラインでも遊べる競馬ボードゲーム。">
 <meta property="og:type" content="website">
@@ -1170,12 +1444,16 @@ button.diceStageButton .diceCube{width:54px;height:54px;font-size:28px}
 <header class="asobibaTop">
 
 <div class="topTitle"><span class="topEmblem"></span><span>うまうまレース</span></div>
-<div class="topCtl">
-<button id="topRules" type="button" title="遊び方" aria-label="遊び方"><svg class="ic"><use href="#ic-help"/></svg></button>
-<button id="topBgm" type="button" title="BGM" aria-label="BGM"><svg class="ic"><use href="#ic-music"/></svg></button>
+<details class="topMenu" id="topMenu">
+<summary><svg aria-hidden="true" class="ic"><use href="#ic-menu"/></svg>メニュー</summary>
+<div class="topMenuList">
+<button id="topRules" class="topMenuItem" type="button"><svg aria-hidden="true" class="ic"><use href="#ic-help"/></svg>遊び方</button>
+<button id="topBgm" class="topMenuItem" type="button" aria-pressed="false"><svg aria-hidden="true" class="ic"><use href="#ic-music"/></svg><span>BGMをオン</span></button>
+<button id="topQuit" class="topMenuItem" type="button" hidden><svg aria-hidden="true" class="ic"><use href="#ic-exit"/></svg>タイトルに戻る</button>
 </div>
+</details>
 </header>
-<div id="app" class="app"></div>
+<main id="app" class="app"></main>
 <div id="raceCutin" aria-hidden="true"></div>
 
 <script type="module">
@@ -1246,6 +1524,9 @@ let goalBurstUntil=0,goalBurstRank=0,goalBurstTimer=null,goalBurstPieces=[];
 let audioCtx=null,bgmOn=false,bgmTimer=null,bgmStep=0;
 let heartbeatTimer=null,watchdogTimer=null,homeMessage="",lastViewKey="",lastRenderStateKey="",resumeInProgress=false;
 let suggestedCode=randomCode();
+let entryMode=/^\d{4}$/.test(initialHash)?"online":"offline";
+const openPanels=new Set();
+const topMenu=document.getElementById("topMenu");
 
 async function initFirebase(){
 if(db)return;
@@ -1502,8 +1783,8 @@ async function createRoom(){
 homeMessage="";
 localName=(document.getElementById("playerName")?.value||"名無").trim().slice(0,3);
 localStorage.setItem("umaRacePlayerName",localName);
-roomCode=(document.getElementById("roomCode")?.value||randomCode()).trim().toUpperCase();
-const singleDevice=!!document.getElementById("homeSingleDeviceMode")?.checked;
+const singleDevice=entryMode==="offline";
+roomCode=singleDevice?randomCode():(document.getElementById("roomCode")?.value.trim()||suggestedCode);
 if(!/^\d{4}$/.test(roomCode)){asobibaToast("部屋番号は半角数字4桁で入力してください");return}
 online=!singleDevice;
 if(online)await initFirebase();
@@ -1556,7 +1837,7 @@ async function joinRoom(){
 homeMessage="";
 localName=(document.getElementById("playerName")?.value||"名無").trim().slice(0,3);
 localStorage.setItem("umaRacePlayerName",localName);
-roomCode=(document.getElementById("roomCode")?.value||roomCode||"").trim().toUpperCase();
+roomCode=document.getElementById("roomCode")?.value.trim()||"";
 if(!roomCode){
 homeMessage="部屋番号を入れてください。";
 render();
@@ -1849,7 +2130,7 @@ p.name=(name||"名無").trim().slice(0,3)||"名無";
 await saveRoom(next);
 }
 async function startGame(){
-if(!isHost())return;
+if(!isHost()||room.phase!=="lobby")return;
 const next=clone(room);
 next.players.forEach(p=>p.money=0);
 next.raceNo=1;
@@ -2165,7 +2446,9 @@ localId=crypto.randomUUID();
 localStorage.setItem("umaRacePlayerId",localId);
 room=null;
 roomCode="";
+entryMode="offline";
 suggestedCode=randomCode();
+openPanels.clear();
 history.replaceState(null,"",location.pathname);
 render();
 }
@@ -2359,10 +2642,10 @@ const hid=move.horse;
 const name=horseDisplayName(hid);
 const color=horseInfo(hid)?.color||"#c9a14a";
 const win=goal&&(move.rank===1);
-const bg=win?"assets/winner.jpg":"assets/cutin-charge.jpg";
+const art=horseSpriteUrl(horseCard(hid)?.secret?"secret":hid,false,true);
 const chip=goal?(move.rank?`<svg class="ic"><use href="#ic-flag"/></svg> ${move.rank}着`:`<svg class="ic"><use href="#ic-flag"/></svg> ゴール`):`<svg class="ic"><use href="#ic-bolt"/></svg> ${steps}マス`;
 const head=win?"ゴールイン！":goal?"ゴール！":"猛 追 ！";
-el.innerHTML=`<div class="cutinCard" style="background-image:linear-gradient(90deg,rgba(0,0,0,.18),transparent 55%),url('${bg}')"><div class="cutinChip">${chip}</div><div class="cutinBar"><div class="cutinHead">${head}</div><div class="cutinName" style="border-left:5px solid ${color};padding-left:9px">${escapeHtml(name)}</div></div></div>`;
+el.innerHTML=`<div class="cutinCard" style="--cutin-art:url('${art}')"><div class="cutinChip">${chip}</div><div class="cutinBar"><div class="cutinHead">${head}</div><div class="cutinName" style="border-left:5px solid ${color};padding-left:9px">${escapeHtml(name)}</div></div></div>`;
 el.classList.remove("show");void el.offsetWidth;el.classList.add("show");
 try{playEffect(goal?"goal":"step")}catch(e){}
 clearTimeout(el._t);el._t=setTimeout(()=>el.classList.remove("show"),1980);
@@ -2461,8 +2744,10 @@ lastRenderStateKey=renderStateKey(room);
 const key=viewKey();
 const shouldScroll=key!==lastViewKey;
 lastViewKey=key;
-const head=room&&room.phase==="lobby"?`<section class="hero"><h1>${GAME_TITLE}</h1></section>`:"";
-appEl.innerHTML=`${head}${!room?renderHome():renderRoom()}`;
+appEl.dataset.view=!room?"home":room.phase==="lobby"?"lobby":"game";
+appEl.innerHTML=!room?renderHome():renderRoom();
+document.getElementById("topQuit").hidden=!room||(room.phase==="lobby"&&!room.settings?.singleDevice);
+syncTopBgm();
 bindEvents();
 if(shouldScroll){
 setTimeout(()=>window.scrollTo({top:0,left:0,behavior:"smooth"}),0);
@@ -2471,22 +2756,8 @@ setTimeout(()=>window.scrollTo({top:0,left:0,behavior:"smooth"}),0);
 function payoutTable(){
 return`<table class="payout"><tr><th>着順</th><th>1票</th><th>2票</th><th>3票</th><th>4票</th><th>5票〜</th></tr><tr><th>1着</th><td>500</td><td>350</td><td>250</td><td>200</td><td>150</td></tr><tr><th>2着</th><td>350</td><td>250</td><td>200</td><td>150</td><td>100</td></tr><tr><th>3着</th><td>250</td><td>200</td><td>150</td><td>100</td><td>100</td></tr></table>`;
 }
-function renderHome(){
-return`<section class="homeHero"><div class="homeCopy"><h2 class="homeTitle">うまうまレース</h2><div class="homeLead">夕暮れのターフへようこそ。スタート位置・出目・人気を読んで、3レース後の所持金で勝負。堅い本命か、配当妙味の穴馬か。</div></div></section>
-<section class="homePanel">
-<div class="homeForm grid">
-<div><b>ゲームをはじめる</b></div>
-<label>名前<input id="playerName" value="${escapeHtml(localName.slice(0,3))}" placeholder="名前" maxlength="3"></label>
-<label>部屋番号<input id="roomCode" value="${escapeHtml(roomCode||suggestedCode)}" maxlength="4" inputmode="numeric" pattern="[0-9]*"></label>
-${homeMessage?`<div class="notice">${escapeHtml(homeMessage)}</div>`:""}
-<div class="modeBox">
-<label class="modeCheck"><input id="homeSingleDeviceMode" type="checkbox">オフライン対戦で遊ぶ</label>
-<div class="tiny">PC・タブレット1台をみんなで回して遊ぶ場合はこちら</div>
-</div>
-<div class="grid two"><button id="createRoom">部屋を作る</button><button id="joinRoom" class="secondary">部屋に入る</button></div>
-<div class="tiny">再入室キー：${getLocalRejoinKey()}（同じ端末なら自動復帰します）</div>
-</div>
-<details class="homeHow" id="howToSection"><summary><b>遊び方</b><span class="tiny">タップで開く</span></summary>
+function renderHow(){
+return`<details class="homeHow openSection" ${openPanels.has("howToSection")?"open":""} id="howToSection"><summary><b>遊び方</b><span class="tiny" aria-hidden="true"></span></summary>
 <div class="ruleBlock small">
 <div class="ruleItem"><b>① BET</b>馬カードを選び、2 → 1 → 1 の順に3枚のチップを置きます。同じ馬に2枚は置けません。</div>
 <div class="ruleItem"><b>② 馬の状態</b>良い位置につけているか、出目との相性が良いか、人気が集まりすぎていないかを見てBETします。</div>
@@ -2498,9 +2769,48 @@ ${homeMessage?`<div class="notice">${escapeHtml(homeMessage)}</div>`:""}
 </div>
 ${payoutTable()}
 <div class="homeTip">オンライン対戦では、最終レースのBETが非公開になります。</div>
-<button id="toggleBgm" class="secondary" style="margin-top:10px"><svg class="ic"><use href="#ic-music"/></svg> BGM ${bgmOn?"OFF":"ON"}</button>
-</details>
+</details>`;
+}
+function renderHome(){
+const local=entryMode==="offline";
+const code=/^\d{4}$/.test(roomCode)?roomCode:"";
+return`<section class="homeHero">
+<div class="heroTurf" aria-hidden="true"></div>
+<div class="homeCopy"><h1 class="homeTitle">${GAME_TITLE}</h1><p class="homeLead">勝ち馬を予想して、ダイスでレースを動かす。3レースでいちばん賞金を集めよう。</p></div>
+<div class="heroHorses" aria-hidden="true">
+<img src="${horseSpriteUrl("blue",false,true)}" alt="" width="48" height="36">
+<img src="${horseSpriteUrl("red",false,true)}" alt="" width="48" height="36">
+</div>
+</section>
+<section class="homePanel">
+<div class="homeForm grid" aria-labelledby="entryTitle">
+<h2 class="entryTitle" id="entryTitle">対戦方法を選ぶ</h2>
+<div class="entryTabs" role="group" aria-label="対戦方法">
+<button type="button" data-entry="offline" aria-pressed="${local}"><b>この端末で</b><small>ひとり・同じ画面で対戦</small></button>
+<button type="button" data-entry="online" aria-pressed="${!local}"><b>オンライン</b><small>別々の端末で対戦</small></button>
+</div>
+<div class="entryFields">
+<label>名前<input id="playerName" value="${escapeHtml(localName.slice(0,3))}" placeholder="3文字まで" maxlength="3" autocomplete="nickname"></label>
+<label id="roomField" class="roomField" ${local?"hidden":""}>部屋番号<input id="roomCode" value="${code}" placeholder="半角数字4桁" maxlength="4" inputmode="numeric" pattern="[0-9]{4}" autocomplete="off" aria-describedby="entryHint"></label>
+<div class="entryButtons"><button id="createRoom" type="button">${local?"オフラインで始める":"新しく部屋を作る"}</button><button id="joinRoom" type="button" class="secondary" ${local?"hidden":""}>番号で参加</button></div>
+</div>
+<p class="entryHint" id="entryHint">${entryHint()}</p>
+${homeMessage?`<div class="notice" role="status">${escapeHtml(homeMessage)}</div>`:""}
+</div>
+${renderHow()}
 </section>`;
+}
+function entryHint(){
+return entryMode==="offline"?"ひとりで遊ぶときは、ロビーでCPUを追加できます。":"参加するときは、友だちから届いた4桁の番号を入力。空欄で作ると番号は自動で決まります。";
+}
+function setEntryMode(mode){
+entryMode=mode;
+const local=mode==="offline";
+document.querySelectorAll("[data-entry]").forEach(btn=>btn.setAttribute("aria-pressed",String(btn.dataset.entry===mode)));
+document.getElementById("roomField").hidden=local;
+document.getElementById("joinRoom").hidden=local;
+document.getElementById("createRoom").textContent=local?"オフラインで始める":"新しく部屋を作る";
+document.getElementById("entryHint").textContent=entryHint();
 }
 function renderRoom(){return room.phase==="lobby"?renderLobby():renderGame()}
 function renderLobby(){
@@ -2508,7 +2818,7 @@ const level=room.settings?.cpuLevel||"normal";
 const speed=room.settings?.cpuSpeed||"normal";
 const single=!!room.settings?.singleDevice;
 const playerList=room.players.map((p,i)=>{
-const nameArea=single&&isHost()?`<input class="nameEdit" data-player-id="${p.id}" value="${escapeHtml(p.name)}" maxlength="3">`:`<b>${escapeHtml(p.name)}</b>`;
+const nameArea=single&&isHost()?`<input class="nameEdit" data-player-id="${p.id}" value="${escapeHtml(p.name)}" aria-label="${i+1}番目のプレイヤーの名前" maxlength="3">`:`<b>${escapeHtml(p.name)}</b>`;
 const status=p.proxy?`<span class="pill">CPU代理</span>`:p.type==="cpu"?`<span class="pill">CPU</span>`:"";
 return`<div class="playerBox row between"><div class="row"><span class="chip" style="border-color:${p.color}">${i+1}</span>${nameArea}</div>${status}</div>`;
 }).join("");
@@ -2525,25 +2835,55 @@ const stepper=(label,idMinus,idPlus,count,canMinus)=>`<div class="stepperRow">
 <button id="${idPlus}" class="stepBtn" aria-label="${label}を追加" ${!isHost()||full?"disabled":""}>＋</button>
 </div></div>`;
 const offlineButtons=single?stepper("いっしょに遊ぶ人","removeLocalPlayer","addLocalPlayer",localCount,room.players.some(p=>p.type==="local")):"";
-return`<section class="card">
-<div class="row between"><div><b>部屋番号：${room.code}</b><div class="tiny">${single?"オフライン対戦":"同じ部屋番号で参加"}</div></div><span class="pill">${online?"同期中":"この端末だけ"}</span></div>
-<div class="tiny">再入室キー：${getLocalRejoinKey()}</div>
-<div class="grid" style="margin-top:10px">${playerList}</div>
+return`<div class="lobby">
+<header class="lobbyBanner">
+<div><h1 class="lobbyTitle">出走前ロビー</h1><p class="roomHint">${single?"この端末で対戦":"オンライン対戦"}</p></div>
+${single?"":`<div><div class="roomHint">部屋番号</div><div class="lobbyRoomCode">${escapeHtml(room.code)}</div></div>`}
+</header>
+<section class="card" aria-labelledby="lobbyRosterTitle">
+${single?"":`<div class="lobbyInvite"><p class="roomHint">招待リンクを開くか、部屋番号を入力すると参加できます。</p><button id="copyInvite" type="button" class="secondary">招待リンクをコピー</button></div>`}
+<div class="row between"><b id="lobbyRosterTitle">参加者</b><span class="pill">${room.players.length} / ${MAX_PLAYERS}</span></div>
+<div class="lobbyRoster">${playerList}</div>
 ${offlineButtons}
 ${stepper("CPU","removeCpu","addCpu",cpuCount,room.players.some(p=>p.type==="cpu"))}
-<label class="small" style="display:block;margin-top:10px"><b>CPUレベル</b><select id="cpuLevel" ${!isHost()?"disabled":""}><option value="weak" ${level==="weak"?"selected":""}>弱い</option><option value="normal" ${level==="normal"?"selected":""}>普通</option><option value="strong" ${level==="strong"?"selected":""}>強い</option></select></label>
-<label class="small" style="display:block;margin-top:10px"><b>CPU速度</b><select id="cpuSpeed" ${!isHost()?"disabled":""}><option value="normal" ${speed==="normal"?"selected":""}>普通</option><option value="fast" ${speed==="fast"?"selected":""}>早い</option><option value="instant" ${speed==="instant"?"selected":""}>最速</option></select></label>
-<div class="grid" style="margin-top:10px"><button id="startGame" class="good" ${!isHost()?"disabled":""}>ゲーム開始</button></div>
-<div class="row" style="margin-top:8px"><button id="toggleBgm" class="secondary"><svg class="ic"><use href="#ic-music"/></svg> BGM ${bgmOn?"OFF":"ON"}</button></div>
+<details id="lobbySettings" class="lobbySettings" ${openPanels.has("lobbySettings")?"open":""}><summary>CPUの設定</summary>
+<div class="grid two">
+<label class="small"><b>強さ</b><select id="cpuLevel" ${!isHost()?"disabled":""}><option value="weak" ${level==="weak"?"selected":""}>弱い</option><option value="normal" ${level==="normal"?"selected":""}>普通</option><option value="strong" ${level==="strong"?"selected":""}>強い</option></select></label>
+<label class="small"><b>行動の速さ</b><select id="cpuSpeed" ${!isHost()?"disabled":""}><option value="normal" ${speed==="normal"?"selected":""}>普通</option><option value="fast" ${speed==="fast"?"selected":""}>早い</option><option value="instant" ${speed==="instant"?"selected":""}>最速</option></select></label>
+</div></details>
+<div class="lobbyStart"><button id="startGame" class="good" ${!isHost()?"disabled":""}>ゲーム開始</button>${!isHost()?`<p class="roomHint">部屋を作った人がゲームを開始します。</p>`:""}</div>
 </section>
-<section class="card"><b>ルール</b><ol class="small" style="margin:8px 0 0;padding-left:20px"><li>馬カードを選び、2 → 1 → 1 の順にチップを置きます。</li><li>BET順はランダムな人から始まり、その後は同じ順番で回ります。</li><li>サイコロ順もランダムな人から始まり、その後は同じ順番で回ります。</li><li>サイコロは ${face("horse")}馬×3 / ${face("cap")}ジョッキー / ${face("carrot")}人参 / ${face("weather")}天候。</li><li>スタートは30〜36マス。コースを1周してゴールします。</li><li>人気が集まるほど配当は下がり、人気薄ほど高配当になります。</li><li>通信切れが1分続くとCPU代理になります。再入室キーが残っていれば復帰できます。</li></ol></section>
-${renderHorseMaster()}`;
+${renderHow()}
+<details id="horseMaster" class="homeHow" ${openPanels.has("horseMaster")?"open":""}><summary><b>出走馬の基本能力</b><span class="tiny" aria-hidden="true"></span></summary>${renderHorseMaster()}</details>
+</div>`;
 }
 function renderHorseMaster(){
 return`<section class="card"><b>出走馬・基本能力</b><div class="horseGrid">${HORSES.map(h=>`<div class="horseCard"><div class="horseHead"><b class="horseName"><span class="pony ponyChip" style="--horse-color:${h.color};background-image:url('${horseFaceUrl(h.id)}')"></span> ${h.label}</b></div><div class="moves"><span>${face("horse")}${h.base.horse}</span><span>${face("cap")}${h.base.cap}</span><span>${face("carrot")}${h.base.carrot}</span><span>${face("weather")}${h.base.weather}</span></div></div>`).join("")}</div></section>`;
 }
 function renderGame(){
-return`${renderGoalConfetti()}${renderTrack()}${renderPayout()}${renderLogSection()}${renderScoreBoard()}${renderRaceControl()}${renderPayoutGuide()}${renderActionPanel()}`;
+const phaseLabels={betting:"勝ち馬を予想",racing:"レース進行中",payout:"レース結果",gameover:"最終結果"};
+const resultPhase=room.phase==="payout"||room.phase==="gameover";
+const raceSteps=Array.from({length:3},(_,i)=>`<li class="${i+1<room.raceNo?"done":""}" ${i+1===room.raceNo?'aria-current="step"':""}>${i+1}R</li>`).join("");
+return`${renderGoalConfetti()}
+<header class="raceStatus">
+<div><h1>第${room.raceNo}レース</h1><small>${phaseLabels[room.phase]}${room.raceNo===3?" ・ 配当とペナルティが2倍":""}</small></div>
+<ol class="raceSteps" aria-label="全3レースの進行">${raceSteps}</ol>
+</header>
+${resultPhase?renderPayout():""}
+<div class="raceBoard">${renderTrack()}
+<section class="raceProgram" aria-labelledby="raceProgramTitle">
+<header><h2 id="raceProgramTitle">出走馬</h2><span class="small">出目別の進むマス数</span></header>
+${renderHorseCards()}
+</section>
+<section class="card scoreSection" aria-labelledby="raceScore"><h2 id="raceScore">所持金</h2>${renderScoreBoard()}</section>
+</div>
+<div class="raceExtras">
+<details class="homeHow" id="raceLog" ${openPanels.has("raceLog")?"open":""}><summary><b>このレースの記録</b><span class="tiny" aria-hidden="true"></span></summary>${renderLogSection()}</details>
+<details class="homeHow openSection" id="raceGuide" ${openPanels.has("raceGuide")?"open":""}><summary><b>配当表</b><span class="tiny" aria-hidden="true"></span></summary>${renderPayoutGuide()}</details>
+<details class="homeHow" id="raceSettings" ${openPanels.has("raceSettings")?"open":""}><summary><b>CPUの設定</b><span class="tiny" aria-hidden="true"></span></summary>${renderRaceControl()}</details>
+${renderHow()}
+</div>
+${renderActionPanel()}`;
 }
 function renderLogSection(){
 if(isSecretBetPhase(room)){
@@ -2559,7 +2899,7 @@ return`<section class="card scoreGrid">${sorted.map(p=>`<div class="playerBox ${
 }
 function renderRaceControl(){
 const speed=room.settings?.cpuSpeed||"normal";
-return`<section class="card"><div class="row between"><b>第${room.raceNo}レース</b><span class="pill">${room.raceNo===3?"3R：すべて2倍":"通常レース"}</span></div><label class="small" style="display:block;margin-top:8px"><b>CPU速度</b><select id="cpuSpeedGame" ${!isHost()?"disabled":""}><option value="normal" ${speed==="normal"?"selected":""}>普通</option><option value="fast" ${speed==="fast"?"selected":""}>早い</option><option value="instant" ${speed==="instant"?"selected":""}>最速</option></select></label><div class="row" style="margin-top:8px"><button id="toggleBgm" class="secondary"><svg class="ic"><use href="#ic-music"/></svg> BGM ${bgmOn?"OFF":"ON"}</button><button id="quitToTop" class="secondary"><svg class="ic"><use href="#ic-exit"/></svg> ゲームをやめる</button></div></section>`;
+return`<label class="small cpuControl"><b>行動の速さ</b><select id="cpuSpeedGame" ${!isHost()?"disabled":""}><option value="normal" ${speed==="normal"?"selected":""}>普通</option><option value="fast" ${speed==="fast"?"selected":""}>早い</option><option value="instant" ${speed==="instant"?"selected":""}>最速</option></select></label>`;
 }
 const DIE_TEX={};
 // 絵文字をシルエット化（source-in で単色塗り）
@@ -2717,12 +3057,12 @@ placed[pos].push(hid);
 const canMoveNow=room.phase==="racing"&&room.race.dice&&!room.race.diceRolling&&!animationState&&canControlPlayer(currentPlayer(room));
 const moveSet=canMoveNow?new Set(activeCards(clone(room)).map(c=>c.horse)):new Set();
 return`<section class="card trackCard"><div class="trackBoard">${renderCenter()}${renderDiceArena()}${trackSpaces().map(sp=>{const horses=placed[sp.no]||[],cls=`trackSpace ${sp.no===GOAL_LINE?"finish":""} ${sp.no===PACE_SPACE?"pace":""}`;const faceLeft=sp.no>=12&&sp.no<=29;return`<div class="${cls}" style="left:${sp.x}%;top:${sp.y}%"><div class="num">${sp.no}</div><div class="lab">${sp.no===GOAL_LINE?"GOAL":sp.no===PACE_SPACE?"PACE":""}</div><div class="slot">${horses.map(hid=>{const hi=horseInfo(hid),c=horseCard(hid),lastMove=room.race.lastMove||{},latest=lastMove.horse===hid,canMv=moveSet.has(hid);// 伏せ馬（正体不明の特別馬）も専用スプライトにする。写真フォールバックだとデフォルメ馬の中で1頭だけ浮くため。
-const secret=!!c?.secret;const kind="sprite "+(faceLeft?"spf-":"sp-")+(secret?"secret":hid);return`<span class="pony ${kind} ${canMv?"movePony clickable":""} ${room.race.paceHorse===hid?"paceLeader":""} ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" data-horse="${hid}" title="${c?.name||hi.label}"></span>`}).join("")}</div></div>`}).join("")}</div>${renderHorseCards()}</section>`;
+const secret=!!c?.secret;const kind="sprite "+(faceLeft?"spf-":"sp-")+(secret?"secret":hid);return`<span class="pony ${kind} ${canMv?"movePony clickable":""} ${room.race.paceHorse===hid?"paceLeader":""} ${latest?"latest":""} ${latest&&lastMove.blocked?"blocked":""} ${animationState?.horse===hid?"anim":""} ${c?.moved?"moved":""}" style="--horse-color:${hi.color}" data-horse="${hid}" title="${c?.name||hi.label}"></span>`}).join("")}</div></div>`}).join("")}</div></section>`;
 }
 function renderHorseCards(){
 const isBet=room.phase==="betting"&&canControlPlayer(currentBetPlayer(room));
 const used=isBet?alreadyBetHorses(room,currentBetPlayer(room).id):new Set();
-const isRace=room.phase==="racing"&&canControlPlayer(currentPlayer(room));
+const isRace=room.phase==="racing"&&!room.race.diceRolling&&!animationState&&canControlPlayer(currentPlayer(room));
 const activeIds=isRace&&room.race.dice?new Set(activeCards(clone(room)).map(c=>c.horse)):new Set();
 const hideBets=room.phase==="betting"&&room.raceNo===3&&!room.settings?.singleDevice;
 return`<div class="cardStrip">${room.race.cards.map(c=>{
@@ -2730,18 +3070,24 @@ const h=horseInfo(c.horse);
 const canBet=isBet&&!used.has(c.horse);
 const canMove=isRace&&room.race.dice&&activeIds.has(c.horse);
 const bets=room.race.bets.filter(b=>b.horse===c.horse);
-return`<div class="horseCard ${room.race.paceHorse===c.horse?"paceHorseCard":""} ${c.secret?"secretHorse":""} ${c.moved?"moved":""} ${canBet?"clickable betCard":""} ${canMove?"clickable moveCard":""} ${used.has(c.horse)?"selected":""}" data-horse="${c.horse}">
-<div class="horsePortrait ${c.secret?'secret':''}" style="--pony-art:url('${horseSpriteUrl(c.secret?'secret':c.horse,false,true)}')"><span class="hpFlag" style="background:${h.color}"></span><span class="hpName">${c.name}</span></div>
+const preview=canMove?previewMove(c):null;
+const actionLabel=canBet?"チップを置く":preview?(preview.zero?"現在のマスにとどまる":preview.to==="GOAL"?"ゴールへ":`${preview.to}マス目へ`):"";
+const selected=used.has(c.horse);
+const cardName=escapeHtml(c.name);
+return`<div class="horseCard ${room.race.paceHorse===c.horse?"paceHorseCard":""} ${c.secret?"secretHorse":""} ${c.moved?"moved":""} ${canBet?"clickable betCard":""} ${canMove?"clickable moveCard":""} ${used.has(c.horse)?"selected":""}" data-horse="${c.horse}" ${actionLabel?`role="button" tabindex="0" aria-label="${cardName} ・ ${actionLabel}"`:""}>
+<div class="horsePortrait ${c.secret?'secret':''}" style="--pony-art:url('${horseSpriteUrl(c.secret?'secret':c.horse,false,true)}')" aria-hidden="true"><span class="hpFlag" style="background:${h.color}"></span></div>
+<b class="horseCaption">${cardName}</b>
 ${room.race.paceHorse===c.horse?`<div class="paceBadge paceHorseBadge"><svg class="ic"><use href="#ic-crown"/></svg> ペースホース</div>`:""}
 ${c.secret?`<div class="paceBadge"><svg class="ic"><use href="#ic-star"/></svg> 配当2倍</div>`:""}
-<div class="moves"><span><i>${face("horse")}</i><b>${c.moves.horse}</b></span><span><i>${face("cap")}</i><b>${c.moves.cap}</b></span><span><i>${face("carrot")}</i><b>${c.moves.carrot}</b></span><span><i>${face("weather")}</i><b>${c.moves.weather}</b></span></div>
+<div class="moves">${Object.entries({horse:"馬",cap:"ジョッキー",carrot:"人参",weather:"天候"}).map(([key,label])=>`<span class="${room.phase==="racing"&&room.race.dice===key&&!room.race.diceRolling?"rolled":""}" title="${label}"><i>${face(key)}</i><b>${c.moves[key]}</b></span>`).join("")}</div>
 <div class="betMini">${
-hideBets?`<span class="pill">BET非公開</span>`:bets.map(b=>{const p=room.players.find(x=>x.id===b.playerId);return`<span class="pill">${escapeHtml(p?.name||"?")} ${b.chip}</span>`}).join("")
+hideBets?"":bets.map(b=>{const p=room.players.find(x=>x.id===b.playerId);return`<span class="pill">${escapeHtml(p?.name||"?")} ${b.chip}</span>`}).join("")
 }</div>
+${actionLabel||selected?`<span class="horseActionHint">${selected?"配置済み":actionLabel}</span>`:""}
 </div>`;
 }).join("")}</div>`;
 }
-function renderPayoutGuide(){return`<section class="card payoutGuideCard"><b>配当表</b>${payoutTable()}</section>`}
+function renderPayoutGuide(){return`<div class="payoutGuideCard">${payoutTable()}</div>`}
 function resultIsReady(){return !animationState&&Date.now()>=(room?.race?.resultReadyAt||0)}
 let resultTimer=null;
 function scheduleResultRefresh(){
@@ -2761,37 +3107,39 @@ if(room.phase==="betting")return renderBetAction();
 if(room.phase==="racing")return renderRaceAction();
 if(room.phase==="payout"){
 if(!resultIsReady()){scheduleResultRefresh();return`<section class="actions"><div class="resultHold">結果発表中…</div></section>`}
-return`<section class="actions"><div class="primaryActionRow"><button id="nextRace" class="good" ${!isHost()?"disabled":""}>次のレースへ</button></div></section>`;
+return isHost()?`<section class="actions"><div class="primaryActionRow"><button id="nextRace" class="good">第${room.raceNo+1}レースへ</button></div></section>`:turnCaption("主催者が次のレースを始めます");
 }
 if(room.phase==="gameover"){
 if(!resultIsReady()){scheduleResultRefresh();return`<section class="actions"><div class="resultHold">優勝者発表中…</div></section>`}
-return`<section class="actions"><div class="primaryActionRow"><button id="backToLobby" ${!isHost()?"disabled":""}>ロビーに戻る</button></div></section>`;
+return isHost()?`<section class="actions"><div class="primaryActionRow"><button id="backToLobby">ロビーに戻る</button></div></section>`:turnCaption("主催者がロビーに戻るまでお待ちください");
 }
 return"";
+}
+function turnCaption(title,description="",showCards=false,dark=false){
+return`<section class="actions ${dark?"betActions":""}"><div class="betGuide" ${dark?"":'style="color:var(--ink)"'}><div class="actionCaption" role="status"><strong>${title}</strong>${description?`<small>${description}</small>`:""}</div>${showCards?`<button type="button" data-go-cards class="secondary">出走馬を見る</button>`:""}</div></section>`;
 }
 function renderBetAction(){
 const p=currentBetPlayer(room);
 if(!p)return"";
 if(!canControlPlayer(p)){
-return`<section class="actions"><div class="resultHold">${p.type==="cpu"?cpuOperatingLabel(p,"チップを置く馬を考えています。"):`${escapeHtml(p.name)} の操作待ち…`}</div></section>`;
+return turnCaption(p.type==="cpu"?cpuOperatingLabel(p,"") : `${escapeHtml(p.name)} が予想中`,"チップを置く馬を選んでいます。");
 }
 const chip=nextChip(room,p.id);
-const blind=room.raceNo===3&&!room.settings?.singleDevice?`<br><span class="small">オンライン対戦の最終レースはBET非公開です</span>`:"";
-return`<section class="actions betActions"><div class="betGuide">${escapeHtml(p.name)} のBET：<b>${chip}</b>チップを置く馬カードをタップ<br><span class="small">同じ馬には2枚置けません</span>${blind}</div></section>`;
+const hidden=room.raceNo===3&&!room.settings?.singleDevice;
+return turnCaption(`${escapeHtml(p.name)}：${chip}チップを置く`,hidden?"最終レースの予想は非公開です。":"同じ馬には1枚まで。",true,true);
 }
 function renderRaceAction(){
 const p=currentPlayer(room);
-if(animationState)return"";
-if(room.race.diceRolling){
-return`<section class="actions"><div class="betGuide" style="color:var(--ink)"><svg class="ic"><use href="#ic-dice"/></svg> ${p?.type==="cpu"?cpuOperatingLabel(p,"サイコロを盤上で回しています。"):`${escapeHtml(p?.name||"")} のサイコロが盤上で回転中…`}</div></section>`;
+const name=escapeHtml(p?.name||"");
+if(animationState)return turnCaption(`${escapeHtml(horseDisplayName(animationState.horse))} が走行中`);
+if(room.race.diceRolling)return turnCaption(`${name} がサイコロを振っています`);
+if(!canControlPlayer(p)){
+return turnCaption(p?.type==="cpu"?cpuOperatingLabel(p,""):`${name} の手番`,room.race.dice?"進める馬を選んでいます。":"サイコロを振るのを待っています。");
 }
 if(room.race.dice){
-return`<section class="actions"><div class="betGuide" style="color:var(--ink)">${p?.type==="cpu"?cpuOperatingLabel(p,"進める馬を考えています。"):`${escapeHtml(p?.name||"")}：<b>盤面の光る馬</b>か<b>下の馬カード</b>をタップして発走！`}</div></section>`;
+return turnCaption(`${name}：進める馬を選ぶ`,"光る駒か、出走馬カードをタップ。",true);
 }
-if(!canControlPlayer(p)){
-return`<section class="actions"><div class="resultHold">${p?.type==="cpu"?cpuOperatingLabel(p,"順番が来ています。"):`${escapeHtml(p?.name||"")} のターン待ち…`}</div></section>`;
-}
-return`<section class="actions"><button id="rollDice" class="diceStageButton">${die3d("idle")}<div><div class="diceText">${escapeHtml(p.name)}：サイコロを振る</div><div class="diceFaces">${face("horse")}×3<span>/</span>${face("cap")}<span>/</span>${face("carrot")}<span>/</span>${face("weather")}</div></div></button></section>`;
+return`<section class="actions"><button id="rollDice" class="diceStageButton">${die3d("idle")}<div class="diceText">${name}：サイコロを振る</div></button></section>`;
 }
 function renderPayout(){
 if(!room.race?.payout)return"";
@@ -2803,7 +3151,7 @@ const last=room.race.lastHorse;
 const winner=[...room.players].sort((a,b)=>b.money-a.money)[0];
 const medalColors=["#d9a82e","#9aa4b2","#b9722d"];
 const raceResult=`<section class="card resultShow"><div class="resultTitle">第${room.raceNo}レース 結果発表</div><div class="podiumGrid">${podium.map((hid,i)=>`<div class="podiumCard ${i===0?"first":""}"><div class="podiumRank" style="color:${medalColors[i]}"><svg class="ic"><use href="#ic-seal"/></svg><span class="podiumRankNo">${i+1}着</span></div><div class="podiumHorse">${escapeHtml(horseDisplayName(hid))}</div></div>`).join("")}</div><div class="lastCard">ビリ：${last?escapeHtml(horseDisplayName(last)):"-"}</div></section>`;
-const winnerBlock=room.phase==="gameover"?`<section class="card winnerCelebration"><img class="winnerShot" src="assets/winner.jpg" alt="優勝" loading="lazy"><div class="winnerTrophy"><svg class="ic"><use href="#ic-trophy"/></svg></div><div class="winnerName">${escapeHtml(winner.name)} 優勝！</div><div class="winnerSub">最終所持金 ¥${winner.money}</div></section>`:"";
+const winnerBlock=room.phase==="gameover"?`<section class="card winnerCelebration"><div class="winnerTrophy"><svg class="ic"><use href="#ic-trophy"/></svg></div><div class="winnerName">${escapeHtml(winner.name)} 優勝！</div><div class="winnerSub">最終所持金 ¥${winner.money}</div></section>`:"";
 return`${raceResult}${winnerBlock}<section class="card"><b>${room.phase==="gameover"?"最終結果":"払い戻し"}</b><div class="grid" style="margin-top:10px">${room.race.payout.playerResults.map(res=>`<div class="playerBox"><div class="row between"><b>${escapeHtml(res.name)}</b><span class="money">${res.net>=0?"+":""}${res.net} → ¥${res.after}</span></div><div class="tiny">${res.details.length?escapeHtml(res.details.join(" / ")):"的中・支払いなし"}</div></div>`).join("")}</div></section>`;
 }
 
@@ -2850,6 +3198,17 @@ function stopBgm(){bgmOn=false;clearInterval(bgmTimer);render()}
 function toggleBgm(){bgmOn?stopBgm():startBgm()}
 
 function bindEvents(){
+appEl.querySelectorAll("details[id]").forEach(panel=>panel.addEventListener("toggle",()=>{
+if(!panel.isConnected)return;
+if(panel.open)openPanels.add(panel.id);
+else openPanels.delete(panel.id);
+}));
+document.querySelectorAll("[data-entry]").forEach(btn=>btn.addEventListener("click",()=>{if(!entering)setEntryMode(btn.dataset.entry)}));
+document.getElementById("roomCode")?.addEventListener("keydown",e=>{
+if(e.key==="Enter"&&!e.isComposing&&entryMode==="online")void enterRoom(joinRoom);
+});
+document.getElementById("copyInvite")?.addEventListener("click",copyInvite);
+document.querySelector("[data-go-cards]")?.addEventListener("click",()=>document.querySelector(".raceProgram").scrollIntoView({behavior:"smooth",block:"start"}));
 document.getElementById("createRoom")?.addEventListener("click",()=>enterRoom(createRoom));
 document.getElementById("joinRoom")?.addEventListener("click",()=>enterRoom(joinRoom));
 document.getElementById("addCpu")?.addEventListener("click",addCpu);
@@ -2864,43 +3223,77 @@ document.getElementById("startGame")?.addEventListener("click",startGame);
 document.getElementById("rollDice")?.addEventListener("click",rollDice);
 document.getElementById("nextRace")?.addEventListener("click",nextRace);
 document.getElementById("backToLobby")?.addEventListener("click",backToLobby);
-document.getElementById("quitToTop")?.addEventListener("click",quitToTop);
-document.querySelectorAll("#toggleBgm").forEach(btn=>btn.addEventListener("click",toggleBgm));
-document.querySelectorAll(".betCard").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();placeBet(el.dataset.horse)}));
-document.querySelectorAll(".moveCard").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();moveHorse(el.dataset.horse)}));
+document.querySelectorAll(".betCard,.moveCard").forEach(el=>{
+const choose=()=>el.classList.contains("betCard")?placeBet(el.dataset.horse):moveHorse(el.dataset.horse);
+el.addEventListener("click",choose);
+el.addEventListener("keydown",e=>{
+if(!["Enter"," "].includes(e.key)||e.repeat)return;
+e.preventDefault();
+void choose();
+});
+});
 document.querySelectorAll(".pony.movePony").forEach(el=>el.addEventListener("click",e=>{e.stopPropagation();moveHorse(el.dataset.horse)}));
 document.querySelectorAll("button").forEach(btn=>btn.addEventListener("click",()=>playEffect("click")));
 }
 document.addEventListener("pointerdown",()=>resumeLocalIfInactive(),{passive:true});
 document.addEventListener("keydown",()=>resumeLocalIfInactive());
 
-// ===== あそびば top-bar chrome (navigation only; bound once, does not touch game logic) =====
-function syncTopBgm(){
-const b=document.getElementById("topBgm");
-if(b)b.classList.toggle("on",bgmOn);
+async function copyInvite(){
+const url=new URL(location.href);
+url.hash=room.code;
+try{
+await navigator.clipboard.writeText(url.href);
+asobibaToast("招待リンクをコピーしました");
+}catch{
+asobibaToast(`リンクはコピーできませんでした。部屋番号は ${room.code} です。`,{kind:"warn"});
 }
-document.getElementById("topBgm")?.addEventListener("click",()=>{toggleBgm();syncTopBgm()});
-document.getElementById("topRules")?.addEventListener("click",()=>{
-playEffect("click");
-const how=document.getElementById("howToSection");
-if(how){if("open" in how)how.open=true;how.scrollIntoView({behavior:"smooth",block:"start"});return}
-const guide=document.querySelector(".payoutGuideCard");
-if(guide)guide.scrollIntoView({behavior:"smooth",block:"center"});
+}
+function syncTopBgm(){
+const button=document.getElementById("topBgm");
+button.setAttribute("aria-pressed",String(bgmOn));
+button.querySelector("span").textContent=bgmOn?"BGMをオフ":"BGMをオン";
+}
+document.getElementById("topBgm").addEventListener("click",()=>{
+toggleBgm();
+topMenu.open=false;
 });
-
+document.getElementById("topRules").addEventListener("click",()=>{
+playEffect("click");
+topMenu.open=false;
+const how=document.getElementById("howToSection");
+if(how){how.open=true;how.scrollIntoView({behavior:"smooth",block:"start"})}
+});
+document.getElementById("topQuit").addEventListener("click",()=>{
+topMenu.open=false;
+void quitToTop();
+});
+document.addEventListener("pointerdown",e=>{
+if(!topMenu.contains(e.target))topMenu.open=false;
+});
+topMenu.addEventListener("keydown",e=>{
+if(e.key!=="Escape")return;
+topMenu.open=false;
+topMenu.querySelector("summary").focus();
+});
 let entering=false;
 async function enterRoom(action){
 if(entering)return;
 entering=true;
-const buttons=["createRoom","joinRoom"].map(id=>document.getElementById(id)).filter(Boolean);
+const buttons=[...document.querySelectorAll("#createRoom,#joinRoom,[data-entry]")];
 buttons.forEach(b=>{b.disabled=true});
+const hint=document.getElementById("entryHint");
+if(hint&&entryMode==="online")hint.textContent="部屋に接続中…";
 try{await action()}catch(err){
 online=false;
 asobibaToast(err.message==="ROOM_IN_USE"?"この番号は使用中です。参加するか、別の番号で作成してください。":"接続できませんでした。通信を確認するか、オフライン対戦を選んでください。",{kind:"warn"});
-}finally{entering=false;buttons.forEach(b=>{b.disabled=false})}
+}finally{
+entering=false;
+buttons.forEach(b=>{b.disabled=false});
+if(hint?.isConnected)hint.textContent=entryHint();
+}
 }
 render();
-if(roomCode)void enterRoom(async()=>{
+if(/^\d{4}$/.test(roomCode)&&(/^local-/i.test(initialHash)||localName))void enterRoom(async()=>{
 let local=/^local-/i.test(initialHash);
 if(!local){
 try{
